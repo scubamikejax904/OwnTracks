@@ -1,5 +1,5 @@
 /**
- *  Copyright 2024 Lyle Pakula
+ *  Copyright 2026 Lyle Pakula
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -14,30 +14,29 @@
  *
  *  Connects OwnTracks push events to virtual presence drivers.
  *
- *
  *  // events are received with the following structure
  *  For 'Location':
  *  [
- *      _type:location, 			    // beacon, card, cmd, configuration, encrypted, location, lwt, transition, waypoint, waypoints
- *      acc:12, 					    // accuracy (m)
- *      vac:0, 						    // vertical accuracy of the alt element (m)
- *      tst:1698361486, 			    // UNIX epoch timestamp in seconds of the location fix
- *      created_at:1698361612, 		    // identifies the time at which the message is constructed (vs. tst which is the timestamp of the GPS fix)
- *      alt:1000, 					    // altitude
- *      lat:50.0000000,				    // latitude
- *      lon:-100.0000000, 			    // longitude
- *      inregions:[Home,City],   	    // Current region
- *      topic:owntracks/User/Panther, 	// MQTT topic:  owntracks/<username>/<deviceID>
- *      batt:79, 					    // battery %
- *      bs:1, 						    // Battery Status 0=unknown, 1=unplugged, 2=charging, 3=full
- *      tid:45, 					    // tracker ID
- *      conn:w, 					    // connection type: w=wifi, m=mobile data
- *      vel:0, 						    // velocity (kph)
- *      cog:180,       				    // bearing (degrees)
- *      BSSID:11:22:33:44:55:66, 	    // WiFi AP MAC
- *      SSID:WIFIAP,     			    // WiFi AP SSID
- *      t:u, 						    // trigger: p=ping, c=region, r=reportLocation, u=manual
- *      m:1, 						    // identifies the monitoring mode at which the message is constructed (significant=1, move=2)
+ *      _type:location,                 // beacon, card, cmd, configuration, encrypted, location, lwt, transition, waypoint, waypoints
+ *      acc:12,                         // accuracy (m)
+ *      vac:0,                          // vertical accuracy of the alt element (m)
+ *      tst:1698361486,                 // UNIX epoch timestamp in seconds of the location fix
+ *      created_at:1698361612,          // identifies the time at which the message is constructed (vs. tst which is the timestamp of the GPS fix)
+ *      alt:1000,                       // altitude
+ *      lat:50.0000000,                 // latitude
+ *      lon:-100.0000000,               // longitude
+ *      inregions:[Home,City],          // Current region
+ *      topic:owntracks/User/Panther,   // MQTT topic:  owntracks/<username>/<deviceID>
+ *      batt:79,                        // battery %
+ *      bs:1,                           // Battery Status 0=unknown, 1=unplugged, 2=charging, 3=full
+ *      tid:45,                         // tracker ID
+ *      conn:w,                         // connection type: w=wifi, m=mobile data
+ *      vel:0,                          // velocity (kph)
+ *      cog:180,                        // bearing (degrees)
+ *      BSSID:11:22:33:44:55:66,        // WiFi AP MAC
+ *      SSID:WIFIAP,                    // WiFi AP SSID
+ *      t:u,                            // trigger: p=ping, c=region, r=reportLocation, u=manual
+ *      m:1,                            // identifies the monitoring mode at which the message is constructed (significant=1, move=2)
  *      hib:0,                          // App can pause when unused (1=yes, 0=no)
  *      ps:0,                           // Phone is in power save mode (1=yes, 0=no)
  *      bo:0,                           // App has battery optimizations (1=restricted/optimized, 0=unrestricted)
@@ -71,7 +70,6 @@
  *      // added to packet
  *      currentDistanceFromHome:0.234,
  *  ]
- *
  *
  *  Author: Lyle Pakula (lpakula)
  *
@@ -155,16 +153,16 @@
 import java.text.SimpleDateFormat
 import groovy.transform.Field
 
-def driverVersion() { return "1.8.12" }
+def driverVersion() { return '1.8.12' }
 
-@Field static final Map MONITORING_MODE = [ 0: "Unknown", 1: "Significant", 2: "Move" ]
-@Field static final Map BATTERY_STATUS = [ 0: "Unknown", 1: "Unplugged", 2: "Charging", 3: "Full" ]
-@Field static final Map DATA_CONNECTION = [ "w": "WiFi", "m": "Mobile", "o": "Offline"  ]
-@Field static final Map TRIGGER_TYPE = [ "p": "Ping", "c": "Region", "r": "Report Location", "u": "Manual", "b": "Beacon", "t": "Timer", "v": "Monitoring", "l": "Region" ]
-@Field static final Map PRESENCE_TILE_BATTERY_FIELD = [ 0: "Battery %", 1: "Current Location and Since Time", 2: "Distance from Home", 3: "Last Speed", 4: "Battery Status (Unplugged/Charging/Full)", 5: "Data Connection (WiFi/Mobile)", 6: "Update Trigger (Ping/Region/Report Location/Manual)", 7: "Distance from Home and Since Time" ]
-@Field static final Map LOCATION_PERMISION = [ "0": "Background - Fine", "-1": "Background - Coarse", "-2": "Foreground - Fine", "-3": "Foreground - Coarse", "-4": "Disabled" ]
-@Field static final Map TRANSITION_DIRECTION = [ "enter": "arrived", "leave": "departed" ]
-@Field static final Map TRANSITION_PHRASES = [ "enter": "arrived at", "leave": "departed from" ]
+@Field static final Map MONITORING_MODE = [ 0: 'Unknown', 1: 'Significant', 2: 'Move' ]
+@Field static final Map BATTERY_STATUS = [ 0: 'Unknown', 1: 'Unplugged', 2: 'Charging', 3: 'Full' ]
+@Field static final Map DATA_CONNECTION = [ 'w': 'WiFi', 'm': 'Mobile', 'o': 'Offline'  ]
+@Field static final Map TRIGGER_TYPE = [ 'p': 'Ping', 'c': 'Region', 'r': 'Report Location', 'u': 'Manual', 'b': 'Beacon', 't': 'Timer', 'v': 'Monitoring', 'l': 'Region' ]
+@Field static final Map PRESENCE_TILE_BATTERY_FIELD = [ 0: 'Battery %', 1: 'Current Location and Since Time', 2: 'Distance from Home', 3: 'Last Speed', 4: 'Battery Status (Unplugged/Charging/Full)', 5: 'Data Connection (WiFi/Mobile)', 6: 'Update Trigger (Ping/Region/Report Location/Manual)', 7: 'Distance from Home and Since Time' ]
+@Field static final Map LOCATION_PERMISION = [ '0': 'Background - Fine', '-1': 'Background - Coarse', '-2': 'Foreground - Fine', '-3': 'Foreground - Coarse', '-4': 'Disabled' ]
+@Field static final Map TRANSITION_DIRECTION = [ 'enter': 'arrived', 'leave': 'departed' ]
+@Field static final Map TRANSITION_PHRASES = [ 'enter': 'arrived at', 'leave': 'departed from' ]
 
 @Field Boolean DEFAULT_presenceTileBatteryField = 0
 @Field Boolean DEFAULT_displayExtendedAttributes = true
@@ -175,96 +173,96 @@ def driverVersion() { return "1.8.12" }
 @Field Boolean DEFAULT_debugOutput = false
 @Field Boolean DEFAULT_debugLogAddresses = false
 @Field Boolean DEFAULT_logLocationChanges = false
-@Field String  DEFAULT_privateLocation = "Private"
+@Field String  DEFAULT_privateLocation = 'Private'
 @Field Boolean DEFAULT_lastLocationViewTracks = false
 @Field Number  DEFAULT_pastLocationSearchWindow = 0.5
 @Field Number  DEFAULT_notificationHysteresisSeconds = 90
 
 metadata {
-  definition (
-      name:        "OwnTracks Driver",
-      namespace:   "lpakula",
-      author:      "Lyle Pakula",
-      importUrl:   "https://raw.githubusercontent.com/wir3z/hubitat/main/owntracks-hubitat/OwnTracks%20Driver.groovy"
+    definition(
+      name:        'OwnTracks Driver',
+      namespace:   'lpakula',
+      author:      'Lyle Pakula',
+      importUrl:   'https://raw.githubusercontent.com/wir3z/hubitat/main/owntracks-hubitat/OwnTracks%20Driver.groovy'
   ) {
-        capability "Actuator"
-        capability "Presence Sensor"
-        capability "Battery"
-        capability "Switch"
+        capability 'Actuator'
+        capability 'Presence Sensor'
+        capability 'Battery'
+        capability 'Switch'
 
-        command    "arrived"
-        command    "departed"
-        command    "createMemberTile"
+        command    'arrived'
+        command    'departed'
+        command    'newMemberTile'
 
-        attribute  "switch", "string"
+        attribute  'switch', 'string'
 
-        attribute  "location", "string"
-        attribute  "transitionRegion", "string"
-        attribute  "transitionTime", "string"
-        attribute  "transitionDirection", "string"
-        attribute  "since", "string"
-        attribute  "sinceTime", "number"
-        attribute  "battery", "number"
-        attribute  "lastSpeed", "number"
-        attribute  "distanceFromHome", "number"
-        attribute  "wifi", "string"
-        attribute  "lastLocationtime", "string"
-        attribute  "imperialUnits", "string"
+        attribute  'location', 'string'
+        attribute  'transitionRegion', 'string'
+        attribute  'transitionTime', 'string'
+        attribute  'transitionDirection', 'string'
+        attribute  'since', 'string'
+        attribute  'sinceTime', 'number'
+        attribute  'battery', 'number'
+        attribute  'lastSpeed', 'number'
+        attribute  'distanceFromHome', 'number'
+        attribute  'wifi', 'string'
+        attribute  'lastLocationtime', 'string'
+        attribute  'imperialUnits', 'string'
 
-        attribute  "batterySaver", "string"
-        attribute  "hiberateAllowed", "string"
-        attribute  "batteryOptimizations", "string"
-        attribute  "locationPermissions", "string"
-        attribute  "mobileAppVersion", "string"
+        attribute  'batterySaver', 'string'
+        attribute  'hiberateAllowed', 'string'
+        attribute  'batteryOptimizations', 'string'
+        attribute  'locationPermissions', 'string'
+        attribute  'mobileAppVersion', 'string'
 
-        attribute  "MemberLocation", "string"
-        attribute  "PastLocations", "string"
-        attribute  "PresenceTile", "string"
+        attribute  'MemberLocation', 'string'
+        attribute  'PastLocations', 'string'
+        attribute  'PresenceTile', 'string'
 
         // extended attributes
-        attribute  "lat", "number"
-        attribute  "lon", "number"
-        attribute  "accuracy", "number"
-        attribute  "bearing", "number"
-        attribute  "verticalAccuracy", "number"
-        attribute  "altitude", "number"
-        attribute  "sourceTopic", "string"
-        attribute  "BSSID", "string"
-        attribute  "SSID", "string"
-        attribute  "address", "string"
-        attribute  "streetAddress", "string"
-        attribute  "dataConnection", "enum", [ "WiFi", "Mobile" ]
-        attribute  "batteryStatus", "enum", [ "Unknown", "Unplugged", "Charging", "Full" ]
-        attribute  "triggerSource", "enum", [ "Ping", "Region", "Report Location", "Manual", "Beacon", "Timer", "Monitoring", "Location" ]
-        attribute  "monitoringMode", "enum", [ "Unknown", "Significant", "Move" ]
-    }
+        attribute  'lat', 'number'
+        attribute  'lon', 'number'
+        attribute  'accuracy', 'number'
+        attribute  'bearing', 'number'
+        attribute  'verticalAccuracy', 'number'
+        attribute  'altitude', 'number'
+        attribute  'sourceTopic', 'string'
+        attribute  'BSSID', 'string'
+        attribute  'SSID', 'string'
+        attribute  'address', 'string'
+        attribute  'streetAddress', 'string'
+        attribute  'dataConnection', 'enum', [ 'WiFi', 'Mobile' ]
+        attribute  'batteryStatus', 'enum', [ 'Unknown', 'Unplugged', 'Charging', 'Full' ]
+        attribute  'triggerSource', 'enum', [ 'Ping', 'Region', 'Report Location', 'Manual', 'Beacon', 'Timer', 'Monitoring', 'Location' ]
+        attribute  'monitoringMode', 'enum', [ 'Unknown', 'Significant', 'Move' ]
+  }
 }
 
 preferences {
-    input name: "displayExtendedAttributes", type: "bool", title: "Display extended location attributes", defaultValue: DEFAULT_displayExtendedAttributes
-    input name: "displayMemberTile", type: "bool", title: "Create a HTML MemberLocation tile", defaultValue: DEFAULT_displayMemberTile
-    input name: "colorMemberTile", type: "bool", title: "Change MemberTile background color based on presence", defaultValue: DEFAULT_colorMemberTile
-    input name: "displayLastLocationTile", type: "bool", title: "Create a HTML PastLocations tile", defaultValue: DEFAULT_displayLastLocationTile
-    input name: "lastLocationViewTracks", type: "bool", title: "Past locations history defaults to lines instead of points", defaultValue: DEFAULT_lastLocationViewTracks
-    input name: "pastLocationSearchWindow", type: "decimal", title: "PastLocations tile search window start date is this many days from current date (0.1..31)", range: "0.1..31.0", defaultValue: DEFAULT_pastLocationSearchWindow
-    input name: "notificationHysteresisSeconds", type: "number", title: "Number of seconds the member needs to be in the same region before the new transition update is sent (0..300).  Used to address arrived/departed ping-pong notifications, Default ${DEFAULT_notificationHysteresisSeconds} seconds", range: "0..300", defaultValue: DEFAULT_notificationHysteresisSeconds
+    input name: 'displayExtendedAttributes', type: 'bool', title: 'Display extended location attributes', defaultValue: DEFAULT_displayExtendedAttributes
+    input name: 'displayMemberTile', type: 'bool', title: 'Create a HTML MemberLocation tile', defaultValue: DEFAULT_displayMemberTile
+    input name: 'colorMemberTile', type: 'bool', title: 'Change MemberTile background color based on presence', defaultValue: DEFAULT_colorMemberTile
+    input name: 'displayLastLocationTile', type: 'bool', title: 'Create a HTML PastLocations tile', defaultValue: DEFAULT_displayLastLocationTile
+    input name: 'lastLocationViewTracks', type: 'bool', title: 'Past locations history defaults to lines instead of points', defaultValue: DEFAULT_lastLocationViewTracks
+    input name: 'pastLocationSearchWindow', type: 'decimal', title: 'PastLocations tile search window start date is this many days from current date (0.1..31)', range: '0.1..31.0', defaultValue: DEFAULT_pastLocationSearchWindow
+    input name: 'notificationHysteresisSeconds', type: 'number', title: "Number of seconds the member needs to be in the same region before the new transition update is sent (0..300).  Used to address arrived/departed ping-pong notifications, Default ${DEFAULT_notificationHysteresisSeconds} seconds", range: '0..300', defaultValue: DEFAULT_notificationHysteresisSeconds
 
-    input name: "descriptionTextOutput", type: "bool", title: "Enable Description Text logging", defaultValue: DEFAULT_descriptionTextOutput
-    input name: "debugOutput", type: "bool", title: "Enable Debug Logging", defaultValue: DEFAULT_debugOutput
-    input name: "debugLogAddresses", type: "bool", title: "Debug Logging Includes Addesses and Location", defaultValue: DEFAULT_debugLogAddresses
-    input name: "logLocationChanges", type: "bool", title: "Enable Logging of location changes", defaultValue: DEFAULT_logLocationChanges
+    input name: 'descriptionTextOutput', type: 'bool', title: 'Enable Description Text logging', defaultValue: DEFAULT_descriptionTextOutput
+    input name: 'debugOutput', type: 'bool', title: 'Enable Debug Logging', defaultValue: DEFAULT_debugOutput
+    input name: 'debugLogAddresses', type: 'bool', title: 'Debug Logging Includes Addesses and Location', defaultValue: DEFAULT_debugLogAddresses
+    input name: 'logLocationChanges', type: 'bool', title: 'Enable Logging of location changes', defaultValue: DEFAULT_logLocationChanges
 }
 
 def installed() {
     log.info "${device.name}: Location Tracker User Driver Installed"
-    sendEvent( name: "sinceTime", value: now() )
-    sendEvent( name: "switch", value: "off" )
+    sendEvent( name: 'sinceTime', value: now() )
+    sendEvent( name: 'switch', value: 'off' )
     state.driverVersion = driverVersion()
-    state.memberName = ""
-    state.homeName = ""
-    state.pendingTransitionUpdateData = ""
+    state.memberName = ''
+    state.homeName = ''
+    state.pendingTransitionUpdateData = ''
     state.transitionDeadband = 0
-    state.presence = ""
+    state.presence = ''
     updated()
 }
 
@@ -277,30 +275,30 @@ def updated() {
 }
 
 def on() {
-    sendEvent( name: "switch", value: "on" )
+    sendEvent( name: 'switch', value: 'on' )
     logDescriptionText("$device.displayName: switch on")
 }
 
 def off() {
-    sendEvent( name: "switch", value: "off" )
+    sendEvent( name: 'switch', value: 'off' )
     logDescriptionText("$device.displayName: switch off")
 }
 
 def arrived() {
-    updatePresenceEvent("enter", "present", (now()/1000).toInteger())
+    updatePresenceEvent('enter', 'present', (now() / 1000).toInteger())
 }
 
 def departed() {
-    updatePresenceEvent("leave", "not present", (now()/1000).toInteger())
+    updatePresenceEvent('leave', 'not present', (now() / 1000).toInteger())
 }
 
-def createMemberTile() {
+def newMemberTile() {
     generateTiles()
 }
 
 def updatePresenceEvent(dataEvent, presenceState, dataTst) {
-    createTransitionEvent(state.homeName, dataEvent, dataTst)
-    createPresenceEvent(presenceState, dataTst)
+    newTransitionEvent(state.homeName, dataEvent, dataTst)
+    newPresenceEvent(presenceState, dataTst)
     generateTiles()
 }
 
@@ -344,72 +342,72 @@ def updateAttributes(data) {
         deletePrivateExtendedAttributes()
     } else {
         // display the extended attributes if they were received, but only allow them to be removed on non-transition event
-        locationType = (data._type == "location")
-        if (data?.acc)         sendEvent (name: "accuracy", value: parent.displayMFtVal(data.acc))             else if (locationType) device.deleteCurrentState('accuracy')
-        if (data?.vac)         sendEvent (name: "verticalAccuracy", value: parent.displayMFtVal(data.vac))     else if (locationType) device.deleteCurrentState('verticalAccuracy')
-        if (data?.alt)         sendEvent (name: "altitude", value: parent.displayMFtVal(data.alt))             else if (locationType) device.deleteCurrentState('altitude')
-        if (data?.cog)         sendEvent (name: "bearing", value: data.cog)                                    else if (locationType) device.deleteCurrentState('bearing')
+        locationType = (data._type == 'location')
+        if (data?.acc)       { sendEvent(name: 'accuracy', value: parent.displayMFtVal(data.acc)) }           else { if (locationType) { device.deleteCurrentState('accuracy') } }
+        if (data?.vac)       { sendEvent(name: 'verticalAccuracy', value: parent.displayMFtVal(data.vac)) }   else { if (locationType) { device.deleteCurrentState('verticalAccuracy') } }
+        if (data?.alt)       { sendEvent(name: 'altitude', value: parent.displayMFtVal(data.alt)) }           else { if (locationType) { device.deleteCurrentState('altitude') } }
+        if (data?.cog)       { sendEvent(name: 'bearing', value: data.cog) }                                  else { if (locationType) { device.deleteCurrentState('bearing') } }
         if (data?.address) {
-            sendEvent (name: "address", value: data.address)
-            sendEvent (name: "streetAddress", value: data.streetAddress)
+            sendEvent(name: 'address', value: data.address)
+            sendEvent(name: 'streetAddress', value: data.streetAddress)
         } else {
-            if (locationType)  device.deleteCurrentState('address')
-            if (locationType)  device.deleteCurrentState('streetAddress')
+            if (locationType)  { device.deleteCurrentState('address') }
+            if (locationType)  { device.deleteCurrentState('streetAddress') }
         }
 
         // can be updated all the time
-        if (data?.batt)        sendEvent (name: "battery", value: data.batt)                                   else if (locationType) device.deleteCurrentState('battery')
-        if (data?.topic)       sendEvent (name: "sourceTopic", value: data.topic)                              else if (locationType) device.deleteCurrentState('sourceTopic')
-        if (data?.bs)          sendEvent (name: "batteryStatus", value: BATTERY_STATUS[data.bs])               else if (locationType) device.deleteCurrentState('batteryStatus')
-        if (data?.conn)        sendEvent (name: "dataConnection", value: DATA_CONNECTION[data.conn])           else if (locationType) device.deleteCurrentState('dataConnection')
-        if (data?.BSSID)       sendEvent (name: "BSSID", value: data.BSSID)                                    else if (locationType) device.deleteCurrentState('BSSID')
-        if (data?.t)           sendEvent (name: "triggerSource", value: TRIGGER_TYPE[data.t])                  else if (locationType) device.deleteCurrentState('triggerSource')
-        if (data?.m)           sendEvent (name: "monitoringMode", value: MONITORING_MODE[data.m])              else if (locationType) device.deleteCurrentState('monitoringMode')
+        if (data?.batt)      { sendEvent(name: 'battery', value: data.batt) }                           else { if (locationType) { device.deleteCurrentState('battery') } }
+        if (data?.topic)     { sendEvent(name: 'sourceTopic', value: data.topic) }                      else { if (locationType) { device.deleteCurrentState('sourceTopic') } }
+        if (data?.bs)        { sendEvent(name: 'batteryStatus', value: BATTERY_STATUS[data.bs]) }       else { if (locationType) { device.deleteCurrentState('batteryStatus') } }
+        if (data?.conn)      { sendEvent(name: 'dataConnection', value: DATA_CONNECTION[data.conn]) }   else { if (locationType) { device.deleteCurrentState('dataConnection') } }
+        if (data?.BSSID)     { sendEvent(name: 'BSSID', value: data.BSSID) }                            else { if (locationType) { device.deleteCurrentState('BSSID') } }
+        if (data?.t)         { sendEvent(name: 'triggerSource', value: TRIGGER_TYPE[data.t]) }          else { if (locationType) { device.deleteCurrentState('triggerSource') } }
+        if (data?.m)         { sendEvent(name: 'monitoringMode', value: MONITORING_MODE[data.m]) }      else { if (locationType) { device.deleteCurrentState('monitoringMode') } }
     }
     // update the coordinates so the member tile can populate correctly
-    if (data?.lat) sendEvent (name: "lat", value: data.lat)
-    if (data?.lon) sendEvent (name: "lon", value: data.lon)
+    if (data?.lat) { sendEvent(name: 'lat', value: data.lat) }
+    if (data?.lon) { sendEvent(name: 'lon', value: data.lon) }
     // needed for the presence detection check -- if the phone holds onto the SSID, check if we switched to wifi
-    if ((data?.SSID) && ((data?.conn) == "w"))  sendEvent (name: "SSID", value: data.SSID) else if (locationType) device.deleteCurrentState('SSID')
+    if ((data?.SSID) && ((data?.conn) == 'w')) { sendEvent(name: 'SSID', value: data.SSID) }            else { if (locationType) { device.deleteCurrentState('SSID') } }
 }
 
 def updateAdditionalAttributes(member) {
-    sendEvent( name: "imperialUnits", value: parent.isimperialUnits() )
+    sendEvent( name: 'imperialUnits', value: parent.isimperialUnits() )
     if (member?.appVersion != null) {
-        sendEvent( name: "mobileAppVersion", value: member?.appVersion )
+        sendEvent( name: 'mobileAppVersion', value: member?.appVersion )
     } else {
         device.deleteCurrentState('mobileAppVersion')
     }
     // process the additional status information
     if (member?.wifi != null) {
-        sendEvent( name: "wifi", value: (member?.wifi ? "on" : "off") )
+        sendEvent( name: 'wifi', value: (member?.wifi ? 'on' : 'off') )
         if (member?.wifi == 0) {
-            logDebug("Phone has WiFi turned off.  Please turn WiFi on.")
+            logDebug('Phone has WiFi turned off.  Please turn WiFi on.')
         }
     } else {
         device.deleteCurrentState('wifi')
     }
     // only display the extra phone fields if they are in a non-optimal state
     if (member?.ps == 1) {
-        sendEvent( name: "batterySaver", value: "on" )
-        logDebug("Phone is currently in battery saver mode")
+        sendEvent( name: 'batterySaver', value: 'on' )
+        logDebug('Phone is currently in battery saver mode')
     } else {
         device.deleteCurrentState('batterySaver')
     }
     if (member?.bo == 1) {
-        sendEvent( name: "batteryOptimizations", value: "Optimized/Restricted" )
+        sendEvent( name: 'batteryOptimizations', value: 'Optimized/Restricted' )
         logNonOptimalSettings("App setting: 'App battery usage' is 'Optimized' or 'Restricted'.  Please change to 'Unrestricted'")
     } else {
         device.deleteCurrentState('batteryOptimizations')
     }
     if (member?.hib == 1) {
-        sendEvent( name: "hiberateAllowed", value: "App can pause" )
+        sendEvent( name: 'hiberateAllowed', value: 'App can pause' )
         logNonOptimalSettings("App setting: 'Pause app activity if unused' is 'Enabled'.  Please change to 'Disabled'")
     } else {
         device.deleteCurrentState('hiberateAllowed')
     }
     if ((member?.loc != null) && (member?.loc < 0)) {
-        sendEvent( name: "locationPermissions", value: LOCATION_PERMISION["${member?.loc}"])
+        sendEvent( name: 'locationPermissions', value: LOCATION_PERMISION["${member?.loc}"])
         logNonOptimalSettings("Location permissions currently set to '${LOCATION_PERMISION["${member?.loc}"]}'.  Please change to 'Allow all the time' and 'Use precise location'")
     } else {
         device.deleteCurrentState('locationPermissions')
@@ -422,23 +420,23 @@ def getCurrentLocation(data) {
         currentLocation = DEFAULT_privateLocation
     } else {
         // if we have a transition event
-        if (data._type == "transition") {
+        if (data._type == 'transition') {
             currentLocation = data.desc
         } else {
             // default to display the street address if it was reported (or the default lat,lon if no geocodeing was sent from the app)
             currentLocation = data.streetAddress
             // if we are in a region stored in the app
             if (data.inregions) {
-                locationList = ""
-                data.inregions.each { place->
+                locationList = ''
+                data.inregions.each { place ->
                     // filter off the +follow regions
-                    if (place[0] != "+") {
+                    if (place[0] != '+') {
                         locationList += "$place,"
                     }
                 }
                 if (locationList) {
-                	// remove the trailing comma
-	                currentLocation = locationList.substring(0, locationList.length() - 1)
+                    // remove the trailing comma
+                    currentLocation = locationList.substring(0, locationList.length() - 1)
                 }
             }
         }
@@ -446,43 +444,43 @@ def getCurrentLocation(data) {
     return (currentLocation)
 }
 
-def createTransitionEvent(dataRegion, dataEvent, dataTst) {
+def newTransitionEvent(dataRegion, dataEvent, dataTst) {
     // set the deadband to a future time
     state.transitionDeadband = dataTst + (notificationHysteresisSeconds == null ? DEFAULT_notificationHysteresisSeconds : notificationHysteresisSeconds)
     // skip duplicate transition events
     if ((TRANSITION_DIRECTION[dataEvent] != device.currentValue('transitionDirection')) || (dataRegion != device.currentValue('transitionRegion'))) {
-        dataTime = new SimpleDateFormat("E h:mm a yyyy-MM-dd").format(new Date((long)dataTst * 1000))
+        dataTime = new SimpleDateFormat('E h:mm a yyyy-MM-dd').format(new Date((long)dataTst * 1000))
         descriptionText = device.displayName +  " has ${TRANSITION_PHRASES[dataEvent]} " + dataRegion
         logDescriptionText("$descriptionText")
 
-        sendEvent( name: "transitionRegion", value: dataRegion )
-        sendEvent( name: "transitionTime", value: dataTime )
-        sendEvent( name: "transitionDirection", value: TRANSITION_DIRECTION[dataEvent] )
-        sendEvent( name: "sinceTime", value: dataTst )
+        sendEvent( name: 'transitionRegion', value: dataRegion )
+        sendEvent( name: 'transitionTime', value: dataTime )
+        sendEvent( name: 'transitionDirection', value: TRANSITION_DIRECTION[dataEvent] )
+        sendEvent( name: 'sinceTime', value: dataTst )
         parent.generateTransitionNotification(state.memberName, TRANSITION_PHRASES[dataEvent], dataRegion, dataTime)
-	} else {
-    	logDebug("Skipping duplicate transition event '${dataEvent} ${dataRegion} at ${new SimpleDateFormat("E h:mm:ss a yyyy-MM-dd").format(new Date((long)dataTst * 1000))}'.")
-	}
+    } else {
+        logDebug("Skipping duplicate transition event '${dataEvent} ${dataRegion} at ${new SimpleDateFormat('E h:mm:ss a yyyy-MM-dd').format(new Date((long)dataTst * 1000))}'.")
+    }
 }
 
-def createPresenceEvent(presenceState, dataTst) {
+def newPresenceEvent(presenceState, dataTst) {
     // skip duplicate presence events
     if (state.presence != presenceState) {
-        descriptionText = device.displayName + " is " + presenceState
+        descriptionText = device.displayName + ' is ' + presenceState
         state.presence = presenceState
-        sendEvent (name: "presence", value: presenceState, descriptionText: descriptionText )
+        sendEvent(name: 'presence', value: presenceState, descriptionText: descriptionText )
         logDescriptionText("$descriptionText")
         updateSinceTime(dataTst)
         generatePresenceTile()
     } else {
-        logDebug("Skipping duplicate presence event '${state.memberName} ${presenceState}' at ${new SimpleDateFormat("E h:mm:ss a yyyy-MM-dd").format(new Date((long)dataTst * 1000))}.")
+        logDebug("Skipping duplicate presence event '${state.memberName} ${presenceState}' at ${new SimpleDateFormat('E h:mm:ss a yyyy-MM-dd').format(new Date((long)dataTst * 1000))}.")
     }
 }
 
-def updateSinceTime (dataTst) {
+def updateSinceTime(dataTst) {
     // update the timestamp and string date for the last location change
-	sendEvent( name: "sinceTime", value: dataTst )
-    sendEvent( name: "since", value: new SimpleDateFormat("E h:mm a yyyy-MM-dd").format(new Date((long)dataTst * 1000)) )
+    sendEvent( name: 'sinceTime', value: dataTst )
+    sendEvent( name: 'since', value: new SimpleDateFormat('E h:mm a yyyy-MM-dd').format(new Date((long)dataTst * 1000)) )
 }
 
 Boolean generateLocationEvent(member, homeName, data) {
@@ -498,11 +496,9 @@ Boolean generateLocationEvent(member, homeName, data) {
     if (state.homeName != homeName) {
         state.homeName = homeName
     }
-    if (state.transitionDeadband == null) state.transitionDeadband = 0
+    if (state.transitionDeadband == null) { state.transitionDeadband = 0 }
     // allow for a clean migration
-    if (!state.presence) {
-        state.presence = device.currentValue("presence") ?: "" 
-    }
+    state.presence = state.presence ?: (device.currentValue('presence') ?: '')
 
     // update the attributes
     updateAttributes(data)
@@ -511,17 +507,17 @@ Boolean generateLocationEvent(member, homeName, data) {
 
     //logDebug("Member Data: $data")
     if (data.private) {
-        logDebug("Updating '${(data.event ? "Event ${data.event}" : (data.t ? TRIGGER_TYPE[data.t] : "Location"))}' presence for ${device.displayName} -- ${(data.memberAtHome ? "'present'" : "'not present'")}, accuracy: ${parent.displayMFtVal(data.acc)} ${parent.getSmallUnits()} ${(data?.SSID ? ", SSID: ${data.SSID}" : "")}")
+        logDebug("Updating '${(data.event ? "Event ${data.event}" : (data.t ? TRIGGER_TYPE[data.t] : 'Location'))}' presence for ${device.displayName} -- ${(data.memberAtHome ? "'present'" : "'not present'")}, accuracy: ${parent.displayMFtVal(data.acc)} ${parent.smallUnits()} ${(data?.SSID ? ", SSID: ${data.SSID}" : '')}")
     } else {
-        logDebug("Updating '${(data.event ? "Event ${data.event}" : (data.t ? TRIGGER_TYPE[data.t] : "Location"))}' presence for ${device.displayName} -- ${(data.memberAtHome ? "'present'" : "'not present'")} (Home Wifi: ${data.memberWiFiHome}, High Accuracy: ${member.dynamicLocaterAccuracy}), " +
-                 "${parent.displayKmMiVal(data.currentDistanceFromHome)} ${parent.getLargeUnits()} from Home, ${(data.batt != null ? "Battery: ${data.batt}%, ":"")}${(data.vel != null ? "Velocity: ${parent.displayKmMiVal(data.vel)} ${parent.getVelocityUnits()}, ":"")}" +
-                 "accuracy: ${parent.displayMFtVal(data.acc)} ${parent.getSmallUnits() }" +
-                 (debugLogAddresses ? ", Location: [${data.lat},${data.lon}] ${(data?.address ? ", Address: [${data.address}]" : "")} ${(data?.streetAddress ? ", Street Address: [${data.streetAddress}]" : "")} " : "") +
-                 "${(data?.inregions ? ", Regions: ${data.inregions}" : "")} ${(data?.SSID ? ", SSID: ${data.SSID}" : "")} " )
+        logDebug("Updating '${(data.event ? "Event ${data.event}" : (data.t ? TRIGGER_TYPE[data.t] : 'Location'))}' presence for ${device.displayName} -- ${(data.memberAtHome ? "'present'" : "'not present'")} (Home Wifi: ${data.memberWiFiHome}, High Accuracy: ${member.dynamicLocaterAccuracy}), " +
+                 "${parent.displayKmMiVal(data.currentDistanceFromHome)} ${parent.largeUnits()} from Home, ${(data.batt != null ? "Battery : ${data.batt}%, " : '')}${(data.vel != null ? "Velocity : ${parent.displayKmMiVal(data.vel)} ${parent.velocityUnits()}, " : '')}" +
+                 "accuracy: ${parent.displayMFtVal(data.acc)} ${parent.smallUnits() }" +
+                 (debugLogAddresses ? ", Location: [${data.lat},${data.lon}] ${(data?.address ? ", Address: [${data.address}]" : '')} ${(data?.streetAddress ? ", Street Address: [${data.streetAddress}]" : '')} " : '') +
+                 "${(data?.inregions ? ", Regions: ${data.inregions}" : '')} ${(data?.SSID ? ", SSID: ${data.SSID}" : '')} " )
     }
 
     // update the last location time
-    sendEvent( name: "lastLocationtime", value: new SimpleDateFormat("E h:mm a yyyy-MM-dd").format(new Date()) )
+    sendEvent( name: 'lastLocationtime', value: new SimpleDateFormat('E h:mm a yyyy-MM-dd').format(new Date()) )
 
     // get the required data for the current or pending update
     updateData = [
@@ -531,14 +527,14 @@ Boolean generateLocationEvent(member, homeName, data) {
         currentDistanceFromHome: data.currentDistanceFromHome,
         vel: data.vel,
         tst: data.tst,
-        memberPresence: (data.memberAtHome ? "present" : "not present"),
+        memberPresence: (data.memberAtHome ? 'present' : 'not present'),
         memberAtHome: data.memberAtHome,
         currentLocation: getCurrentLocation(data),
         private: data.private,
     ]
 
     // if transition message occurs, we are in the same region and the deadband has not expired
-    if ((data?.desc == device.currentValue("transitionRegion")) && (data.tst < state.transitionDeadband)) {
+    if ((data?.desc == device.currentValue('transitionRegion')) && (data.tst < state.transitionDeadband)) {
         // set the deadband to a future time
         state.transitionDeadband = data.tst + (notificationHysteresisSeconds == null ? DEFAULT_notificationHysteresisSeconds : notificationHysteresisSeconds)
         // store the pending update
@@ -546,9 +542,9 @@ Boolean generateLocationEvent(member, homeName, data) {
         // reschedule a update to trigger after the deadband expires
         unschedule(processScheduledTransitionEvent)
         runIn((state.transitionDeadband - data.tst), processScheduledTransitionEvent)
-        if (!data.private) logDebug("Scheduling transition update for '${data.event} ${data?.desc} at ${new SimpleDateFormat("E h:mm:ss a yyyy-MM-dd").format(new Date((long)data.tst * 1000))}' to occur in ${(state.transitionDeadband - data.tst)} seconds.")
+        if (!data.private) { logDebug("Scheduling transition update for '${data.event} ${data?.desc} at ${new SimpleDateFormat('E h:mm:ss a yyyy-MM-dd').format(new Date((long)data.tst * 1000))}' to occur in ${(state.transitionDeadband - data.tst)} seconds.") }
     } else {
-        if (data._type == "transition") {
+        if (data._type == 'transition') {
             // if we had a pending transition update process it first
             processScheduledTransitionEvent()
         }
@@ -559,8 +555,8 @@ Boolean generateLocationEvent(member, homeName, data) {
     // if we missed a presence change and we don't have a hysteresis event pending
     if ((state.presence != updateData.memberPresence) && (data.tst > state.transitionDeadband)) {
         logDebug("Correcting presence of '${state.memberName}' to '${updateData.memberPresence}'.")
-        createTransitionEvent(state.homeName, (updateData.memberPresence == "present" ? "enter" : "leave"), data.tst)
-        createPresenceEvent(updateData.memberPresence, updateData.tst)
+        newTransitionEvent(state.homeName, (updateData.memberPresence == 'present' ? 'enter' : 'leave'), data.tst)
+        newPresenceEvent(updateData.memberPresence, updateData.tst)
     }
 
     return true
@@ -569,37 +565,37 @@ Boolean generateLocationEvent(member, homeName, data) {
 void processScheduledTransitionEvent() {
     // cancel any pending tranistion updates
     unschedule(processScheduledTransitionEvent)
-	if (state.pendingTransitionUpdateData) processLocationEvent(state.pendingTransitionUpdateData)
+    if (state.pendingTransitionUpdateData) { processLocationEvent(state.pendingTransitionUpdateData) }
     // clear the pending updates
-    state.pendingTransitionUpdateData = ""
+    state.pendingTransitionUpdateData = ''
 }
 
 void processLocationEvent(data) {
     // mask private data
     if (!data.private) {
         // if we have a transition event
-        if (data._type == "transition") {
+        if (data._type == 'transition') {
             // create the notification event, update the transition and log the message
             // prevent a leave event if we are still connected to wifi
-            if ((data.event == "enter") || !data.memberWiFiHome) {
-            	createTransitionEvent(data.desc, data.event, data.tst)
+            if ((data.event == 'enter') || !data.memberWiFiHome) {
+                newTransitionEvent(data.desc, data.event, data.tst)
             }
         } else {
             // only log if there was a location change
-            if (device.currentValue("location") != data.currentLocation) {
-                if (logLocationChanges) log.info "${device.displayName} is at $data.currentLocation"
+            if (device.currentValue('location') != data.currentLocation) {
+                if (logLocationChanges) { log.info "${device.displayName} is at $data.currentLocation" }
                 updateSinceTime(data.tst)
             }
         }
-        sendEvent( name: "distanceFromHome", value: parent.displayKmMiVal(data.currentDistanceFromHome) )
-        sendEvent( name: "lastSpeed", value: (data?.vel ? parent.displayKmMiVal(data.vel).toInteger() : 0) )
+        sendEvent( name: 'distanceFromHome', value: parent.displayKmMiVal(data.currentDistanceFromHome) )
+        sendEvent( name: 'lastSpeed', value: (data?.vel ? parent.displayKmMiVal(data.vel).toInteger() : 0) )
     }
     // we only get .desc on a transition event
     if (state.homeName == data.desc) {
         // trigger a presence update
-        createPresenceEvent(data.memberPresence, data.tst)
+        newPresenceEvent(data.memberPresence, data.tst)
     }
-    sendEvent( name: "location", value: data.currentLocation )
+    sendEvent( name: 'location', value: data.currentLocation )
     // schedule an update to ensure all attributes have been cached
     runIn(1, generateMemberTile)
 }
@@ -615,7 +611,7 @@ def generateTiles() {
 
 def generateMemberTile() {
     if (displayMemberTile) {
-        sendEvent(name: "MemberLocation", value: parent.displayTile(false, "membermap/${state.memberName.toLowerCase()}"), displayed: true)
+        sendEvent(name: 'MemberLocation', value: parent.displayTile(false, "membermap/${state.memberName.toLowerCase()}"), displayed: true)
     } else {
         device.deleteCurrentState('MemberLocation')
     }
@@ -623,36 +619,36 @@ def generateMemberTile() {
 
 def generatePastLocationsTile() {
     if (displayLastLocationTile) {
-        sendEvent(name: "PastLocations", value: parent.displayTile(true, "memberpastlocations/${state.memberName.toLowerCase()}"), displayed: true)
+        sendEvent(name: 'PastLocations', value: parent.displayTile(true, "memberpastlocations/${state.memberName.toLowerCase()}"), displayed: true)
     } else {
         device.deleteCurrentState('PastLocations')
     }
 }
 
 def generatePresenceTile() {
-    sendEvent(name: "PresenceTile", value: parent.displayTile(false, "memberpresence/${state.memberName.toLowerCase()}"), displayed: true)
+    sendEvent(name: 'PresenceTile', value: parent.displayTile(false, "memberpresence/${state.memberName.toLowerCase()}"), displayed: true)
 }
 
 def generateMember(urlSource) {
-    String htmlData = ""
+    String htmlData = ''
     if (device.currentValue('location') != DEFAULT_privateLocation) {
-        long sinceTimeMilliSeconds = device.currentValue("sinceTime")
-        tileDate = new SimpleDateFormat("E h:mm a").format(new Date(sinceTimeMilliSeconds * 1000))
+        long sinceTimeMilliSeconds = device.currentValue('sinceTime')
+        tileDate = new SimpleDateFormat('E h:mm a').format(new Date(sinceTimeMilliSeconds * 1000))
 
         htmlData += """
         <div style="width:100%;height:100%;margin:2px;font-family:arial">
-            <div style="background:${(colorMemberTile ? ((device.currentValue("presence") == "present") ? "green" : "#b40000") : "#555555")}">
+            <div style="background:${(colorMemberTile ? ((device.currentValue('presence') == 'present') ? 'green' : '#b40000') : '#555555')}">
                 <table style="width:100%;font-size:0.8em;color:white">
                     <tr>
                         <td align="left" width=11%>
                             ${parent.insertThumbnailObject(state.memberName, 35, true)}
                         </td>
                         <td align="center" width=79%>
-                            ${device.currentValue("location")}</br>
+                            ${device.currentValue('location')}</br>
                             ${tileDate}</br>
                         </td>
                         <td align="right" width=20%>
-                            ${(colorMemberTile ? "" : ((device.currentValue("presence") == "present") ? "&#10004</br>Present" : "&#10008</br>Not Present"))}
+                            ${(colorMemberTile ? '' : ((device.currentValue('presence') == 'present') ? '&#10004</br>Present' : '&#10008</br>Not Present'))}
                         </td>
                     </tr>
                 </table>
@@ -661,24 +657,24 @@ def generateMember(urlSource) {
                 <table style="position:absolute;width:calc(100% + 650px);height:100%">
                     <tr align="center">
                         <td>
-                            <iframe src="https://maps.google.com/?q=${device.currentValue("lat").toString()},${device.currentValue("lon").toString()}&z=17&output=embed&" style="height:100%;width:100%;border:none;"></iframe>
+                            <iframe src="https://maps.google.com/?q=${device.currentValue('lat')},${device.currentValue('lon')}&z=17&output=embed&" style="height:100%;width:100%;border:none;"></iframe>
                         </td>
                     </tr>
                 </table>
             </div>
             <table style="width:100%;font-size:0.8em;color:white;background:#555555">
-                <caption style="background:#555555">Last Update: ${device.currentValue("lastLocationtime")}</caption>
+                <caption style="background:#555555">Last Update: ${device.currentValue('lastLocationtime')}</caption>
                 <tr align="center">
                     <th width=25%>Distance</th>
-                    ${(device.currentValue("lastSpeed") != null) ? "<th width=25%>Speed</th>" : ""}
-                    ${(device.currentValue("battery") != null) ? "<th width=25%>Battery</th>" : ""}
-                    ${(device.currentValue("dataConnection") != null) ? "<th width=25%>Data</th>" : ""}
+                    ${(device.currentValue('lastSpeed') != null) ? '<th width=25%>Speed</th>' : ''}
+                    ${(device.currentValue('battery') != null) ? '<th width=25%>Battery</th>' : ''}
+                    ${(device.currentValue('dataConnection') != null) ? '<th width=25%>Data</th>' : ''}
                 </tr>
                 <tr align="center">
-                    <td width=25%>${parent.displayKmMiVal(device.currentValue("distanceFromHome"))} ${parent.getLargeUnits()}</td>
-                    ${(device.currentValue("lastSpeed") != null) ? "<td width=25%>${parent.displayKmMiVal(device.currentValue("lastSpeed"))} ${parent.getVelocityUnits()}</td>" : ""}
-                    ${(device.currentValue("battery") != null) ? "<td width=25%>${device.currentValue("battery")} % ${(device.currentValue("batteryStatus") ? "</br>${device.currentValue("batteryStatus")}" : "")}</td>" : ""}
-                    ${(device.currentValue("dataConnection") != null) ? "<td width=25%>${device.currentValue("dataConnection")}</td>" : ""}
+                    <td width=25%>${parent.displayKmMiVal(device.currentValue('distanceFromHome'))} ${parent.largeUnits()}</td>
+                    ${(device.currentValue('lastSpeed') != null) ? "<td width=25%>${parent.displayKmMiVal(device.currentValue('lastSpeed'))} ${parent.velocityUnits()}</td>" : ''}
+                    ${(device.currentValue('battery') != null) ? "<td width=25%>${device.currentValue('battery')} % ${(device.currentValue('batteryStatus') ? "</br>${device.currentValue('batteryStatus')}" : '')}</td>" : ''}
+                    ${(device.currentValue('dataConnection') != null) ? "<td width=25%>${device.currentValue('dataConnection')}</td>" : ''}
                 </tr>
             </table>
             ${generateScriptData(urlSource)}
@@ -689,7 +685,7 @@ def generateMember(urlSource) {
 }
 
 def generatePastLocations() {
-    String htmlData = ""
+    String htmlData = ''
     if (parent.getRecorderURL() && (device.currentValue('location') != DEFAULT_privateLocation)) {
         // split the topic into it's elements.  user is [1], device is [2].
         topicElements = parent.splitTopic(device.currentValue('sourceTopic').toLowerCase())
@@ -736,7 +732,7 @@ def generatePastLocations() {
             } else {
                 linesRadio.checked;
                 pointsRadio.checked = !linesRadio.checked;
-            }
+    }
             // Add event listeners to toggle state
             pointsRadio.addEventListener('click', () => {
                 linesRadio.checked = !pointsRadio.checked;
@@ -746,31 +742,31 @@ def generatePastLocations() {
             });
 
             // Set the date picker to the current date
-		    const endTime = new Date()
-    		const startTime = new Date()
+            const endTime = new Date()
+            const startTime = new Date()
             const timeZoneHourOffset = endTime.getTimezoneOffset() / 60;
             // set the time date selectors with the proper timezone
-	    	endTime.setHours(endTime.getHours() - timeZoneHourOffset)
-            startTime.setHours(startTime.getHours() - timeZoneHourOffset - ${(pastLocationSearchWindow ? pastLocationSearchWindow*24 : DEFAULT_pastLocationSearchWindow*24)})
+            endTime.setHours(endTime.getHours() - timeZoneHourOffset)
+            startTime.setHours(startTime.getHours() - timeZoneHourOffset - ${(pastLocationSearchWindow ? pastLocationSearchWindow * 24 : DEFAULT_pastLocationSearchWindow * 24)})
             document.getElementById("id-startDate").value = startTime.toISOString().slice(0, 16);
             document.getElementById("id-endDate").value = endTime.toISOString().slice(0, 16);
             // trigger the update to the start URL
             window.onload = updateUrl;
         </script>"""
-    }
+}
 
     return (htmlData)
 }
 
 def generatePresence(urlSource) {
-    long sinceTimeMilliSeconds = device.currentValue("sinceTime")
-    sinceDate = new SimpleDateFormat("E h:mm a").format(new Date(sinceTimeMilliSeconds * 1000))
+    long sinceTimeMilliSeconds = device.currentValue('sinceTime')
+    sinceDate = new SimpleDateFormat('E h:mm a').format(new Date(sinceTimeMilliSeconds * 1000))
 
     String htmlData = """
-    <div style="width:100%;height:100%;margin:4px;background:${((device.currentValue('presence') == "present") ? "green" : "#b40000")}">
+    <div style="width:100%;height:100%;margin:4px;background:${((device.currentValue('presence') == 'present') ? 'green' : '#b40000')}">
         <table style="height:100%;width:100%;color:white;font-size:0.8em;font-family:arial">
             <tr align="center" height=33%>
-                <td valign="center">${device.currentValue("location")}</td>
+                <td valign="center">${device.currentValue('location')}</td>
             </tr>
             <tr align="center" height=33%>
                 <td valign="center">
@@ -789,40 +785,40 @@ def generatePresence(urlSource) {
 
 def generateScriptData(urlSource) {
     String htmlData = """
-	<script>
-		lastUpdate = sessionStorage.getItem('lastReportTime') || 0;
+    <script>
+        lastUpdate = sessionStorage.getItem('lastReportTime') || 0;
 
-		function updateTile() {
-			const postData = {};
-			postData["action"] = "update";
-			postData["payload"] = "${state.memberName}";
-			sendDataToHub(postData)
-		};
+        function updateTile() {
+            const postData = {};
+            postData["action"] = "update";
+            postData["payload"] = "${state.memberName}";
+            sendDataToHub(postData)
+        };
 
-		function sendDataToHub(postData) {
-			fetch("${parent.getAttributeURL(urlSource, "apidata")}", {
-				method: "POST",
-				body: JSON.stringify(postData),
-				headers: {
-					"Content-type": "application/json; charset=UTF-8"
-				}
-			})
-			.then(response => response.json())
-			.then(data => {
-				if (lastUpdate != data.lastReportTime) {
-					sessionStorage.setItem('lastReportTime', data.lastReportTime);
-					// refresh the window
-					location.reload(true);
-				}
-			})
-			.catch(error => { console.error('Error fetching data:', error); })
-		};
+        function sendDataToHub(postData) {
+            fetch("${parent.attributeURL(urlSource, 'apidata')}", {
+                method: "POST",
+                body: JSON.stringify(postData),
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (lastUpdate != data.lastReportTime) {
+                    sessionStorage.setItem('lastReportTime', data.lastReportTime);
+                    // refresh the window
+                    location.reload(true);
+                }
+            })
+            .catch(error => { console.error('Error fetching data:', error); })
+        };
 
-		// Poll for member data every 5000ms
-		setInterval(() => {
-			updateTile();
-		}, 5000);
-	</script>"""
+        // Poll for member data every 5000ms
+        setInterval(() => {
+            updateTile();
+        }, 5000);
+    </script>"""
 
     return (htmlData)
 }

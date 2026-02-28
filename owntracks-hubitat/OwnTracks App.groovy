@@ -1,5 +1,5 @@
 /**
- *  Copyright 2024 Lyle Pakula
+ *  Copyright 2026 Lyle Pakula
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -152,70 +152,69 @@
  *  1.8.4      2024-10-13      - Added missing "members" in JSON.
  *  1.8.5      2024-10-26      - Cleanup migration.  Fixed issue if thumbnails were enabled, but no image files were loaded in the hub.
  *  1.8.6      2024-11-03      - Added radius around the Google Friends Map member pin that scales based on their location accuracy.
- *  1.8.7      2024-12-10	   - Changed map and geocode limits to match upcoming Google changes.
- *  1.8.8      2024-12-20	   - Fixed location debug logging.
- *  1.8.9      2024-12-21	   - Changed app to single threaded.
- *  1.8.10     2025-01-08	   - Allow all new regions to be added to member notifications if enabled.  Fixed issue where the last notification region/device couldn't be deselected.
- *  1.8.11     2025-01-25	   - Fixed issue creating a new region.
+ *  1.8.7      2024-12-10      - Changed map and geocode limits to match upcoming Google changes.
+ *  1.8.8      2024-12-20      - Fixed location debug logging.
+ *  1.8.9      2024-12-21      - Changed app to single threaded.
+ *  1.8.10     2025-01-08      - Allow all new regions to be added to member notifications if enabled.  Fixed issue where the last notification region/device couldn't be deselected.
+ *  1.8.11     2025-01-25      - Fixed issue creating a new region.
  *  1.8.12     2025-04-13      - Rephrased the member group reset button.
  *  1.8.13     2025-05-01      - Fixed issue where passing a member name to the Google Family Map needed to be in lowercase.
  *  1.8.14     2025-05-02      - Added a Google Maps setting to use the last followed member when the Google Map reloads.
- *  1.8.15	   2025-05-16	   - Added a member drawer to the bottom of the Google Family Map.  Clicking on a thumbnail will follow that user.
- *  1.8.17	   2025-05-18	   - Add the ability to scale the thumbnail size Google Family Map member drawer.
- *  1.8.18	   2025-05-19	   - Changed the drawer behavior to allow a single click/tap to open/close vs dragging.  Increased width up to 500 pixels.
- *  1.8.19	   2025-05-23	   - Added scalers to the map zoom in mobile portrait mode and the drawer member details.
- *  1.8.20	   2025-06-01	   - Fixed the zoom issues and removed the mobile portrait mode zoom for the Google Family map.  Fixed race condition when the thumbnails were loading on the family map.  Fixed issue where new users were not being added to the default group.
+ *  1.8.15     2025-05-16      - Added a member drawer to the bottom of the Google Family Map.  Clicking on a thumbnail will follow that user.
+ *  1.8.17     2025-05-18      - Add the ability to scale the thumbnail size Google Family Map member drawer.
+ *  1.8.18     2025-05-19      - Changed the drawer behavior to allow a single click/tap to open/close vs dragging.  Increased width up to 500 pixels.
+ *  1.8.19     2025-05-23      - Added scalers to the map zoom in mobile portrait mode and the drawer member details.
+ *  1.8.20     2025-06-01      - Fixed the zoom issues and removed the mobile portrait mode zoom for the Google Family map.  Fixed race condition when the thumbnails were loading on the family map.  Fixed issue where new users were not being added to the default group.
  *  1.8.21     2025-06-07      - Google Family Map: Improved zooming on members and member drawer.  Selecting a member row in the drawer selects that member.  Address issue that could lead to thumbnails not being displayed.  Added zoom option for smart displays (Nest, Amazon).
- *  1.8.22	   2025-07-02	   - Added member battery level to each history point.
- *  1.8.23	   2025-08-08	   - Removed past cleanup that removed drawer scaling.
- *  1.8.24	   2025-09-01	   - Added Android setting to ignore incoming network locations if a high accuracy location was received recently.
- *  1.8.25	   2025-09-03	   - Reformat the mobile app version sent to the driver for better readability.
- *  1.8.26	   2025-09-05	   - Fix to address the different incoming HTTP header value from Android.
- *  1.8.27     2025-11-25	   - Changed to dynamic tile URLs to fix tiles not working when web links were disabled.
+ *  1.8.22     2025-07-02      - Added member battery level to each history point.
+ *  1.8.23     2025-08-08      - Removed past cleanup that removed drawer scaling.
+ *  1.8.24     2025-09-01      - Added Android setting to ignore incoming network locations if a high accuracy location was received recently.
+ *  1.8.25     2025-09-03      - Reformat the mobile app version sent to the driver for better readability.
+ *  1.8.26     2025-09-05      - Fix to address the different incoming HTTP header value from Android.
+ *  1.8.27     2025-11-25      - Changed to dynamic tile URLs to fix tiles not working when web links were disabled.
  *  1.8.28     2025-11-26      - Fixed local Google maps links not working.
+ *  1.8.29     2026-02-22      - Cleanup and lint.
 */
 
 import groovy.transform.Field
-import groovy.json.JsonSlurper
-import groovy.json.JsonOutput
 import groovy.json.JsonBuilder
 import java.text.SimpleDateFormat
 
-def appVersion() { return "1.8.27" }
+def appVersion() { return '1.8.27' }
 
-@Field static final Map BATTERY_STATUS = [ "0": "Unknown", "1": "Unplugged", "2": "Charging", "3": "Full" ]
-@Field static final Map DATA_CONNECTION = [ "w": "WiFi", "m": "Mobile", "o": "Offline"  ]
-@Field static final Map TRIGGER_TYPE = [ "p": "Ping", "c": "Region", "r": "Report Location", "u": "Manual", "b": "Beacon", "t": "Timer", "v": "Monitoring", "l": "Region" ]
-@Field static final Map TOPIC_FORMAT = [ 0: "topicSource", 1: "userName", 2: "deviceID", 3: "eventType" ]
-@Field static final Map LOCATOR_PRIORITY = [ "NoPower": "NO_POWER (best accuracy with zero power consumption)", "LowPower": "LOW_POWER (city level accuracy)", "BalancedPowerAccuracy": "BALANCED_POWER (block level accuracy based on Wifi/Cell)", "HighAccuracy": "HIGH_POWER (most accurate accuracy based on GPS)" ]
-@Field static final Map DYNAMIC_INTERVALS = [ "pegLocatorFastestIntervalToInterval": false, "locatorPriority": "HighAccuracy" ]
+@Field static final Map BATTERY_STATUS = [ '0': 'Unknown', '1': 'Unplugged', '2': 'Charging', '3': 'Full' ]
+@Field static final Map DATA_CONNECTION = [ 'w': 'WiFi', 'm': 'Mobile', 'o': 'Offline'  ]
+@Field static final Map TRIGGER_TYPE = [ 'p': 'Ping', 'c': 'Region', 'r': 'Report Location', 'u': 'Manual', 'b': 'Beacon', 't': 'Timer', 'v': 'Monitoring', 'l': 'Region' ]
+@Field static final Map TOPIC_FORMAT = [ 0: 'topicSource', 1: 'userName', 2: 'deviceID', 3: 'eventType' ]
+@Field static final Map LOCATOR_PRIORITY = [ 'NoPower': 'NO_POWER (best accuracy with zero power consumption)', 'LowPower': 'LOW_POWER (city level accuracy)', 'BalancedPowerAccuracy': 'BALANCED_POWER (block level accuracy based on Wifi/Cell)', 'HighAccuracy': 'HIGH_POWER (most accurate accuracy based on GPS)' ]
+@Field static final Map DYNAMIC_INTERVALS = [ 'pegLocatorFastestIntervalToInterval': false, 'locatorPriority': 'HighAccuracy' ]
 //@Field static final Map MONITORING_MODES = [ 0: "Manual (user triggered events)", 1: "Significant (standard tracking using Wifi/Cell)", 2: "Move (permanent tracking using GPS)" ]
-@Field static final Map MONITORING_MODES = [ 1: "Significant (standard tracking using Wifi/Cell)", 2: "Move (permanent tracking using GPS)" ]
-@Field static final Map IOS_PLUS_FOLLOW = [ "rad":50, "tst":1700000000, "_type":"waypoint", "lon":0.0, "lat":0.0, "desc":"+follow" ]
-@Field static final Map GEOCODE_PROVIDERS = [ 0: "Disabled", 1: "Google", 2: "Geoapify", 3: "Opencage" ]
-@Field static final Map GEOCODE_ADDRESS = [ 1: "https://maps.googleapis.com/maps/api/geocode/json", 2: "https://api.geoapify.com/v1/geocode/", 3: "https://api.opencagedata.com/geocode/v1/json" ]
-@Field static final Map GEOCODE_REQUEST = [ 1: "?address=", 2: "search?text=", 3: "?q=" ]
-@Field static final Map REVERSE_GEOCODE_REQUEST_LAT = [ 1: "?latlng=", 2: "reverse?lat=", 3: "?q=" ]
-@Field static final Map REVERSE_GEOCODE_REQUEST_LON = [ 1: ",", 2: "&lon=", 3: "," ]
-@Field static final Map GEOCODE_KEY = [ 1: "&key=", 2: "&format=json&apiKey=", 3: "&key=" ]
-@Field static final Map ADDRESS_JSON = [ 1: "formatted_address", 2: "formatted", 3: "formatted" ]
-@Field static final Map GEOCODE_USAGE_COUNTER = [ 1: "googleUsage", 2: "geoapifyUsage", 3: "opencageUsage" ]
+@Field static final Map MONITORING_MODES = [ 1: 'Significant (standard tracking using Wifi/Cell)', 2: 'Move (permanent tracking using GPS)' ]
+@Field static final Map GEOCODE_PROVIDERS = [ 0: 'Disabled', 1: 'Google', 2: 'Geoapify', 3: 'Opencage' ]
+@Field static final Map GEOCODE_ADDRESS = [ 1: 'https://maps.googleapis.com/maps/api/geocode/json', 2: 'https://api.geoapify.com/v1/geocode/', 3: 'https://api.opencagedata.com/geocode/v1/json' ]
+@Field static final Map GEOCODE_REQUEST = [ 1: '?address=', 2: 'search?text=', 3: '?q=' ]
+@Field static final Map REVERSE_GEOCODE_REQUEST_LAT = [ 1: '?latlng=', 2: 'reverse?lat=', 3: '?q=' ]
+@Field static final Map REVERSE_GEOCODE_REQUEST_LON = [ 1: ',', 2: '&lon=', 3: ',' ]
+@Field static final Map GEOCODE_KEY = [ 1: '&key=', 2: '&format=json&apiKey=', 3: '&key=' ]
+@Field static final Map ADDRESS_JSON = [ 1: 'formatted_address', 2: 'formatted', 3: 'formatted' ]
+@Field static final Map GEOCODE_USAGE_COUNTER = [ 1: 'googleUsage', 2: 'geoapifyUsage', 3: 'opencageUsage' ]
 @Field static final Map GEOCODE_QUOTA = [ 1: 10000, 2: 3000, 3: 2500 ]
 @Field static final Map GEOCODE_QUOTA_INTERVAL_DAILY = [ 1: false, 2: true, 3: true ]
 @Field static final Map GEOCODE_API_KEY_LINK = [ 1: "<a href='https://developers.google.com/maps/documentation/directions/get-api-key/' target='_blank'>Sign up for a Google API Key</a>", 2: "<a href='https://apidocs.geoapify.com/docs/geocoding/reverse-geocoding/#about' target='_blank'>Sign up for a Geoapify API Key</a>", 3: "<a href='https://opencagedata.com/api#quickstart' target='_blank'>Sign up for a Opencage API Key</a>" ]
-@Field static final List URL_SOURCE = [ "[cloud.hubitat.com]", "[local.com]" ]
-@Field static final Map COLLECT_PLACES = [ "desc": 0, "desc_tst": 1, "map" : 2 ]
+@Field static final Map COLLECT_PLACES = [ 'desc': 0, 'desc_tst': 1, 'map' : 2 ]
+@Field static final Map IOS_PLUS_FOLLOW = [ 'rad':50, 'tst':1700000000, '_type':'waypoint', 'lon':0.0, 'lat':0.0, 'desc':'+follow' ]
+@Field static final List URL_SOURCE = [ '[cloud.hubitat.com]', '[local.com]' ]
 
 // Main defaults
-@Field String  HUBITAT_CLOUD_URL = "cloud.hubitat.com"
-@Field String  DEFAULT_APP_THEME_COLOR = "#191970"
-@Field String  DEFAULT_MEMBER_PIN_COLOR = "MidnightBlue"         // "#191970" - "MidnightBlue"
-@Field String  DEFAULT_MEMBER_GLYPH_COLOR = "Purple"             // "#800080" - "Brown"
-@Field String  DEFAULT_REGION_PIN_COLOR = "FireBrick"            // "#b22222" - "FireBrick"
-@Field String  DEFAULT_REGION_NEW_PIN_COLOR = "red"              // "#ff0000" - "Red"
-@Field String  DEFAULT_REGION_NEW_GLYPH_COLOR = "black"          // "#000000" - "Black"
-@Field String  DEFAULT_REGION_HOME_GLYPH_COLOR = "DarkSlateGrey" // "#2f4f4f" - "DarkSlateGrey"
-@Field String  DEFAULT_REGION_GLYPH_COLOR = "Maroon"             // "#800000" - "Maroon"
+@Field String  HUBITAT_CLOUD_URL = 'cloud.hubitat.com'
+@Field String  DEFAULT_APP_THEME_COLOR = '#191970'
+@Field String  DEFAULT_MEMBER_PIN_COLOR = 'MidnightBlue'         // "#191970" - "MidnightBlue"
+@Field String  DEFAULT_MEMBER_GLYPH_COLOR = 'Purple'             // "#800080" - "Brown"
+@Field String  DEFAULT_REGION_PIN_COLOR = 'FireBrick'            // "#b22222" - "FireBrick"
+@Field String  DEFAULT_REGION_NEW_PIN_COLOR = 'red'              // "#ff0000" - "Red"
+@Field String  DEFAULT_REGION_NEW_GLYPH_COLOR = 'black'          // "#000000" - "Black"
+@Field String  DEFAULT_REGION_HOME_GLYPH_COLOR = 'DarkSlateGrey' // "#2f4f4f" - "DarkSlateGrey"
+@Field String  DEFAULT_REGION_GLYPH_COLOR = 'Maroon'             // "#800000" - "Maroon"
 @Field Number  DEFAULT_memberAccuracyRadiusOpacity = 1.0
 @Field Number  DEFAULT_memberHistoryLength = 60
 @Field Number  DEFAULT_maxMemberHistoryLength = 60
@@ -232,17 +231,17 @@ def appVersion() { return "1.8.27" }
 @Field Number  memberMaximumLocationAgeMinutes = 5
 @Field Number  memberHistoryMinimumSpeed = 3
 @Field Number  memberVelocityMinimumTimeDifference = 5
-@Field String  memberBeginMarker = "b"
-@Field String  memberMiddleMarker = "m"
-@Field String  memberEndMarker = "e"
+@Field String  memberBeginMarker = 'b'
+@Field String  memberMiddleMarker = 'm'
+@Field String  memberEndMarker = 'e'
 @Field Number  GOOGLE_MAP_API_QUOTA = 10000
 @Field String  GOOGLE_MAP_API_KEY_LINK = "<a href='https://developers.google.com/maps/documentation/directions/get-api-key/' target='_blank'>Sign up for a Google API Key</a>"
-@Field String  RECORDER_PUBLISH_FOLDER = "/pub"
-@Field String  MQTT_TOPIC_PREFIX = "owntracks"
+@Field String  RECORDER_PUBLISH_FOLDER = '/pub'
+@Field String  MQTT_TOPIC_PREFIX = 'owntracks'
 @Field Number  INVALID_COORDINATE = 999
-@Field String  COMMON_CHILDNAME = "OwnTracks"
-@Field String  ANDROID_USER_AGENT = "Android"
-@Field String  DEFAULT_CHILDPREFIX = "OwnTracks - "
+@Field String  COMMON_CHILDNAME = 'OwnTracks'
+@Field String  ANDROID_USER_AGENT = 'Android'
+@Field String  DEFAULT_CHILDPREFIX = 'OwnTracks - '
 @Field Number  DEFAULT_RADIUS = 75
 @Field Number  DEFAULT_regionHighAccuracyRadius = 750
 @Field Number  DEFAULT_wifiPresenceKeepRadius = 750
@@ -258,7 +257,7 @@ def appVersion() { return "1.8.27" }
 @Field Number  DEFAULT_discardNetworkLocationThresholdSeconds = 3
 @Field Boolean DEFAULT_lowPowerModeInRegion = false
 @Field Number  DEFAULT_googleMapsZoom = 0
-@Field String  DEFAULT_googleMapsMember = "null"
+@Field String  DEFAULT_googleMapsMember = 'null'
 @Field Boolean DEFAULT_useLastGoogleFriendsMapMember = false
 @Field Boolean DEFAULT_descriptionTextOutput = true
 @Field Boolean DEFAULT_debugOutput = false
@@ -268,17 +267,17 @@ def appVersion() { return "1.8.27" }
 @Field Number  DEFAULT_geocodeLookupHysteresis = 0.010
 @Field Boolean DEFAULT_mapFreeOnly = true
 @Field Boolean DEFAULT_useCustomNotificationMessage = false
-@Field String  DEFAULT_notificationMessage = "NAME EVENT REGION at TIME"
+@Field String  DEFAULT_notificationMessage = 'NAME EVENT REGION at TIME'
 @Field Boolean DEFAULT_addNewRegionsToMemberNotificationList = false
 @Field Boolean DEFAULT_manualDeleteBehavior = false
 @Field Number  DEFAULT_globalGroupNumber = 0
-@Field String  DEFAULT_globalGroupName = "Default"
-@Field String  DEFAULT_groupNames = "Group "
+@Field String  DEFAULT_globalGroupName = 'Default'
+@Field String  DEFAULT_groupNames = 'Group '
 @Field Number  DEFAULT_maxGroups = 5
 
 // Mobile app location defaults
 @Field Number  DEFAULT_monitoring = 1
-@Field String  DEFAULT_locatorPriority = "BalancedPowerAccuracy"
+@Field String  DEFAULT_locatorPriority = 'BalancedPowerAccuracy'
 @Field Number  DEFAULT_moveModeLocatorInterval = 30
 @Field Number  DEFAULT_locatorDisplacement = 50
 @Field Number  DEFAULT_locatorInterval = 60
@@ -297,178 +296,177 @@ def appVersion() { return "1.8.27" }
 @Field Boolean DEFAULT_notificationGeocoderErrors = false
 
 definition(
-    name: "OwnTracks",
-    namespace: "lpakula",
-    author: "Lyle Pakula",
-    description: "OwnTracks app connects your OwnTracks mobile app to Hubitat Elevation for virtual presence triggers",
-    importUrl: "https://raw.githubusercontent.com/wir3z/hubitat/main/owntracks-hubitat/OwnTracks%20App.groovy",
-    category: "",
-    iconUrl: "",
-    iconX2Url: "",
-    oauth: [displayName: "OwnTracks", displayLink: "https://owntracks.org/"],
+    name: 'OwnTracks',
+    namespace: 'lpakula',
+    author: 'Lyle Pakula',
+    description: 'OwnTracks app connects your OwnTracks mobile app to Hubitat Elevation for virtual presence triggers',
+    importUrl: 'https://raw.githubusercontent.com/wir3z/hubitat/main/owntracks-hubitat/OwnTracks%20App.groovy',
+    category: '',
+    iconUrl: '',
+    iconX2Url: '',
+    oauth: [displayName: 'OwnTracks', displayLink: 'https://owntracks.org/'],
     singleInstance: true,
     singleThreaded: true,
 )
 
 preferences {
-    page(name: "mainPage")
-    page(name: "configureHubApp")
-    page(name: "installationInstructions")
-    page(name: "thumbnailCreation")
-    page(name: "configureNotifications")
-    page(name: "configureRecorder")
-    page(name: "configureSecondaryHub")
-    page(name: "recorderInstallationInstructions")
-    page(name: "advancedHub")
-    page(name: "advancedLocation")
-    page(name: "advancedDisplay")
-    page(name: "configureRegions")
-    page(name: "configureGroups")
-    page(name: "addRegions")
-    page(name: "editRegions")
-    page(name: "deleteRegions")
-    page(name: "deleteMembers")
-    page(name: "resetDefaults")
+    page(name: 'mainPage')
+    page(name: 'configureHubApp')
+    page(name: 'installationInstructions')
+    page(name: 'thumbnailCreation')
+    page(name: 'configureNotifications')
+    page(name: 'configureRecorder')
+    page(name: 'configureSecondaryHub')
+    page(name: 'recorderInstallationInstructions')
+    page(name: 'advancedHub')
+    page(name: 'advancedLocation')
+    page(name: 'advancedDisplay')
+    page(name: 'configureRegions')
+    page(name: 'configureGroups')
+    page(name: 'addRegions')
+    page(name: 'editRegions')
+    page(name: 'deleteRegions')
+    page(name: 'deleteMembers')
+    page(name: 'resetDefaults')
 }
 
 def mainPage() {
     // clear the setting fields
     clearSettingFields()
-    app.removeSetting("regionToCheck")
+    app.removeSetting('regionToCheck')
     // if we selected a user to retrieve their regions, set the flag so the table updates
     updateGetRegion()
 
     // initialize all fields if they are undefined
     initialize(false)
-    def oauthStatus = ""
+    def oauthStatus = ''
     //enable OAuth in the app settings or this call will fail
-    try{
+    try {
         if (!state.accessToken) {
             createAccessToken()
         }
-    }
-    catch (e) {
+    } catch (e) {
         oauthStatus = "Edit Apps Code -> OwnTracks.  Select 'oAUTH' in the top right and use defaults to enable oAUTH to continue."
         logError(oauthStatus)
     }
 
     // clear the http result
-    dynamicPage(name: "mainPage", title: "", install: true, uninstall: true) {
-        section(getFormat("title", "OwnTracks Version ${appVersion()}")) {
+    dynamicPage(name: 'mainPage', title: '', install: true, uninstall: true) {
+        section(styleFormat('title', "OwnTracks Version ${appVersion()}")) {
         }
         // if we didn't get a token, display the error and stop
-        if (oauthStatus != "") {
-            section("<h2>${oauthStatus}</h2>") {}
+        if (oauthStatus != '') {
+            section("<h2>${ oauthStatus }</h2>") { }
         } else if (state.installed != true) {
-            section("<h3>Select '<b>Done</b>' to finsh the initial app installation and then re-select the OwnTracks app to finish configuration.</h3>") {}
+            section("<h3>Select '<b>Done</b>' to finish the initial app installation and then re-select the OwnTracks app to finish configuration.</h3>") { }
         } else {
-            section(getFormat("box", "Member Status")) {
+            section(styleFormat('box', 'Member Status')) {
                 displayMemberStatus()
                 displayMissingHomePlace()
                 displayRegionsPendingDelete()
             }
-            section() {
-                input name: "sectionInstall", type: "button", title: getSectionTitle(state.show.install, "Installation and Configuration"), submitOnChange: true, style: getSectionStyle()
+            section {
+                input name: 'sectionInstall', type: 'button', title: sectionTitle(state.show.install, 'Installation and Configuration'), submitOnChange: true, style: sectionStyle()
                 if (state.show.install) {
-                    href(title: "Mobile App Installation Instructions", description: "", style: "page", page: "installationInstructions")
-                    href(title: "Configure Hubitat App - WiFi Settings, Units, Location Performance, Device Prefix, Geocode and Google Map API keys", description: "", style: "page", page: "configureHubApp")
-                    href(title: "Configure Regions - Add, Edit, Delete, Assign 'Home'", description: "", style: "page", page: "configureRegions")
-                    href(title: "Configure Groups - Assign Friend Groups", description: "", style: "page", page: "configureGroups")
-                    input "enabledMembers", "enum", multiple: true, title:(enabledMembers ? '<div>' : '<div style="color:#ff0000">') + "Select family member(s) to monitor.  Member device will be created and configured once 'Done' is pressed, below.</div>", options: (state.members ? state.members.name.sort() : []), submitOnChange: true
-                    input "privateMembers", "enum", multiple: true, title:(privateMembers ? '<div style="color:#ff0000">' : '<div>') + 'Select family member(s) to remain private.  Locations and regions will <B>NOT</b> be shared with other members or the Recorder.  Their Hubitat device will only display presence information.</div>', options: (state.members ? state.members.name.sort() : []), submitOnChange: true
-                    href(title: "Configure Stale Member and Region Arrived/Departed Notifications", description: "", style: "page", page: "configureNotifications")
+                    href(title: 'Mobile App Installation Instructions', description: '', style: 'page', page: 'installationInstructions')
+                    href(title: 'Configure Hubitat App - WiFi Settings, Units, Location Performance, Device Prefix, Geocode and Google Map API keys', description: '', style: 'page', page: 'configureHubApp')
+                    href(title: "Configure Regions - Add, Edit, Delete, Assign 'Home'", description: '', style: 'page', page: 'configureRegions')
+                    href(title: 'Configure Groups - Assign Friend Groups', description: '', style: 'page', page: 'configureGroups')
+                    input 'enabledMembers', 'enum', multiple: true, title:(enabledMembers ? '<div>' : '<div style="color:#ff0000">') + "Select family member(s) to monitor.  Member device will be created and configured once 'Done' is pressed, below.</div>", options: (state.members ? state.members.name.sort() : []), submitOnChange: true
+                    input 'privateMembers', 'enum', multiple: true, title:(privateMembers ? '<div style="color:#ff0000">' : '<div>') + 'Select family member(s) to remain private.  Locations and regions will <B>NOT</b> be shared with other members or the Recorder.  Their Hubitat device will only display presence information.</div>', options: (state.members ? state.members.name.sort() : []), submitOnChange: true
+                    href(title: 'Configure Stale Member and Region Arrived/Departed Notifications', description: '', style: 'page', page: 'configureNotifications')
                     if (enabledMembers) {
                         enabledMembers.each { name ->
-                            member = state.members.find {it.name==name}
+                            member = state.members.find { it.name == name }
                             // cancel any deactivation
-                            member?.remove("deactivate")
+                            member?.remove('deactivate')
                         }
                     }
                 }
-                input name: "sectionLinks", type: "button", title: getSectionTitle(state.show.links, "Dashboard Web Links"), submitOnChange: true, style: getSectionStyle()
+                input name: 'sectionLinks', type: 'button', title: sectionTitle(state.show.links, 'Dashboard Web Links'), submitOnChange: true, style: sectionStyle()
                 if (state.show.links) {
-                    paragraph ("<b>Direct dashboard links for use in a web browser.</b>")
-                    input name: "disableCloudLinks", type: "bool", title: "Disable cloud links", defaultValue: DEFAULT_disableCloudLinks, submitOnChange: true
-                    URL_SOURCE.each{ source->
+                    paragraph('<b>Direct dashboard links for use in a web browser.</b>')
+                    input name: 'disableCloudLinks', type: 'bool', title: 'Disable cloud links', defaultValue: DEFAULT_disableCloudLinks, submitOnChange: true
+                    URL_SOURCE.each { source ->
                         if ((source != URL_SOURCE[0]) || (disableCloudLinks != true)) {
-                            paragraph ((source == URL_SOURCE[0] ? "<h2>Cloud Links</h2>" : "<h2>Local Links</h2>"))
+                            paragraph((source == URL_SOURCE[0] ? '<h2>Cloud Links</h2>' : '<h2>Local Links</h2>'))
                             if (googleMapsAPIKey) {
-                                paragraph ("<b>Google family map:</b></br>&emsp;<a href='${getAttributeURL(source, "googlemap")}" + "&member='" + ">${getAttributeURL(source, "googlemap")}" + "&member=" + "</a></br>")
-                                paragraph ("<b>Region configuration map:</b></br>&emsp;<a href='${getAttributeURL(source, "configmap")}'>${getAttributeURL(source, "configmap")}</a></br>")
+                                paragraph("<b>Google family map:</b></br>&emsp;<a href='${attributeURL(source, 'googlemap')}&member='>${attributeURL(source, 'googlemap')}&member=</a></br>")
+                                paragraph("<b>Region configuration map:</b></br>&emsp;<a href='${attributeURL(source, 'configmap')}'>${attributeURL(source, 'configmap')}</a></br>")
                             }
                             if (state.members) {
-                                urlList = ""
-                                state.members.each { member->
-                                    urlList += "${member.name}:</br>&emsp;<a href='${getAttributeURL(source, "membermap/${member.name.toLowerCase()}")}'>${getAttributeURL(source, "membermap/${member.name.toLowerCase()}")}</a></br>"
+                                urlList = ''
+                                state.members.each { member ->
+                                    urlList += "${member.name}:</br>&emsp;<a href='${attributeURL(source, "membermap/${member.name.toLowerCase()}")}'>${attributeURL(source, "membermap/${member.name.toLowerCase()}")}</a></br>"
                                 }
-                                paragraph ("<b>Member location map:</b></br>${urlList}")
+                                paragraph("<b>Member location map:</b></br>${urlList}")
                             }
                             if (state.members) {
-                                urlList = ""
-                                state.members.each { member->
-                                    urlList += "${member.name}:</br>&emsp;<a href='${getAttributeURL(source, "memberpresence/${member.name.toLowerCase()}")}'>${getAttributeURL(source, "memberpresence/${member.name.toLowerCase()}")}</a></br>"
+                                urlList = ''
+                                state.members.each { member ->
+                                    urlList += "${member.name}:</br>&emsp;<a href='${attributeURL(source, "memberpresence/${member.name.toLowerCase()}")}'>${attributeURL(source, "memberpresence/${member.name.toLowerCase()}")}</a></br>"
                                 }
-                                paragraph ("<b>Member Presence:</b></br>${urlList}")
+                                paragraph("<b>Member Presence:</b></br>${urlList}")
                             }
                             if (recorderURL) {
                                 // only display the recorder links if it's a local URL or if it's https (required for the cloud link)
                                 if ((source != URL_SOURCE[0]) || isHTTPsURL(getRecorderURL())) {
-                                    paragraph ("<b>OwnTracks Recorder family map:</b></br>&emsp;<a href='${getAttributeURL(source, "recordermap")}'>${getAttributeURL(source, "recordermap")}</a>")
+                                    paragraph("<b>OwnTracks Recorder family map:</b></br>&emsp;<a href='${attributeURL(source, 'recordermap')}'>${attributeURL(source, 'recordermap')}</a>")
 
                                     if (state.members) {
-                                        urlList = ""
-                                        state.members.each { member->
-                                            urlList += "${member.name}:</br>&emsp;<a href='${getAttributeURL(source, "memberpastlocations/${member.name.toLowerCase()}")}'>${getAttributeURL(source, "memberpastlocations/${member.name.toLowerCase()}")}</a></br>"
+                                        urlList = ''
+                                        state.members.each { member ->
+                                            urlList += "${member.name}:</br>&emsp;<a href='${attributeURL(source, "memberpastlocations/${member.name.toLowerCase()}")}'>${attributeURL(source, "memberpastlocations/${member.name.toLowerCase()}")}</a></br>"
                                         }
-                                        paragraph ("<b>OwnTracks Recorder member past locations:</b></br>${urlList}")
+                                        paragraph("<b>OwnTracks Recorder member past locations:</b></br>${urlList}")
                                     }
                                 }
                             }
                         }
                     }
                 }
-                input name: "sectionCommands", type: "button", title: getSectionTitle(state.show.commands, "Member Command API Links"), submitOnChange: true, style: getSectionStyle()
+                input name: 'sectionCommands', type: 'button', title: sectionTitle(state.show.commands, 'Member Command API Links'), submitOnChange: true, style: sectionStyle()
                 if (state.show.commands) {
-                    paragraph ("<b>Member API command links for advanced integrations and virtual switch controls.</b>")
-                    URL_SOURCE.each{ source->
-                        paragraph ((source == URL_SOURCE[0] ? "<h2>Cloud Links</h2>" : "<h2>Local Links</h2>"))
+                    paragraph('<b>Member API command links for advanced integrations and virtual switch controls.</b>')
+                    URL_SOURCE.each { source ->
+                        paragraph((source == URL_SOURCE[0] ? '<h2>Cloud Links</h2>' : '<h2>Local Links</h2>'))
                         if (state.members) {
-                            urlList = ""
-                            state.members.each { member->
+                            urlList = ''
+                            state.members.each { member ->
                                 urlList += "${member.name}</br>"
-                                urlList += "&emsp;'On':&emsp;<a href='${getAttributeURL(source, "membercmd/${member.name.toLowerCase()}/on")}'>${getAttributeURL(source, "membercmd/${member.name.toLowerCase()}/on")}</a></br>"
-                                urlList += "&emsp;'Off':&emsp;<a href='${getAttributeURL(source, "membercmd/${member.name.toLowerCase()}/off")}'>${getAttributeURL(source, "membercmd/${member.name.toLowerCase()}/off")}</a></br>"
-                                urlList += "&emsp;'Arrived':&emsp;<a href='${getAttributeURL(source, "membercmd/${member.name.toLowerCase()}/arrived")}'>${getAttributeURL(source, "membercmd/${member.name.toLowerCase()}/arrived")}</a></br>"
-                                urlList += "&emsp;'Departed':&emsp;<a href='${getAttributeURL(source, "membercmd/${member.name.toLowerCase()}/departed")}'>${getAttributeURL(source, "membercmd/${member.name.toLowerCase()}/departed")}</a></br>"
+                                urlList += "&emsp;'On':&emsp;<a href='${attributeURL(source, "membercmd/${member.name.toLowerCase()}/on")}'>${attributeURL(source, "membercmd/${member.name.toLowerCase()}/on")}</a></br>"
+                                urlList += "&emsp;'Off':&emsp;<a href='${attributeURL(source, "membercmd/${member.name.toLowerCase()}/off")}'>${attributeURL(source, "membercmd/${member.name.toLowerCase()}/off")}</a></br>"
+                                urlList += "&emsp;'Arrived':&emsp;<a href='${attributeURL(source, "membercmd/${member.name.toLowerCase()}/arrived")}'>${attributeURL(source, "membercmd/${member.name.toLowerCase()}/arrived")}</a></br>"
+                                urlList += "&emsp;'Departed':&emsp;<a href='${attributeURL(source, "membercmd/${member.name.toLowerCase()}/departed")}'>${attributeURL(source, "membercmd/${member.name.toLowerCase()}/departed")}</a></br>"
                             }
-                            paragraph ("<b>Member On/Off/Arrived/Departed:</b></br>${urlList}")
+                            paragraph("<b>Member On/Off/Arrived/Departed:</b></br>${urlList}")
                         }
                     }
                 }
-                input name: "sectionOptional", type: "button", title: getSectionTitle(state.show.optional, "Optional Features - Thumbnails, Recorder, Secondary Hub"), submitOnChange: true, style: getSectionStyle()
+                input name: 'sectionOptional', type: 'button', title: sectionTitle(state.show.optional, 'Optional Features - Thumbnails, Recorder, Secondary Hub'), submitOnChange: true, style: sectionStyle()
                 if (state.show.optional) {
-                    href(title: "Enabling User Thumbnails", description: "", style: "page", page: "thumbnailCreation")
-                    href(title: "Enable OwnTracks Recorder", description: "", style: "page", page: "configureRecorder")
-                    href(title: "Link Secondary Hub", description: "", style: "page", page: "configureSecondaryHub")
+                    href(title: 'Enabling User Thumbnails', description: '', style: 'page', page: 'thumbnailCreation')
+                    href(title: 'Enable OwnTracks Recorder', description: '', style: 'page', page: 'configureRecorder')
+                    href(title: 'Link Secondary Hub', description: '', style: 'page', page: 'configureSecondaryHub')
                 }
-                input name: "sectionAdvanced", type: "button", title: getSectionTitle(state.show.advanced, "Advanced Settings - Hub and Mobile"), submitOnChange: true, style: getSectionStyle()
+                input name: 'sectionAdvanced', type: 'button', title: sectionTitle(state.show.advanced, 'Advanced Settings - Hub and Mobile'), submitOnChange: true, style: sectionStyle()
                 if (state.show.advanced) {
-                    paragraph("The default settings provide the best balance of accuracy/power.  To view or modify advanced settings, select the items below.")
-                    href(title: "Hub App Settings", description: "", style: "page", page: "advancedHub")
-                    href(title: "Mobile App Location Settings", description: "", style: "page", page: "advancedLocation")
-                    href(title: "Mobile App Display Settings", description: "", style: "page", page: "advancedDisplay")
+                    paragraph('The default settings provide the best balance of accuracy/power.  To view or modify advanced settings, select the items below.')
+                    href(title: 'Hub App Settings', description: '', style: 'page', page: 'advancedHub')
+                    href(title: 'Mobile App Location Settings', description: '', style: 'page', page: 'advancedLocation')
+                    href(title: 'Mobile App Display Settings', description: '', style: 'page', page: 'advancedDisplay')
                 }
-                input name: "sectionMaintenance", type: "button", title: getSectionTitle(state.show.maintenance, "Maintenance - Sync Member Settings, Reset to Defaults, Deactivate and Delete Members"), submitOnChange: true, style: getSectionStyle()
+                input name: 'sectionMaintenance', type: 'button', title: sectionTitle(state.show.maintenance, 'Maintenance - Sync Member Settings, Reset to Defaults, Deactivate and Delete Members'), submitOnChange: true, style: sectionStyle()
                 if (state.show.maintenance) {
-                    input "syncMobileSettings", "enum", multiple: true, title:"Select family member(s) to update location, display and region settings on the next location update. The user will be registered to receive this update once 'Done' is pressed, below, and this list will be automatically cleared.", options: (enabledMembers ? enabledMembers.sort() : enabledMembers)
-                    href(title: "Recommended Default Settings", description: "", style: "page", page: "resetDefaults")
-                    href(title: "Delete or Deactivate Family Members", description: "", style: "page", page: "deleteMembers")
+                    input 'syncMobileSettings', 'enum', multiple: true, title:"Select family member(s) to update location, display and region settings on the next location update. The user will be registered to receive this update once 'Done' is pressed, below, and this list will be automatically cleared.", options: (enabledMembers ? enabledMembers.sort() : enabledMembers)
+                    href(title: 'Recommended Default Settings', description: '', style: 'page', page: 'resetDefaults')
+                    href(title: 'Delete or Deactivate Family Members', description: '', style: 'page', page: 'deleteMembers')
                 }
-                input name: "sectionLogging", type: "button", title: getSectionTitle(state.show.logging, "Logging"), submitOnChange: true, style: getSectionStyle()
+                input name: 'sectionLogging', type: 'button', title: sectionTitle(state.show.logging, 'Logging'), submitOnChange: true, style: sectionStyle()
                 if (state.show.logging) {
-                    input name: "descriptionTextOutput", type: "bool", title: "Enable Description Text logging", defaultValue: DEFAULT_descriptionTextOutput
-                    input name: "debugOutput", type: "bool", title: "Enable Debug Logging", defaultValue: DEFAULT_debugOutput
-                    input name: "debugResetHours", type: "number", title: "Turn off debug logging after this many hours (1..24)", range: "1..24", defaultValue: DEFAULT_debugResetHours
+                    input name: 'descriptionTextOutput', type: 'bool', title: 'Enable Description Text logging', defaultValue: DEFAULT_descriptionTextOutput
+                    input name: 'debugOutput', type: 'bool', title: 'Enable Debug Logging', defaultValue: DEFAULT_debugOutput
+                    input name: 'debugResetHours', type: 'number', title: 'Turn off debug logging after this many hours (1..24)', range: '1..24', defaultValue: DEFAULT_debugResetHours
                 }
             }
         }
@@ -484,309 +482,311 @@ def getLocatorPriority(inRegion) {
 }
 
 def configureHubApp() {
-    return dynamicPage(name: "configureHubApp", title: "", nextPage: "mainPage") {
-        section(getFormat("box", "Configure Hubitat App")) {
+    return dynamicPage(name: 'configureHubApp', title: '', nextPage: 'mainPage') {
+        section(styleFormat('box', 'Configure Hubitat App')) {
             // deal with changes if the imperial/metric slider was changed
             initializeHub(false)
         }
-        section() {
-            input name: "sectionHubsettings", type: "button", title: getSectionTitle(state.show.hubsettings, "Hubitat Settings - WiFi Settings, Units, Device Prefix"), submitOnChange: true, style: getSectionStyle()
+        section {
+            input name: 'sectionHubsettings', type: 'button', title: sectionTitle(state.show.hubsettings, 'Hubitat Settings - WiFi Settings, Units, Device Prefix'), submitOnChange: true, style: sectionStyle()
             if (state.show.hubsettings) {
-                input "homeSSID", "string", title:"Enter your 'Home' WiFi SSID(s), separated by commas.  Used to prevent devices from being 'non-present' if currently connected to these WiFi access point(s).", defaultValue: ""
-                input name: "wifiPresenceKeepRadius", type: "enum", title: "SSID will only be used for presence detection when a member is within this radius from home, Recommended=${displayMFtVal(DEFAULT_wifiPresenceKeepRadius)}", defaultValue: "${DEFAULT_wifiPresenceKeepRadius}", options: (imperialUnits ? [0:'disabled',250:'820 ft',500:'1640 ft',750:'2461 ft',2000:'1.2 mi',5000:'3.1 mi',10000:'6.2 mi'] : [0:'disabled',250:'250 m',500:'500 m',750:'750 m',2000:'2 km',5000:'5 km',10000:'10 km'])
-                input name: "imperialUnits", type: "bool", title: "Display imperial units instead of metric units", defaultValue: DEFAULT_imperialUnits, submitOnChange: true
-                input name: "deviceNamePrefix", type: "string", title: "Prefix to be added to each member's device name.  For example, member '<b>Bob</b>' with a prefix of '<b>${DEFAULT_CHILDPREFIX}</b>' will have a device name of '<b>${DEFAULT_CHILDPREFIX}Bob</b>'. Member device name will be updated once the Hubibit app is exited. Enter a space to have no prefix in front of the member name.", defaultValue: DEFAULT_CHILDPREFIX, submitOnChange: true, required: true
+                input 'homeSSID', 'string', title:"Enter your 'Home' WiFi SSID(s), separated by commas.  Used to prevent devices from being 'non-present' if currently connected to these WiFi access point(s).", defaultValue: ''
+                input name: 'wifiPresenceKeepRadius', type: 'enum', title: "SSID will only be used for presence detection when a member is within this radius from home, Recommended=${displayMFtVal(DEFAULT_wifiPresenceKeepRadius)}", defaultValue: "${DEFAULT_wifiPresenceKeepRadius}", options: (imperialUnits ? [0:'disabled', 250:'820 ft', 500:'1640 ft', 750:'2461 ft', 2000:'1.2 mi', 5000:'3.1 mi', 10000:'6.2 mi'] : [0:'disabled', 250:'250 m', 500:'500 m', 750:'750 m', 2000:'2 km', 5000:'5 km', 10000:'10 km'])
+                input name: 'imperialUnits', type: 'bool', title: 'Display imperial units instead of metric units', defaultValue: DEFAULT_imperialUnits, submitOnChange: true
+                input name: 'deviceNamePrefix', type: 'string', title: "Prefix to be added to each member's device name.  For example, member '<b>Bob</b>' with a prefix of '<b>${DEFAULT_CHILDPREFIX}</b>' will have a device name of '<b>${DEFAULT_CHILDPREFIX}Bob</b>'. Member device name will be updated once the Hubibit app is exited. Enter a space to have no prefix in front of the member name.", defaultValue: DEFAULT_CHILDPREFIX, submitOnChange: true, required: true
             }
-            input name: "sectionGeocode", type: "button", title: getSectionTitle(state.show.geocode, "Geocode API Settings - Converts latitude/longitude to address"), submitOnChange: true, style: getSectionStyle()
+            input name: 'sectionGeocode', type: 'button', title: sectionTitle(state.show.geocode, 'Geocode API Settings - Converts latitude/longitude to address'), submitOnChange: true, style: sectionStyle()
             if (state.show.geocode) {
-                input name: "geocodeProvider", type: "enum", title: "Select the optional geocode provider for address lookups.  Allows location latitude/longitude to be displayed as physical address.", description: "Enter", defaultValue: DEFAULT_geocodeProvider, options: GEOCODE_PROVIDERS, submitOnChange: true
-                if (geocodeProvider != "0") {
-                    paragraph ("<b><i>Google provides the best accuracy, but offers the least amount of free locations - Google usage quota is reset MONTHLY vs DAILY for the other providers.</i></b>")
+                input name: 'geocodeProvider', type: 'enum', title: 'Select the optional geocode provider for address lookups.  Allows location latitude/longitude to be displayed as physical address.', description: 'Enter', defaultValue: DEFAULT_geocodeProvider, options: GEOCODE_PROVIDERS, submitOnChange: true
+                if (geocodeProvider != '0') {
+                    paragraph('<b><i>Google provides the best accuracy, but offers the least amount of free locations - Google usage quota is reset MONTHLY vs DAILY for the other providers.</i></b>')
                     String provider = GEOCODE_USAGE_COUNTER[geocodeProvider?.toInteger()]
                     usageCounter = state."$provider"
-                    input name: "geocodeFreeOnly", type: "bool", title: "Prevent geocode lookups once free quota has been exhausted.  Current usage: <b>${usageCounter}/${GEOCODE_QUOTA[geocodeProvider?.toInteger()]} per ${(GEOCODE_QUOTA_INTERVAL_DAILY[geocodeProvider?.toInteger()] ? "day" : "month")}</b>.", defaultValue: DEFAULT_geocodeFreeOnly
-                    paragraph (GEOCODE_API_KEY_LINK[geocodeProvider?.toInteger()] + (geocodeProvider?.toInteger() == 1 ? " -- <i><b>'Geocoding API'</b> must be enabled under <b><a href='https://console.cloud.google.com/apis/dashboard' target='_blank'>API's & Services</a></b>.  Use <b>API restrictions</b> and select <b>Geocoding API</b>.</i>" : ""))
-                    input name: "geocodeAPIKey_$geocodeProvider", type: "string", title: "Geocode API key for address lookups:", submitOnChange: true
-                    reverseGeocodeTest = reverseGeocode(37.422331,-122.0843455)
-                    paragraph ("Geocode API key check: ${(reverseGeocodeTest ? "<div><b>PASSED</b> - $reverseGeocodeTest</div>" : "<div style='color:#ff0000'>FAILED</div>")}")
+                    input name: 'geocodeFreeOnly', type: 'bool', title: "Prevent geocode lookups once free quota has been exhausted.  Current usage: <b>${usageCounter}/${GEOCODE_QUOTA[geocodeProvider?.toInteger()]} per ${(GEOCODE_QUOTA_INTERVAL_DAILY[geocodeProvider?.toInteger()] ? 'day' : 'month')}</b>.", defaultValue: DEFAULT_geocodeFreeOnly
+                    paragraph(GEOCODE_API_KEY_LINK[geocodeProvider?.toInteger()] + (geocodeProvider?.toInteger() == 1 ? " -- <i><b>'Geocoding API'</b> must be enabled under <b><a href='https://console.cloud.google.com/apis/dashboard' target='_blank'>API's & Services</a></b>.  Use <b>API restrictions</b> and select <b>Geocoding API</b>.</i>" : ''))
+                    input name: "geocodeAPIKey_$geocodeProvider", type: 'string', title: 'Geocode API key for address lookups:', submitOnChange: true
+                    reverseGeocodeTest = reverseGeocode(37.422331, -122.0843455)
+                    paragraph("Geocode API key check: ${(reverseGeocodeTest ? "<div><b>PASSED</b> - $reverseGeocodeTest</div>" : "<div style='color:#ff0000'>FAILED</div>")}")
                 }
             }
-            input name: "sectionMap", type: "button", title: getSectionTitle(state.show.map, "Google Map API Settings - Creates a combined family map and adds radius bubbles on the 'Region' 'Add/Edit/Delete' page maps"), submitOnChange: true, style: getSectionStyle()
+            input name: 'sectionMap', type: 'button', title: sectionTitle(state.show.map, "Google Map API Settings - Creates a combined family map and adds radius bubbles on the 'Region' 'Add/Edit/Delete' page maps"), submitOnChange: true, style: sectionStyle()
             if (state.show.map) {
-                paragraph ("<h3><b>The Google Family Map dashboard URL provides detailed location and trip history for all members.  It requires signing up for a free Google Maps Javascript API key (see below).</b></h3>" +
-                       "<h2>Interacting with the map</h2>" +
-                       "<h4><b>     Selecting a member marker</b></h4>" +
-                       "          1. The map will automatically zoom and center on all family members when opened.\r" +
-                       "          2. Clicking a member marker will change tracking to that member.  The map will auto-center based on their incoming locations to ensure they are always in frame.\r" +
-                       "          3. The info box will display the last location information.  If the Android app is configured with non-optimal settings for operation, the following warnings will be listed depending on the issue:\r" +
-                       "             a. 'App battery usage: Optimized/Restricted.'  Change to 'Unrestricted' for optimal operation.\r" +
-                       "             b. 'Permissions: App can pause.'  Disable the slider to prevent Android from pausing the app if it has not be used in a while.\r" +
-                       "             c. 'Location permission: Not allowed all the time.'  Change to 'Allow all the time' and 'Use precise location'.\r" +
-                       "          3. Clicking on the map will release the member and auto-zoom to fit all members.\r" +
-                       "<h4><b>     Selecting member history</b></h4>" +
-                       "          1. When a member is selected, their past trip history is displayed fading from dark (newest) to light (oldest).\r" +
-                       "          2. Selecting a history point will display information about that trip at that point in time, hide other trips and pause auto-centering.\r" +
-                       "          3. Selecting a history line will display information for the entire trip, hide other trips and pause auto-centering.\r" +
-                       "          4. While the info window is open, clicking anywhere on the map will display all trips for that member.  Closing the info window will resume auto-centering.\r" +
-                       "          5. Trips use numbered based on how new they are in the history.  Trip #1 is the latest trip.\r" +
-                       "          6. Trips use three different markers:\r" +
-                       "             a. Hollow circle with thick border: Start location for the trip.\r" +
-                       "             b. Solid circle: Intermediate location in the trip.\r" +
-                       "             a. Hollow circle with thin border: End location for the trip.\r" +
-                       "<h4><b>     Bottom banner</b></h4>" +
-                       "          1. The bottom banner displays the last date/time that the map received an updated member location.\r" +
-                       "          2. If a member was selected, 'Following: <member>' will be displayed.\r" +
-                       "          3. If the map was dragged or history point or line was selected, the automatic pan and zoom is paused and 'Auto-Centering Paused' will be displayed.\r" +
-                       "          4. Clicking anywhere on the map will resume auto-centering when the next incoming location is received.\r\r"
-                )
-                paragraph ("<h2>Configuring the Map</h2>")
-                paragraph ("If user thumbnails have not been added to Hubitat, follow the instructions for 'Enabling User Thumbnail Instructions' to allow images to be displayed on map pins:")
-                href(title: "Enabling User Thumbnails", description: "", style: "page", page: "thumbnailCreation")
-                input name: "mapFreeOnly", type: "bool", title: "Prevent generating maps once free quota has been exhausted.  Current usage: <b>${state.mapApiUsage}/${GOOGLE_MAP_API_QUOTA} per month</b>.", defaultValue: DEFAULT_mapFreeOnly
-                paragraph (GOOGLE_MAP_API_KEY_LINK + " -- <i><b>'Maps JavaScript API'</b> must be enabled under <b><a href='https://console.cloud.google.com/apis/dashboard' target='_blank'>API's & Services</a></b>.  Use <b>API restrictions</b> and select <b>Maps JavaScript API</b>.</i>")
-                input name: "googleMapsAPIKey", type: "string", title: "Google Maps API key for combined family location map and region add/edit/delete pages to display with region radius bubbles:", submitOnChange: true
-                paragraph ("<a href='${getAttributeURL("[cloud.hubitat.com]", "googlemap")}' target='_blank'>Test map API key</a>")
-                input name: "memberBoundsRadius", type: "number", title: "Map will only auto-zoom to fit members within this distance from home (${getLargeUnits()}) (0..${displayKmMiVal(6400).toInteger()}) Recommended=${displayKmMiVal(DEFAULT_memberBoundsRadius).toInteger()}, Show all members=0", range: "0..${displayKmMiVal(6400).toInteger()}", defaultValue: displayKmMiVal(DEFAULT_memberBoundsRadius).toInteger(), submitOnChange: true
-                input name: "smartDisplayScale", type: "decimal", title: "Scale value for casting to 1024x600 or 1280x800 smart displays. (1.0..1.3), recommended: 1.2:", range: "1.0..1.3", defaultValue: DEFAULT_smartDisplayScale
-                input name: "useZoomWhenMembersAreClose", type: "bool", title: "Enable to allow auto-zoom to zoom in closer when all member(s) are in the same area.", defaultValue: DEFAULT_useZoomWhenMembersAreClose
-                paragraph ("<h2>Member History and Pin Colors</h2>")
-                input name: "memberAccuracyRadiusOpacity", type: "decimal", title: "Opacity value for the member accuracy radius, 0=disabled (0.0..3.0):", range: "0.0..3.0", defaultValue: DEFAULT_memberAccuracyRadiusOpacity
-                input name: "memberHistoryLength", type: "number", title: "Number of total past member locations to save (0..${DEFAULT_maxMemberHistoryLength}):", range: "0..${DEFAULT_maxMemberHistoryLength}", defaultValue: DEFAULT_memberHistoryLength
-                input name: "memberTripIdleMarkerTime", type: "number", title: "Time in minutes between adjacent history locations to denote an end of trip (5..60):", range: "5..60", defaultValue: DEFAULT_memberTripIdleMarkerTime
-                input name: "removeMemberMarkersWithSameBearing", type: "bool", title: "Remove previous history location if member is moving in the same direction.", defaultValue: DEFAULT_removeMemberMarkersWithSameBearing, submitOnChange: true
+                paragraph('''|<h3><b>The Google Family Map dashboard URL provides detailed location and trip history for all members.  It requires signing up for a free Google Maps Javascript API key (see below).</b></h3>
+                |<h2>Interacting with the map</h2>
+                |<h4><b>Selecting a member marker</b></h4>
+                |  1. The map will automatically zoom and center on all family members when opened.\r
+                |  2. Clicking a member marker will change tracking to that member.  The map will auto-center based on their incoming locations to ensure they are always in frame.\r
+                |  3. The info box will display the last location information.  If the Android app is configured with non-optimal settings for operation, the following warnings will be listed depending on the issue:\r
+                |      a. 'App battery usage: Optimized/Restricted.'  Change to 'Unrestricted' for optimal operation.\r
+                |      b. 'Permissions: App can pause.'  Disable the slider to prevent Android from pausing the app if it has not be used in a while.\r
+                |      c. 'Location permission: Not allowed all the time.'  Change to 'Allow all the time' and 'Use precise location'.\r
+                |  4. Clicking on the map will release the member and auto-zoom to fit all members.\r
+                |<h4><b>Selecting member history</b></h4>
+                |  1. When a member is selected, their past trip history is displayed fading from dark (newest) to light (oldest).\r
+                |  2. Selecting a history point will display information about that trip at that point in time, hide other trips and pause auto-centering.\r
+                |  3. Selecting a history line will display information for the entire trip, hide other trips and pause auto-centering.\r
+                |  4. While the info window is open, clicking anywhere on the map will display all trips for that member.  Closing the info window will resume auto-centering.\r
+                |  5. Trips use numbered based on how new they are in the history.  Trip #1 is the latest trip.\r
+                |  6. Trips use three different markers:\r
+                |      a. Hollow circle with thick border: Start location for the trip.\r
+                |      b. Solid circle: Intermediate location in the trip.\r
+                |      c. Hollow circle with thin border: End location for the trip.\r
+                |<h4><b>Bottom banner</b></h4>
+                |  1. The bottom banner displays the last date/time that the map received an updated member location.\r
+                |  2. If a member was selected, 'Following: <member>' will be displayed.\r
+                |  3. If the map was dragged or history point or line was selected, the automatic pan and zoom is paused and 'Auto-Centering Paused' will be displayed.\r
+                |  4. Clicking anywhere on the map will resume auto-centering when the next incoming location is received.\r
+                '''.stripMargin())
+                paragraph('<h2>Configuring the Map</h2>')
+                paragraph("If user thumbnails have not been added to Hubitat, follow the instructions for 'Enabling User Thumbnail Instructions' to allow images to be displayed on map pins:")
+                href(title: 'Enabling User Thumbnails', description: '', style: 'page', page: 'thumbnailCreation')
+                input name: 'mapFreeOnly', type: 'bool', title: "Prevent generating maps once free quota has been exhausted.  Current usage: <b>${state.mapApiUsage}/${GOOGLE_MAP_API_QUOTA} per month</b>.", defaultValue: DEFAULT_mapFreeOnly
+                paragraph(GOOGLE_MAP_API_KEY_LINK + " -- <i><b>'Maps JavaScript API'</b> must be enabled under <b><a href='https://console.cloud.google.com/apis/dashboard' target='_blank'>API's & Services</a></b>.  Use <b>API restrictions</b> and select <b>Maps JavaScript API</b>.</i>")
+                input name: 'googleMapsAPIKey', type: 'string', title: 'Google Maps API key for combined family location map and region add/edit/delete pages to display with region radius bubbles:', submitOnChange: true
+                paragraph("<a href='${attributeURL('[cloud.hubitat.com]', 'googlemap')}' target='_blank'>Test map API key</a>")
+                input name: 'memberBoundsRadius', type: 'number', title: "Map will only auto-zoom to fit members within this distance from home (${largeUnits()}) (0..${displayKmMiVal(6400).toInteger()}) Recommended=${displayKmMiVal(DEFAULT_memberBoundsRadius).toInteger()}, Show all members=0", range: "0..${displayKmMiVal(6400).toInteger()}", defaultValue: displayKmMiVal(DEFAULT_memberBoundsRadius).toInteger(), submitOnChange: true
+                input name: 'smartDisplayScale', type: 'decimal', title: 'Scale value for casting to 1024x600 or 1280x800 smart displays. (1.0..1.3), recommended: 1.2:', range: '1.0..1.3', defaultValue: DEFAULT_smartDisplayScale
+                input name: 'useZoomWhenMembersAreClose', type: 'bool', title: 'Enable to allow auto-zoom to zoom in closer when all member(s) are in the same area.', defaultValue: DEFAULT_useZoomWhenMembersAreClose
+                paragraph('<h2>Member History and Pin Colors</h2>')
+                input name: 'memberAccuracyRadiusOpacity', type: 'decimal', title: 'Opacity value for the member accuracy radius, 0=disabled (0.0..3.0):', range: '0.0..3.0', defaultValue: DEFAULT_memberAccuracyRadiusOpacity
+                input name: 'memberHistoryLength', type: 'number', title: "Number of total past member locations to save (0..${DEFAULT_maxMemberHistoryLength}):", range: "0..${DEFAULT_maxMemberHistoryLength}", defaultValue: DEFAULT_memberHistoryLength
+                input name: 'memberTripIdleMarkerTime', type: 'number', title: 'Time in minutes between adjacent history locations to denote an end of trip (5..60):', range: '5..60', defaultValue: DEFAULT_memberTripIdleMarkerTime
+                input name: 'removeMemberMarkersWithSameBearing', type: 'bool', title: 'Remove previous history location if member is moving in the same direction.', defaultValue: DEFAULT_removeMemberMarkersWithSameBearing, submitOnChange: true
                 if (removeMemberMarkersWithSameBearing) {
-                    input name: "memberMarkerBearingDifferenceDegrees", type: "number", title: "Locations with bearings within this number of degrees are removed to reduce history size (0..45):", range: "0..45", defaultValue: DEFAULT_memberMarkerBearingDifferenceDegrees
+                    input name: 'memberMarkerBearingDifferenceDegrees', type: 'number', title: 'Locations with bearings within this number of degrees are removed to reduce history size (0..45):', range: '0..45', defaultValue: DEFAULT_memberMarkerBearingDifferenceDegrees
                 }
-                input name: "memberDrawerScale", type: "decimal", title: "Scale value for the member details in the info boxes and map drawer. (1.0..1.3), recommended: 1.2:", range: "1.0..1.3", defaultValue: DEFAULT_memberDrawerScale
-                input name: "memberHistoryScale", type: "decimal", title: "Scale value for the past member locations (1.0..3.0):", range: "1.0..3.0", defaultValue: DEFAULT_memberHistoryScale
-                input name: "memberHistoryRepeat", type: "number", title: "Distance between repeat arrows on the history lines. '0' will place a single arrow in the middle of the line (0..1000):", range: "0..1000", defaultValue: DEFAULT_memberHistoryRepeat
-                input name: "useLastGoogleFriendsMapMember", type: "bool", title: "Save the last followed member between map reloads", defaultValue: DEFAULT_useLastGoogleFriendsMapMember
-                input name: "displayAllMembersHistory", type: "bool", title: "Enable to display all member(s) history on map.  Disable to only display history of selected member on map.", defaultValue: DEFAULT_displayAllMembersHistory
-                input name: "memberPinColor", type: "string", title: "<b>Member pin color</b>:  Enter a <a href='https://www.w3schools.com/tags/ref_colornames.asp' target='_blank'>HTML color name</a> (MidnightBlue) or a 6-digit <a href='https://www.w3schools.com/colors/colors_picker.asp' target='_blank'>HTML color code</a> (#191970):", defaultValue: DEFAULT_MEMBER_PIN_COLOR
-                input "selectMemberGlyph", "enum", multiple: false, title:"Select family member to change glyph and history color.", options: state.members.name.sort(), submitOnChange: true
+                input name: 'memberDrawerScale', type: 'decimal', title: 'Scale value for the member details in the info boxes and map drawer. (1.0..1.3), recommended: 1.2:', range: '1.0..1.3', defaultValue: DEFAULT_memberDrawerScale
+                input name: 'memberHistoryScale', type: 'decimal', title: 'Scale value for the past member locations (1.0..3.0):', range: '1.0..3.0', defaultValue: DEFAULT_memberHistoryScale
+                input name: 'memberHistoryRepeat', type: 'number', title: "Distance between repeat arrows on the history lines. '0' will place a single arrow in the middle of the line (0..1000):", range: '0..1000', defaultValue: DEFAULT_memberHistoryRepeat
+                input name: 'useLastGoogleFriendsMapMember', type: 'bool', title: 'Save the last followed member between map reloads', defaultValue: DEFAULT_useLastGoogleFriendsMapMember
+                input name: 'displayAllMembersHistory', type: 'bool', title: 'Enable to display all member(s) history on map.  Disable to only display history of selected member on map.', defaultValue: DEFAULT_displayAllMembersHistory
+                input name: 'memberPinColor', type: 'string', title: "<b>Member pin color</b>:  Enter a <a href='https://www.w3schools.com/tags/ref_colornames.asp' target='_blank'>HTML color name</a> (MidnightBlue) or a 6-digit <a href='https://www.w3schools.com/colors/colors_picker.asp' target='_blank'>HTML color code</a> (#191970):", defaultValue: DEFAULT_MEMBER_PIN_COLOR
+                input 'selectMemberGlyph', 'enum', multiple: false, title:'Select family member to change glyph and history color.', options: state.members.name.sort(), submitOnChange: true
                 // only clear on a change of selected member
                 if (state.selectMemberGlyph != selectMemberGlyph) {
-                    app.removeSetting("memberGlyphColor")
+                    app.removeSetting('memberGlyphColor')
                 }
                 if (selectMemberGlyph) {
                     state.selectMemberGlyph = selectMemberGlyph
-                    selectedMember = state.members.find {it.name==selectMemberGlyph}
+                    selectedMember = state.members.find { it.name == selectMemberGlyph }
                     // if we have a defined color, then assign it to the member
                     if (memberGlyphColor) {
                         selectedMember.color = memberGlyphColor
                     }
-                    input name: "memberGlyphColor", type: "string", title: "<b>${selectMemberGlyph} glyph and history color</b>:  Enter a <a href='https://www.w3schools.com/tags/ref_colornames.asp' target='_blank'>HTML color name</a> (Purple) or a 6-digit <a href='https://www.w3schools.com/colors/colors_picker.asp' target='_blank'>HTML color code</a> (#800080):", defaultValue: (selectedMember?.color ? selectedMember.color : DEFAULT_MEMBER_GLYPH_COLOR), submitOnChange: true
+                    input name: 'memberGlyphColor', type: 'string', title: "<b>${selectMemberGlyph} glyph and history color</b>:  Enter a <a href='https://www.w3schools.com/tags/ref_colornames.asp' target='_blank'>HTML color name</a> (Purple) or a 6-digit <a href='https://www.w3schools.com/colors/colors_picker.asp' target='_blank'>HTML color code</a> (#800080):", defaultValue: (selectedMember?.color ? selectedMember.color : DEFAULT_MEMBER_GLYPH_COLOR), submitOnChange: true
                 }
-                paragraph ("<h2>Region Pin Colors</h2>")
-                input name: "regionPinColor", type: "string", title: "<b>Region pin color</b>:  Enter a <a href='https://www.w3schools.com/tags/ref_colornames.asp' target='_blank'>HTML color name</a> (DarkRed) or a 6-digit <a href='https://www.w3schools.com/colors/colors_picker.asp' target='_blank'>HTML color code</a> (#b22222):", defaultValue: DEFAULT_REGION_PIN_COLOR
-                input name: "regionGlyphColor", type: "string", title: "<b>Region glyph color</b>:  Enter a <a href='https://www.w3schools.com/tags/ref_colornames.asp' target='_blank'>HTML color name</a> (Maroon) or a 6-digit <a href='https://www.w3schools.com/colors/colors_picker.asp' target='_blank'>HTML color code</a> (#800000):", defaultValue: DEFAULT_REGION_GLYPH_COLOR
-                input name: "regionHomeGlyphColor", type: "string", title: "<b>Region home glyph color</b>:  Enter a <a href='https://www.w3schools.com/tags/ref_colornames.asp' target='_blank'>HTML color name</a> (WhiteSmoke) or a 6-digit <a href='https://www.w3schools.com/colors/colors_picker.asp' target='_blank'>HTML color code</a> (#2f4f4f):", defaultValue: DEFAULT_REGION_HOME_GLYPH_COLOR
+                paragraph('<h2>Region Pin Colors</h2>')
+                input name: 'regionPinColor', type: 'string', title: "<b>Region pin color</b>:  Enter a <a href='https://www.w3schools.com/tags/ref_colornames.asp' target='_blank'>HTML color name</a> (DarkRed) or a 6-digit <a href='https://www.w3schools.com/colors/colors_picker.asp' target='_blank'>HTML color code</a> (#b22222):", defaultValue: DEFAULT_REGION_PIN_COLOR
+                input name: 'regionGlyphColor', type: 'string', title: "<b>Region glyph color</b>:  Enter a <a href='https://www.w3schools.com/tags/ref_colornames.asp' target='_blank'>HTML color name</a> (Maroon) or a 6-digit <a href='https://www.w3schools.com/colors/colors_picker.asp' target='_blank'>HTML color code</a> (#800000):", defaultValue: DEFAULT_REGION_GLYPH_COLOR
+                input name: 'regionHomeGlyphColor', type: 'string', title: "<b>Region home glyph color</b>:  Enter a <a href='https://www.w3schools.com/tags/ref_colornames.asp' target='_blank'>HTML color name</a> (WhiteSmoke) or a 6-digit <a href='https://www.w3schools.com/colors/colors_picker.asp' target='_blank'>HTML color code</a> (#2f4f4f):", defaultValue: DEFAULT_REGION_HOME_GLYPH_COLOR
             }
         }
     }
 }
 
 def installationInstructions() {
-    return dynamicPage(name: "installationInstructions", title: "", nextPage: "mainPage") {
-        def extUri = fullApiServerUrl().replaceAll("null","webhook?access_token=${state.accessToken}")
-        section(getFormat("box", "Mobile App Installation Instructions")) {
-            paragraph ("This integration requires the <a href='https://owntracks.org/' target='_blank'>OwnTracks</a> app to be installed on your mobile device.\r" +
-                       "<b>NOTE:</b>  If you reinstall the OwnTracks app on Hubitat, the host URL below will change, and the mobile devices will need to be updated. \r" +
-                       "             This integration currently only supports one device per user for presence detection.  Linking more than one device will cause unreliable presence detection. \r\n\r\n" +
-                       "     <b>Mobile App Configuration</b>\r" +
-                       "     1. Open the OwnTracks app on the mobile device, and configure the following fields.  <b>Only the settings below need to be changed; leave the rest as defaults.</b>\r" +
-                       "          <b>Android</b>\r" +
-                       "          <i>Preferences -> Connection\r" +
-                       "                 Mode -> HTTP \r" +
-                       "                 Host -> <a href='${extUri}' target='_blank'>${extUri}</a> \r" +
-                       "                 Identification ->\r" +
-                       "                        Username -> Name of the user's phone (IE: 'Kevin') \r" +
-                       "                        Device ID -> Optional extra descriptor (IE: 'Phone').  If using OwnTracks recorder, it would be desirable\r" +
-                       "                                               to keep this device ID common across device changes, since it logs 'username/deviceID'. \r" +
-                       "            Preferences -> Advanced\r" +
-                       "                Remote commands -> Selected\r" +
-                       "                Remote configuration -> Selected</i>\r\n\r\n" +
-                       "          <b>iOS</b>\r" +
-                       "          <i>Tap (i) top left, and select 'Settings'.  Only the settings below need to be changed.\r" +
-                       "                 Mode -> HTTP \r" +
-                       "                 DeviceID -> 2-character user initials that will be displayed on your map (IE: 'KT').  If using OwnTracks recorder, it would be desirable to keep this device ID common across device changes, since it logs 'username/deviceID'. \r" +
-                       "                 UserID -> Name of the user's phone (IE: 'Kevin') \r" +
-                       "                 URL -> <a href='${extUri}' target='_blank'>${extUri}</a> \r" +
-                       "                 cmd -> Selected</i>\r\n\r\n" +
-                       "     2. Click the up arrow button in the top right of the map to trigger a 'Send Location Now' to register the device with the Hubitat App."
-                      )
+    return dynamicPage(name: 'installationInstructions', title: '', nextPage: 'mainPage') {
+        def extUri = fullApiServerUrl().replaceAll('null', "webhook?access_token=${state.accessToken}")
+        section(styleFormat('box', 'Mobile App Installation Instructions')) {
+            paragraph("""This integration requires the <a href='https://owntracks.org/' target='_blank'>OwnTracks</a> app to be installed on your mobile device.\r
+            |<b>NOTE:</b> If you reinstall the OwnTracks app on Hubitat, the host URL below will change, and the mobile devices will need to be updated.\r
+            |            This integration currently only supports one device per user for presence detection.  Linking more than one device will cause unreliable presence detection.\r\r
+            |<b>Mobile App Configuration</b>\r
+            |1. Open the OwnTracks app on the mobile device, and configure the following fields.  <b>Only the settings below need to be changed; leave the rest as defaults.</b>\r
+            |     <b>Android</b>\r
+            |     <i>Preferences -> Connection\r
+            |            Mode -> HTTP\r
+            |            Host -> <a href='${extUri}' target='_blank'>${extUri}</a>\r
+            |            Identification ->\r
+            |                   Username -> Name of the user's phone (IE: 'Kevin') \r
+            |                   Device ID -> Optional extra descriptor (IE: 'Phone').  If using OwnTracks recorder, it would be desirable\r
+            |                                to keep this device ID common across device changes, since it logs 'username/deviceID'.\r
+            |        Preferences -> Advanced\r
+            |            Remote commands -> Selected\r
+            |            Remote configuration -> Selected</i>\r\r
+            |     <b>iOS</b>\r
+            |     <i>Tap (i) top left, and select 'Settings'.  Only the settings below need to be changed.\r
+            |            Mode -> HTTP\r
+            |            DeviceID -> 2-character user initials that will be displayed on your map (IE: 'KT').  If using OwnTracks recorder, it would be desirable to keep this device ID common across device changes, since it logs 'username/deviceID'.\r
+            |            UserID -> Name of the user's phone (IE: 'Kevin')\r
+            |            URL -> <a href='${extUri}' target='_blank'>${extUri}</a>\r
+            |            cmd -> Selected</i>\r\r
+            |2. Click the up arrow button in the top right of the map to trigger a 'Send Location Now' to register the device with the Hubitat App.
+            """.stripMargin())
         }
     }
 }
 
 def thumbnailCreation() {
-    return dynamicPage(name: "thumbnailCreation", title: "", nextPage: "mainPage") {
-        section(getFormat("box", "Enabling User Thumbnails")) {
-            paragraph ("Creating User Thumbnails for the OwnTracks Mobile App and optional OwnTracks Recorder.\r\n\r\n" +
-                       "     1. Create a thumbnail for the user at a maximum resolution 192x192 pixels in JPG format using your computer.\r" +
-                       "          a. 96x96 pixels at 96 DPI create a file size of ~5kB which is optimal.\r" +
-                       "          b. Large file sizes can cause location timeouts from the mobile device (HTTP error 504).\r" +
-                       "     2. Name the thumbnail 'MyUser.jpg' where 'MyUser' is the same name as the user name (case sensitive) entered in the mobile app.\r" +
-                       "     3. In Hubitat:\r" +
-                       "          a. Navigate to the <a href='http://${location.hubs[0].getDataValue("localIP")}/hub/fileManager' target='_blank'>Hubitat File Manager</a> ('Settings->File Manager').\r" +
-                       "          b. Select '+ Choose' and select the 'MyUser.jpg' that was created above.\r" +
-                       "          c. Select 'Upload'.\r" +
-                       "          d. Repeat for any additional users.\r" +
-                       "     4. In the OwnTracks Hubitat app:\r" +
-                       "          a. Select 'Display', and enable the 'Display user thumbnails on the map.' and then 'Done'.\r" +
-                       "          b. Select all users in the 'Select family member(s) to update location, display and region settings on the next location update.' box, and then 'Done'.\r" +
-                       "     5. In the OwnTracks Mobile app:\r" +
-                       "          a. Select the 'Send Location Now' button, top right of the map screen.  User thumbnails should now populate on the mobile app map.\r"
-                      )
-            input name: "imageCards", type: "bool", title: "Display user thumbnails on the map.  Needs to have a 'user.jpg' image of maximum resolution 192x192 pixels uploaded to the 'Settings->File Manager'", defaultValue: DEFAULT_imageCards
+    return dynamicPage(name: 'thumbnailCreation', title: '', nextPage: 'mainPage') {
+        section(styleFormat('box', 'Enabling User Thumbnails')) {
+            paragraph("""Creating User Thumbnails for the OwnTracks Mobile App and optional OwnTracks Recorder.\r\r
+            |1. Create a thumbnail for the user at a maximum resolution 192x192 pixels in JPG format using your computer.\r
+            |    a. 96x96 pixels at 96 DPI create a file size of ~5kB which is optimal.\r
+            |    b. Large file sizes can cause location timeouts from the mobile device (HTTP error 504).\r
+            |2. Name the thumbnail 'MyUser.jpg' where 'MyUser' is the same name as the user name (case sensitive) entered in the mobile app.\r
+            |3. In Hubitat:\r
+            |    a. Navigate to the <a href='http://${location.hubs[0].getDataValue('localIP')}/hub/fileManager' target='_blank'>Hubitat File Manager</a> ('Settings->File Manager').\r
+            |    b. Select '+ Choose' and select the 'MyUser.jpg' that was created above.\r
+            |    c. Select 'Upload'.\r
+            |    d. Repeat for any additional users.\r
+            |4. In the OwnTracks Hubitat app:\r
+            |    a. Select 'Display', and enable the 'Display user thumbnails on the map.' and then 'Done'.\r
+            |    b. Select all users in the 'Select family member(s) to update location, display and region settings on the next location update.' box, and then 'Done'.\r
+            |5. In the OwnTracks Mobile app:\r
+            |    a. Select the 'Send Location Now' button, top right of the map screen.  User thumbnails should now populate on the mobile app map.\r
+            """.stripMargin())
+            input name: 'imageCards', type: 'bool', title: "Display user thumbnails on the map.  Needs to have a 'user.jpg' image of maximum resolution 192x192 pixels uploaded to the 'Settings->File Manager'", defaultValue: DEFAULT_imageCards
         }
     }
 }
 
 def recorderInstallationInstructions() {
-    return dynamicPage(name: "recorderInstallationInstructions", title: "", nextPage: "configureRecorder") {
-        section(getFormat("box", "Installing and configuring the OwnTracks Recorder using Docker")) {
-            paragraph ("<b>NOTE:</b>  Instructions assume that Docker has already been installed and is operational.  Replace <b>[HOME_PATH]</b> with your installation specific docker path.  For OpenSUSE, the <b>[HOME_PATH]</b> is '<b>/var/lib</b>'.  Other installations may have a different home path.\r\n\r\n" +
-                       "For the source code and instructions, navigate to <a href='https://github.com/owntracks/docker-recorder/' target='_blank'>OwnTracks Recorder GitHub</a> \r\n\r\n" +
-                       "     1. Install OwnTracks Recorder:\r" +
-                       "          a. docker pull owntracks/recorder\r\n\r\n" +
-                       "     2. Configure OwnTracks Recorder:\r" +
-                       "          a. docker volume create recorder_store\r" +
-                       "          b. docker volume create config\r" +
-                       "          c. Copy (or create if non-existant) the 'recorder.conf' file to '/<b>[HOME_PATH]</b>/docker/volumes/config/_data', which contains the following:\r\n\r\n" +
-                       "                 OTR_STORAGEDIR=\"/<b>[HOME_PATH]</b>/docker/volumes/recorder_store/_data\"\r" +
-                       "                 OTR_PORT=0\r" +
-                       "                 OTR_HTTPHOST=\"0.0.0.0\"\r" +
-                       "                 OTR_HTTPPORT=8083\r" +
-                       "                 OTR_TOPICS=\"owntracks/#\"\r" +
-                       "                 OTR_GEOKEY=\"\"\r" +
-                       "                 OTR_BROWSERAPIKEY=\"\"\r" +
-                       "                 OTR_SERVERLABEL=\"OwnTracks\"\r\n\r\n" +
-                       "                 <b>NOTE:</b> Recorder defaults to OpenStreet Maps.  To use Google maps, add a Google Maps API key between the quotes for OTR_BROWSERAPIKEY.\r" +
-                       "                              For reverse Geocode address lookups, add a Google Maps API key between the quotes for OTR_GEOKEY.\r" +
-                       "                              Select <b>'Configure Hubitat App'</b> for directons to get API keys: \n"
-                       )
-                      href(title: "Configure Hubitat App", description: "", style: "page", page: "configureHubApp")
-            paragraph ("          d. docker run -d --restart always --name=owntracks -p 8083:8083 -v recorder_store:/store -v config:/config owntracks/recorder\r\n\r\n" +
-                       "     3. The above 'recorder_store' (STORAGEDIR) and 'config' is found here in Docker:\r" +
-                       "          a. /<b>[HOME_PATH]</b>/docker/volumes/recorder_store/_data\r" +
-                       "          b. /<b>[HOME_PATH]</b>/docker/volumes/config/_data\r\n\r\n" +
-                       "     4. Access the Owntracks Recorder by opening a web broswer and navigating to 'http://<b>[enter.your.recorder.ip]</b>:8083'.\r"
-                      )
+    return dynamicPage(name: 'recorderInstallationInstructions', title: '', nextPage: 'configureRecorder') {
+        section(styleFormat('box', 'Installing and configuring the OwnTracks Recorder using Docker')) {
+            paragraph("""<b>NOTE:</b>  Instructions assume that Docker has already been installed and is operational.  Replace <b>[HOME_PATH]</b> with your installation specific docker path.  For OpenSUSE, the <b>[HOME_PATH]</b> is '<b>/var/lib</b>'.  Other installations may have a different home path.\r\r
+            |For the source code and instructions, navigate to <a href='https://github.com/owntracks/docker-recorder/' target='_blank'>OwnTracks Recorder GitHub</a> \r\r
+            |1. Install OwnTracks Recorder:\r
+            |    a. docker pull owntracks/recorder\r\r
+            |2. Configure OwnTracks Recorder:\r
+            |    a. docker volume create recorder_store\r
+            |    b. docker volume create config\r
+            |    c. Copy (or create if non-existant) the 'recorder.conf' file to '/<b>[HOME_PATH]</b>/docker/volumes/config/_data', which contains the following:\r\r
+            |            OTR_STORAGEDIR=\"/<b>[HOME_PATH]</b>/docker/volumes/recorder_store/_data\"\r
+            |            OTR_PORT=0\r
+            |            OTR_HTTPHOST=\"0.0.0.0\"\r
+            |            OTR_HTTPPORT=8083\r
+            |            OTR_TOPICS=\"owntracks/#\"\r
+            |            OTR_GEOKEY=\"\"\r
+            |            OTR_BROWSERAPIKEY=\"\"\r
+            |            OTR_SERVERLABEL=\"OwnTracks\"\r\r
+            |            <b>NOTE:</b> Recorder defaults to OpenStreet Maps.  To use Google maps, add a Google Maps API key between the quotes for OTR_BROWSERAPIKEY.\r
+            |                         For reverse Geocode address lookups, add a Google Maps API key between the quotes for OTR_GEOKEY.\r
+            |                         Select <b>'Configure Hubitat App'</b> for directons to get API keys:\r
+            """.stripMargin())
+            href(title: 'Configure Hubitat App', description: '', style: 'page', page: 'configureHubApp')
+            paragraph("""
+            |    d. docker run -d --restart always --name=owntracks -p 8083:8083 -v recorder_store:/store -v config:/config owntracks/recorder\r\r
+            |3. The above 'recorder_store' (STORAGEDIR) and 'config' is found here in Docker:\r
+            |    a. /<b>[HOME_PATH]</b>/docker/volumes/recorder_store/_data\r
+            |    b. /<b>[HOME_PATH]</b>/docker/volumes/config/_data\r\r
+            |4. Access the Owntracks Recorder by opening a web broswer and navigating to 'http://<b>[enter.your.recorder.ip]</b>:8083'.\r
+            """.stripMargin())
         }
-        section(getFormat("box", "Installing and configuring the OwnTracks Frontend (optional UI) using Docker")) {
-            paragraph ("<b>NOTE:</b>  Instructions assume that Docker has already been installed and is operational and the Owntracks Recorder, above, has been installed an configured.\r\n\r\n" +
-                       "For the source code and instructions, navigate to <a href='https://github.com/owntracks/frontend/' target='_blank'>OwnTracks Frontend GitHub</a> \r\n\r\n" +
-                       "     1. Install OwnTracks Recorder:\r" +
-                       "          a. docker pull owntracks/frontend\r\n\r\n" +
-                       "     2. Configure OwnTracks Recorder:\r" +
-                       "          a. docker run -d --restart always --name=owntracks_ui -p 8082:80 -e SERVER_HOST=<b>[enter.your.recorder.ip]</b> -e SERVER_PORT=8083 owntracks/frontend\r\n\r\n" +
-                       "     3. Access the Owntracks Frontend by opening a web broswer and navigating to 'http://<b>[enter.your.recorder.ip]</b>:8082'.\r"
-                      )
+        section(styleFormat('box', 'Installing and configuring the OwnTracks Frontend (optional UI) using Docker')) {
+            paragraph("""<b>NOTE:</b>  Instructions assume that Docker has already been installed and is operational and the Owntracks Recorder, above, has been installed an configured.\r\r
+            |For the source code and instructions, navigate to <a href='https://github.com/owntracks/frontend/' target='_blank'>OwnTracks Frontend GitHub</a> \r\r
+            |    1. Install OwnTracks Recorder:\r
+            |        a. docker pull owntracks/frontend\r\r
+            |    2. Configure OwnTracks Recorder:\r
+            |        a. docker run -d --restart always --name=owntracks_ui -p 8082:80 -e SERVER_HOST=<b>[enter.your.recorder.ip]</b> -e SERVER_PORT=8083 owntracks/frontend\r\r
+            |    3. Access the Owntracks Frontend by opening a web broswer and navigating to 'http://<b>[enter.your.recorder.ip]</b>:8082'.\r
+            """.stripMargin())
         }
-        section(getFormat("box", "Adding user cards to OwnTracks Recorder")) {
-            paragraph ("1. If user thumbnails have not been added to Hubitat, follow the instructions for 'Enabling User Thumbnail Instructions' first:")
-            href(title: "Enabling User Thumbnails", description: "", style: "page", page: "thumbnailCreation")
-            paragraph ("2. Select the slider to generate the enabled user's JSON card data in the Hubitat logs:")
-            input name: "generateMemberCardJSON", type: "bool", title: "Create 'trace' outputs for each enabled member in the Hubitat logs.  Slider will turn off once complete.  ${(imageCards ? "" : "<div style='color:#ff0000'><b>Thumbnails are disabled.  Select 'Enabling User Thumbnails' to allow thumbnail generation.</b></div>")}", defaultValue: false, submitOnChange: true
+        section(styleFormat('box', 'Adding user cards to OwnTracks Recorder')) {
+            paragraph("1. If user thumbnails have not been added to Hubitat, follow the instructions for 'Enabling User Thumbnail Instructions' first:")
+            href(title: 'Enabling User Thumbnails', description: '', style: 'page', page: 'thumbnailCreation')
+            paragraph("2. Select the slider to generate the enabled user's JSON card data in the Hubitat logs:")
+            input name: 'generateMemberCardJSON', type: 'bool', title: "Create 'trace' outputs for each enabled member in the Hubitat logs.  Slider will turn off once complete.  ${(imageCards ? '' : "<div style='color:#ff0000'><b>Thumbnails are disabled.  Select 'Enabling User Thumbnails' to allow thumbnail generation.</b></div>")}", defaultValue: false, submitOnChange: true
             if (generateMemberCardJSON) {
                 logMemberCardJSON()
-                app.updateSetting("generateMemberCardJSON",[value: false, type: "bool"])
+                app.updateSetting('generateMemberCardJSON', [value: false, type: 'bool'])
             }
-            paragraph ("3. In the <a href='http://${location.hubs[0].getDataValue("localIP")}/logs' target='_blank'>Hubitat log</a>, look for the 'trace' output that looks like this:\r" +
-                       "          For recorder cards, copy the bold JSON text between | |, and save this file to 'STORAGEDIR/cards/myuser/myuser.json' (user name is in lower case): \r" +
-                       "          |<b>{\"_type\":\"card\",\"name\":\"MyUser\",\"face\":\"....\",\"tid\":\"MyUser\"}</b>|\r\n\r\n" +
-                       "4. Save the <b>{\"_type\":\"card\",\"name\":\"MyUser\",\"face\":\"....\",\"tid\":\"MyUser\"}</b> to a text file with the name <b>myuser.json</b> (user name is in lower case), as listed in step 3.\r\n\r\n" +
-                       "5. Create the cards folder if it does not exist:\r" +
-                       "          /<b>[HOME_PATH]</b>/docker/volumes/recorder_store/_data/cards\r\n\r\n" +
-                       "6. To add user cards, copy card file for each user to the following docker path:\r" +
-                       "          /<b>[HOME_PATH]</b>/docker/volumes/recorder_store/_data/cards/<b>myuser/myuser</b>.json\r\n\r\n" +
-                       "7. Alternatively, if you choose to have user/device specific cards, you would name the card 'myuser-mydevice.json' (user/device name is in lower case), and save it in the following docker path:\r" +
-                       "          /<b>[HOME_PATH]</b>/docker/volumes/recorder_store/_data/cards/<b>myuser/mydevice/myuser-mydevice</b>.json\r"
-                      )
+            paragraph("""
+            |3. In the <a href='http://${location.hubs[0].getDataValue('localIP')}/logs' target='_blank'>Hubitat log</a>, look for the 'trace' output that looks like this:\r
+            |        For recorder cards, copy the bold JSON text between | |, and save this file to 'STORAGEDIR/cards/myuser/myuser.json' (user name is in lower case): \r
+            |        |<b>{\"_type\":\"card\",\"name\":\"MyUser\",\"face\":\"....\",\"tid\":\"MyUser\"}</b>|\r\r
+            |4. Save the <b>{\"_type\":\"card\",\"name\":\"MyUser\",\"face\":\"....\",\"tid\":\"MyUser\"}</b> to a text file with the name <b>myuser.json</b> (user name is in lower case), as listed in step 3.\r\r
+            |5. Create the cards folder if it does not exist:\r
+            |        /<b>[HOME_PATH]</b>/docker/volumes/recorder_store/_data/cards\r\r
+            |6. To add user cards, copy card file for each user to the following docker path:\r
+            |        /<b>[HOME_PATH]</b>/docker/volumes/recorder_store/_data/cards/<b>myuser/myuser</b>.json\r\r
+            |7. Alternatively, if you choose to have user/device specific cards, you would name the card 'myuser-mydevice.json' (user/device name is in lower case), and save it in the following docker path:\r
+            |        /<b>[HOME_PATH]</b>/docker/volumes/recorder_store/_data/cards/<b>myuser/mydevice/myuser-mydevice</b>.json\r
+            """.stripMargin())
         }
     }
 }
 
 def configureRecorder() {
-    return dynamicPage(name: "configureRecorder", title: "", nextPage: "mainPage") {
-        section(getFormat("box", "Recorder Configuration")) {
+    return dynamicPage(name: 'configureRecorder', title: '', nextPage: 'mainPage') {
+        section(styleFormat('box', 'Recorder Configuration')) {
             paragraph("The <a href='https://owntracks.org/booklet/clients/recorder/' target='_blank'>OwnTracks Recorder</a> (optional) can be installed for local tracking.  For the Recorder dashboard tiles and links to work outside the home network, the recorder must have a secure URL (https) and be secured with a public certificate.")
-            input name: "recorderURL", type: "text", title: "HTTP URL of the OwnTracks Recorder.  It will be in the format <b>'http://enter.your.recorder.ip:8083'</b>, assuming using the default port of 8083.  The app will automatically add the <b>'$RECORDER_PUBLISH_FOLDER'</b> path.", defaultValue: ""
-            input name: "enableRecorder", type: "bool", title: "Enable location updates to be sent to the Recorder URL", defaultValue: false, submitOnChange: true
+            input name: 'recorderURL', type: 'text', title: "HTTP URL of the OwnTracks Recorder.  It will be in the format <b>'http://enter.your.recorder.ip:8083'</b>, assuming using the default port of 8083.  The app will automatically add the <b>'$RECORDER_PUBLISH_FOLDER'</b> path.", defaultValue: ''
+            input name: 'enableRecorder', type: 'bool', title: 'Enable location updates to be sent to the Recorder URL', defaultValue: false, submitOnChange: true
             if (!recorderURL) {
-                app.updateSetting("enableRecorder",[value: false, type: "bool"])
+                app.updateSetting('enableRecorder', [value: false, type: 'bool'])
             }
         }
-        section() {
-            href(title: "Installing OwnTracks Recorder and Configuring User Card Instructions", description: "", style: "page", page: "recorderInstallationInstructions")
+        section {
+            href(title: 'Installing OwnTracks Recorder and Configuring User Card Instructions', description: '', style: 'page', page: 'recorderInstallationInstructions')
         }
     }
 }
 
 def configureSecondaryHub() {
-    return dynamicPage(name: "configureSecondaryHub", title: "", nextPage: "mainPage") {
-        section(getFormat("box", "Secondary Hub Configuration")) {
-            paragraph ("Allows for OwnTracks to daisy chain to multiple hubs.\r" +
-                       "1. On the secondary hub, paste the host/URL from 'Mobile App Installation Instructions -> Mobile App Configuration' below.\r" +
-                       "2. Select the slider to enable mobile updates to be sent to the secondary hub URL as they arrive.\r" +
-                       "3. Additional hubs can be daisy chained by repeating the above on the third hub, and adding it to the second hub.\r"
-            )
-            input name: "secondaryHubURL", type: "text", title: "Host URL of the Seconday Hub from the OwnTracks app 'Mobile App Installation Instructions' page.", defaultValue: ""
-            input name: "enableSecondaryHub", type: "bool", title: "Enable location updates to be sent to the secondary hub URL", defaultValue: false, submitOnChange: true
+    return dynamicPage(name: 'configureSecondaryHub', title: '', nextPage: 'mainPage') {
+        section(styleFormat('box', 'Secondary Hub Configuration')) {
+            paragraph("""Allows for OwnTracks to daisy chain to multiple hubs.\r
+            |    1. On the secondary hub, paste the host/URL from 'Mobile App Installation Instructions -> Mobile App Configuration' below.\r
+            |    2. Select the slider to enable mobile updates to be sent to the secondary hub URL as they arrive.\r
+            |    3. Additional hubs can be daisy chained by repeating the above on the third hub, and adding it to the second hub.\r
+            """.stripMargin())
+            input name: 'secondaryHubURL', type: 'text', title: "Host URL of the Seconday Hub from the OwnTracks app 'Mobile App Installation Instructions' page.", defaultValue: ''
+            input name: 'enableSecondaryHub', type: 'bool', title: 'Enable location updates to be sent to the secondary hub URL', defaultValue: false, submitOnChange: true
             if (!secondaryHubURL) {
-                app.updateSetting("enableSecondaryHub",[value: false, type: "bool"])
+                app.updateSetting('enableSecondaryHub', [value: false, type: 'bool'])
             }
         }
     }
 }
 
 def advancedHub() {
-    return dynamicPage(name: "advancedHub", title: "", nextPage: "mainPage") {
-        section(getFormat("box", "Hub App Configuration")) {
+    return dynamicPage(name: 'advancedHub', title: '', nextPage: 'mainPage') {
+        section(styleFormat('box', 'Hub App Configuration')) {
             if (state.submit) {
                 appButtonHandler(state.submit)
-	            state.submit = ""
+                state.submit = ''
             }
-            input name: "resetHubDefaultsButton", type: "button", title: "Restore Defaults", state: "submit"
-            input name: "regionHighAccuracyRadius", type: "enum", title: "Enable high accuracy reporting when location is between region radius and this value, Recommended=${displayMFtVal(DEFAULT_regionHighAccuracyRadius)}", defaultValue: "${DEFAULT_regionHighAccuracyRadius}", options: (imperialUnits ? [0:'disabled',250:'820 ft',500:'1640 ft',750:'2461 ft',1000:'3281 ft',1250:'4101 ft',1500:'4921 ft'] : [0:'disabled',250:'250 m',500:'500 m',750:'750 m',1000:'1000 m',1250:'1250 m',1500:'1500 m'])
-            input name: "regionHighAccuracyRadiusHomeOnly", type: "bool", title: "High accuracy reporting is used for home region only when selected, all regions if not selected", defaultValue: DEFAULT_regionHighAccuracyRadiusHomeOnly
-            input name: "warnOnNoUpdateHours", type: "number", title: "Highlight members on the 'Member Status' that have not reported a location for this many hours (1..168)", range: "1..168", defaultValue: DEFAULT_warnOnNoUpdateHours
-            input name: "warnOnDisabledMember", type: "bool", title: "Display a warning in the logs if a family member reports a location but is not enabled", defaultValue: DEFAULT_warnOnDisabledMember
-            input name: "warnOnMemberSettings", type: "bool", title: "Display a warning in the logs if a family member app settings are not configured for optimal operation", defaultValue: DEFAULT_warnOnMemberSettings
+            input name: 'resetHubDefaultsButton', type: 'button', title: 'Restore Defaults', state: 'submit'
+            input name: 'regionHighAccuracyRadius', type: 'enum', title: "Enable high accuracy reporting when location is between region radius and this value, Recommended=${displayMFtVal(DEFAULT_regionHighAccuracyRadius)}", defaultValue: "${DEFAULT_regionHighAccuracyRadius}", options: (imperialUnits ? [0:'disabled', 250:'820 ft', 500:'1640 ft', 750:'2461 ft', 1000:'3281 ft', 1250:'4101 ft', 1500:'4921 ft'] : [0:'disabled', 250:'250 m', 500:'500 m', 750:'750 m', 1000:'1000 m', 1250:'1250 m', 1500:'1500 m'])
+            input name: 'regionHighAccuracyRadiusHomeOnly', type: 'bool', title: 'High accuracy reporting is used for home region only when selected, all regions if not selected', defaultValue: DEFAULT_regionHighAccuracyRadiusHomeOnly
+            input name: 'warnOnNoUpdateHours', type: 'number', title: "Highlight members on the 'Member Status' that have not reported a location for this many hours (1..168)", range: '1..168', defaultValue: DEFAULT_warnOnNoUpdateHours
+            input name: 'warnOnDisabledMember', type: 'bool', title: 'Display a warning in the logs if a family member reports a location but is not enabled', defaultValue: DEFAULT_warnOnDisabledMember
+            input name: 'warnOnMemberSettings', type: 'bool', title: 'Display a warning in the logs if a family member app settings are not configured for optimal operation', defaultValue: DEFAULT_warnOnMemberSettings
         }
     }
 }
 
 def advancedLocation() {
-    return dynamicPage(name: "advancedLocation", title: "", nextPage: "mainPage") {
-        section(getFormat("box", "Mobile App Location Configuration")) {
+    return dynamicPage(name: 'advancedLocation', title: '', nextPage: 'mainPage') {
+        section(styleFormat('box', 'Mobile App Location Configuration')) {
             if (state.submit) {
                 appButtonHandler(state.submit)
-	            state.submit = ""
+                state.submit = ''
             }
-            input name: "resetLocationDefaultsButton", type: "button", title: "Restore Defaults", state: "submit"
-            input name: "monitoring", type: "enum", title: "Location reporting mode, Recommended=${MONITORING_MODES[DEFAULT_monitoring]}", required: true, options: MONITORING_MODES, defaultValue: DEFAULT_monitoring, submitOnChange: true
-            if (getAndroidMembers()) {
-                input name: "ping", type: "number", title: "Device will send a location interval at this heart beat interval (minutes) (15..360), Recommended=${DEFAULT_ping} (<b>Android ONLY</b>)", required: true, range: "15..60", defaultValue: DEFAULT_ping
-                input name: "highPowerMode", type: "bool", title: "Use GPS for high accuracy locations.  <b>NOTE:</b> This will consume slightly more battery but will offer better performance in areas with poor WiFi/Cell coverage. (<b>Android ONLY</b>)", defaultValue: DEFAULT_highPowerMode, submitOnChange: true
+            input name: 'resetLocationDefaultsButton', type: 'button', title: 'Restore Defaults', state: 'submit'
+            input name: 'monitoring', type: 'enum', title: "Location reporting mode, Recommended=${MONITORING_MODES[DEFAULT_monitoring]}", required: true, options: MONITORING_MODES, defaultValue: DEFAULT_monitoring, submitOnChange: true
+            if (androidMembers()) {
+                input name: 'ping', type: 'number', title: "Device will send a location interval at this heart beat interval (minutes) (15..360), Recommended=${DEFAULT_ping} (<b>Android ONLY</b>)", required: true, range: '15..60', defaultValue: DEFAULT_ping
+                input name: 'highPowerMode', type: 'bool', title: 'Use GPS for high accuracy locations.  <b>NOTE:</b> This will consume slightly more battery but will offer better performance in areas with poor WiFi/Cell coverage. (<b>Android ONLY</b>)', defaultValue: DEFAULT_highPowerMode, submitOnChange: true
                 // if in high power mode, default to high accuracy pings
                 if (highPowerMode) {
-                    app.updateSetting("highAccuracyOnPing", [value: true, type: "bool"])
-                    input name: "lowPowerModeInRegion", type: "bool", title: "Turn off high accuracy locations when the member is inside a region to reduce location jitter and power consumption. (<b>Android ONLY</b>)", defaultValue: DEFAULT_lowPowerModeInRegion
+                    app.updateSetting('highAccuracyOnPing', [value: true, type: 'bool'])
+                    input name: 'lowPowerModeInRegion', type: 'bool', title: 'Turn off high accuracy locations when the member is inside a region to reduce location jitter and power consumption. (<b>Android ONLY</b>)', defaultValue: DEFAULT_lowPowerModeInRegion
                 } else {
-                    input name: "highAccuracyOnPing", type: "bool", title: "Request a high accuracy location from members on their next location report after a ping update to keep location fresh (<b>Android ONLY</b>)", defaultValue: DEFAULT_highAccuracyOnPing
+                    input name: 'highAccuracyOnPing', type: 'bool', title: 'Request a high accuracy location from members on their next location report after a ping update to keep location fresh (<b>Android ONLY</b>)', defaultValue: DEFAULT_highAccuracyOnPing
                 }
             }
-            input name: "ignoreInaccurateLocations", type: "number", title: "Do not send a location if the accuracy is greater than the given (${getSmallUnits()}) (0..${displayMFtVal(2000)}) Recommended=${displayMFtVal(DEFAULT_ignoreInaccurateLocations)}", required: true, range: "0..${displayMFtVal(2000)}", defaultValue: displayMFtVal(DEFAULT_ignoreInaccurateLocations)
-            input name: "ignoreStaleLocations", type: "number", title: "Number of days after which location updates from friends are assumed stale and removed (0..7), Recommended=${DEFAULT_ignoreStaleLocations}", required: true, range: "0..7", defaultValue: DEFAULT_ignoreStaleLocations
-            input name: "pegLocatorFastestIntervalToInterval", type: "bool", title: "Request that the location provider deliver updates no faster than the requested locater interval, Recommended '${DEFAULT_pegLocatorFastestIntervalToInterval}'", defaultValue: DEFAULT_pegLocatorFastestIntervalToInterval
-            paragraph("<h3><b>Settings for Significant Monitoring Mode</b></h3>")
-            if (getAndroidMembers()) {
-                input name: "locatorDisplacement", type: "number", title: "How far the device travels (${getSmallUnits()}) before receiving another location update, Recommended=${displayMFtVal(DEFAULT_locatorDisplacement)}  <i><b>This value needs to be less than the minimum configured region radius for automations to trigger.</b></i> (<b>Android ONLY</b>)", required: true, range: "0..${displayMFtVal(1000)}", defaultValue: displayMFtVal(DEFAULT_locatorDisplacement)
-                input name: "discardNetworkLocationThresholdSeconds", type: "number", title: "Ignore incoming network locations if the last high accuracy location was received this many seconds ago, Range 0-10 seconds, Recommended=${DEFAULT_discardNetworkLocationThresholdSeconds}. (<b>Android ONLY</b>)", required: true, range: "0..10", defaultValue: DEFAULT_discardNetworkLocationThresholdSeconds
+            input name: 'ignoreInaccurateLocations', type: 'number', title: "Do not send a location if the accuracy is greater than the given (${smallUnits()}) (0..${displayMFtVal(2000)}) Recommended=${displayMFtVal(DEFAULT_ignoreInaccurateLocations)}", required: true, range: "0..${displayMFtVal(2000)}", defaultValue: displayMFtVal(DEFAULT_ignoreInaccurateLocations)
+            input name: 'ignoreStaleLocations', type: 'number', title: "Number of days after which location updates from friends are assumed stale and removed (0..7), Recommended=${DEFAULT_ignoreStaleLocations}", required: true, range: '0..7', defaultValue: DEFAULT_ignoreStaleLocations
+            input name: 'pegLocatorFastestIntervalToInterval', type: 'bool', title: "Request that the location provider deliver updates no faster than the requested locater interval, Recommended '${DEFAULT_pegLocatorFastestIntervalToInterval}'", defaultValue: DEFAULT_pegLocatorFastestIntervalToInterval
+            paragraph('<h3><b>Settings for Significant Monitoring Mode</b></h3>')
+            if (androidMembers()) {
+                input name: 'locatorDisplacement', type: 'number', title: "How far the device travels (${smallUnits()}) before receiving another location update, Recommended=${displayMFtVal(DEFAULT_locatorDisplacement)}  <i><b>This value needs to be less than the minimum configured region radius for automations to trigger.</b></i> (<b>Android ONLY</b>)", required: true, range: "0..${displayMFtVal(1000)}", defaultValue: displayMFtVal(DEFAULT_locatorDisplacement)
+                input name: 'discardNetworkLocationThresholdSeconds', type: 'number', title: "Ignore incoming network locations if the last high accuracy location was received this many seconds ago, Range 0-10 seconds, Recommended=${DEFAULT_discardNetworkLocationThresholdSeconds}. (<b>Android ONLY</b>)", required: true, range: '0..10', defaultValue: DEFAULT_discardNetworkLocationThresholdSeconds
             }
-            input name: "locatorInterval", type: "number", title: "Device will not report location updates faster than this interval (seconds) unless moving.  When moving, Android uses this 'locaterInterval/6' or '5-seconds' (whichever is greater, unless 'locaterInterval' is less than 5-seconds, then 'locaterInterval' is used), Recommended=60  <i><b>Requires the device to move the above distance, otherwise no update is sent.</b></i>", required: true, range: "0..3600", defaultValue: DEFAULT_locatorInterval, submitOnChange: true
+            input name: 'locatorInterval', type: 'number', title: "Device will not report location updates faster than this interval (seconds) unless moving.  When moving, Android uses this 'locaterInterval/6' or '5-seconds' (whichever is greater, unless 'locaterInterval' is less than 5-seconds, then 'locaterInterval' is used), Recommended=60  <i><b>Requires the device to move the above distance, otherwise no update is sent.</b></i>", required: true, range: '0..3600', defaultValue: DEFAULT_locatorInterval, submitOnChange: true
             // IE:  locatorInterval=0-seconds,   then locations every 0-seconds  if moved locatorDisplacement meters
             //      locatorInterval=5-seconds,   then locations every 5-seconds  if moved locatorDisplacement meters
             //      locatorInterval=10-seconds,  then locations every 5-seconds  if moved locatorDisplacement meters
@@ -796,197 +796,196 @@ def advancedLocation() {
             //      locatorInterval=120-seconds, then locations every 20-seconds if moved locatorDisplacement meters
             //      locatorInterval=240-seconds, then locations every 40-seconds if moved locatorDisplacement meters
             // assign the app defaults for move monitoring modes - we will use a larger interval in case the user accidentally switches to 'move mode'
-            paragraph("<h3><b>Settings for Move Monitoring Mode</b></h3>")
-            input name: "moveModeLocatorInterval", type: "number", title: "How often should locations be continuously sent from the device while in 'Move' mode (seconds) (2..3600), Recommended=${DEFAULT_moveModeLocatorInterval}.  <i><b>'Move' mode will result in higher battery consumption.</b></i>", required: true, range: "2..3600", defaultValue: DEFAULT_moveModeLocatorInterval
+            paragraph('<h3><b>Settings for Move Monitoring Mode</b></h3>')
+            input name: 'moveModeLocatorInterval', type: 'number', title: "How often should locations be continuously sent from the device while in 'Move' mode (seconds) (2..3600), Recommended=${DEFAULT_moveModeLocatorInterval}.  <i><b>'Move' mode will result in higher battery consumption.</b></i>", required: true, range: '2..3600', defaultValue: DEFAULT_moveModeLocatorInterval
         }
-        setUpdateFlag([ "name":"" ], "updateLocation", true, false)
+        setUpdateFlag([ 'name':'' ], 'updateLocation', true, false)
     }
 }
 
 def advancedDisplay() {
-    return dynamicPage(name: "advancedDisplay", title: "", nextPage: "mainPage") {
-        section(getFormat("box", "Mobile App Display Configuration")) {
+    return dynamicPage(name: 'advancedDisplay', title: '', nextPage: 'mainPage') {
+        section(styleFormat('box', 'Mobile App Display Configuration')) {
             if (state.submit) {
                 appButtonHandler(state.submit)
-	            state.submit = ""
+                state.submit = ''
             }
-            input name: "resetDisplayDefaultsButton", type: "button", title: "Restore Defaults", state: "submit"
-            input name: "replaceTIDwithUsername", type: "bool", title: "Replace the 'TID' (tracker ID) with 'username' for displaying a name on the map and recorder", defaultValue: DEFAULT_replaceTIDwithUsername
-            input name: "notificationEvents", type: "bool", title: "Notify about received events", defaultValue: DEFAULT_notificationEvents
-            input name: "extendedData", type: "bool", title: "Include extended data in location reports", defaultValue: DEFAULT_extendedData
-            input name: "enableMapRotation", type: "bool", title: "Allow the map to be rotated", defaultValue: DEFAULT_enableMapRotation
-            input name: "showRegionsOnMap", type: "bool", title: "Display the region pins/bubbles on the map", defaultValue: DEFAULT_showRegionsOnMap
-            input name: "notificationLocation", type: "bool", title: "Show last reported location in ongoing notification banner", defaultValue: DEFAULT_notificationLocation
-            input name: "notificationGeocoderErrors", type: "bool", title: "Display Geocoder errors in the notification banner", defaultValue: DEFAULT_notificationGeocoderErrors
+            input name: 'resetDisplayDefaultsButton', type: 'button', title: 'Restore Defaults', state: 'submit'
+            input name: 'replaceTIDwithUsername', type: 'bool', title: "Replace the 'TID' (tracker ID) with 'username' for displaying a name on the map and recorder", defaultValue: DEFAULT_replaceTIDwithUsername
+            input name: 'notificationEvents', type: 'bool', title: 'Notify about received events', defaultValue: DEFAULT_notificationEvents
+            input name: 'extendedData', type: 'bool', title: 'Include extended data in location reports', defaultValue: DEFAULT_extendedData
+            input name: 'enableMapRotation', type: 'bool', title: 'Allow the map to be rotated', defaultValue: DEFAULT_enableMapRotation
+            input name: 'showRegionsOnMap', type: 'bool', title: 'Display the region pins/bubbles on the map', defaultValue: DEFAULT_showRegionsOnMap
+            input name: 'notificationLocation', type: 'bool', title: 'Show last reported location in ongoing notification banner', defaultValue: DEFAULT_notificationLocation
+            input name: 'notificationGeocoderErrors', type: 'bool', title: 'Display Geocoder errors in the notification banner', defaultValue: DEFAULT_notificationGeocoderErrors
         }
-        setUpdateFlag([ "name":"" ], "updateDisplay", true, false)
+        setUpdateFlag([ 'name':'' ], 'updateDisplay', true, false)
     }
 }
 
 def configureRegions() {
-    return dynamicPage(name: "configureRegions", title: "", nextPage: "mainPage") {
-        section(getFormat("box", "Configure Regions")) {
+    return dynamicPage(name: 'configureRegions', title: '', nextPage: 'mainPage') {
+        section(styleFormat('box', 'Configure Regions')) {
         }
         if (isMapAllowed(false)) {
-            def deviceWrapper = getChildDevice(getCommonChildDNI())
+            def deviceWrapper = getChildDevice(commonChildDNI())
             if (deviceWrapper) {
                 deviceWrapper.generateConfigMapTile()
             }
-            section() {
-                input name: "sectionRegion", type: "button", title: getSectionTitle(state.show.region, "Region Map Instructions and Delete Behavior"), submitOnChange: true, style: getSectionStyle()
+            section {
+                input name: 'sectionRegion', type: 'button', title: sectionTitle(state.show.region, 'Region Map Instructions and Delete Behavior'), submitOnChange: true, style: sectionStyle()
                 if (state.show.region) {
-                    paragraph ("<h2>Add a Region</h2>" +
-                               "1. Click the map to drop a pin at a desired location.\r" +
-                               "2. Add the region name and radius information.\r" +
-                               "3. Once 'Save' is selected, all enabled members will automatically receive the changes on their next location report.\r" +
-                               "4. Clicking on the map or another region without saving will remove this pin.\r" +
-                               "5. The pin will remain red until it is saved.\r" +
-                               "<b>NOTE:</b> If a Google geocode API has been entered, an input box to allow direct address lookup will be displayed."
-                    )
-                    paragraph ("<h2>Edit a Region</h2>" +
-                               "1. Select the pin to be edited or a region from the selection box.\r" +
-                               "2. Once 'Save' is selected, all enabled members will automatically receive the changes on their next location report.\r"
-                    )
-                    paragraph ("<h2>Assign a Home Region</h2>" +
-                               "1. Select a pin to be 'Home'.\r" +
-                               "2. Select the 'Set Home' button to assign the region.\r" +
-                               "3. New pins must be saved before the 'Set Home' button is visible.\r" +
-                               "4. The 'Home' pin will be larger with a green glyph.\r"
-                    )
-                    paragraph ("<h2>Delete a Region</h2>" +
-                               "1. Select the pin to be deleted.\r" +
-                               "2. Select the 'Delete' button to remove the region from the map.\r" +
-                               "3. <b>NOTE:</b> The actual delete behavior will be based on the operation described below.\r"
-                    )
-                    input name: "manualDeleteBehavior", type: "bool", title: "Manual Delete", defaultValue: DEFAULT_manualDeleteBehavior, submitOnChange: true
-                    paragraph("<h3><b>Manual Delete: Region Deleted from Hub Only.  Requires Region to be Manually Deleted from Mobile</b></h3>" +
-                              "1. Deleted regions will be deleted from the Hubitat <b>ONLY</b>.\r" +
-                              "2. On each mobile phone, find and remove the region that was deleted.\r"
-                             )
-
-                    paragraph ("<h3><b>Automatic Delete: Region Deleted from Hub and Mobile after Location Update</b></h3>" +
-                               "1. The deleted region will be assigned an invalid lat/lon, but will not be immediately removed.\r" +
-                               "2. The region will remain in the Hubitat until <b>ALL</b> enabled users have sent a location report.\r" +
-                               "3. Once the last user has sent a location report, the region will be deleted from Hubitat.\r"
-                              )
+                    paragraph('''<h2>Add a Region</h2>
+                    |1. Click the map to drop a pin at a desired location.\r
+                    |2. Add the region name and radius information.\r
+                    |3. Once 'Save' is selected, all enabled members will automatically receive the changes on their next location report.\r
+                    |4. Clicking on the map or another region without saving will remove this pin.\r
+                    |5. The pin will remain red until it is saved.\r
+                    |<b>NOTE:</b> If a Google geocode API has been entered, an input box to allow direct address lookup will be displayed.
+                    '''.stripMargin())
+                    paragraph('''<h2>Edit a Region</h2>
+                    |1. Select the pin to be edited or a region from the selection box.\r
+                    |2. Once 'Save' is selected, all enabled members will automatically receive the changes on their next location report.\r
+                    '''.stripMargin())
+                    paragraph('''<h2>Assign a Home Region</h2>
+                    |1. Select a pin to be 'Home'.\r
+                    |2. Select the 'Set Home' button to assign the region.\r
+                    |3. New pins must be saved before the 'Set Home' button is visible.\r
+                    |4. The 'Home' pin will be larger with a green glyph.\r
+                    '''.stripMargin())
+                    paragraph('''<h2>Delete a Region</h2>
+                    |1. Select the pin to be deleted.\r
+                    |2. Select the 'Delete' button to remove the region from the map.\r
+                    |3. <b>NOTE:</b> The actual delete behavior will be based on the operation described below.\r
+                    '''.stripMargin())
+                    input name: 'manualDeleteBehavior', type: 'bool', title: 'Manual Delete', defaultValue: DEFAULT_manualDeleteBehavior, submitOnChange: true
+                    paragraph('''<h3><b>Manual Delete: Region Deleted from Hub Only.  Requires Region to be Manually Deleted from Mobile</b></h3>
+                    |1. Deleted regions will be deleted from the Hubitat <b>ONLY</b>.\r
+                    |2. On each mobile phone, find and remove the region that was deleted.\r
+                    '''.stripMargin())
+                    paragraph('''<h3><b>Automatic Delete: Region Deleted from Hub and Mobile after Location Update</b></h3>
+                    |1. The deleted region will be assigned an invalid lat/lon, but will not be immediately removed.\r
+                    |2. The region will remain in the Hubitat until <b>ALL</b> enabled users have sent a location report.\r
+                    |3. Once the last user has sent a location report, the region will be deleted from Hubitat.\r
+                    '''.stripMargin())
                 }
             }
         }
-        section() {
+        section {
             if (isMapAllowed(false)) {
-                configMapURL = "${getAttributeURL(URL_SOURCE[0],'configmap')}"
+                configMapURL = "${attributeURL(URL_SOURCE[0], 'configmap')}"
                 paragraph("<iframe src='${configMapURL}' style='height: 650px; width: 100%; border: none;'></iframe>")
             } else {
                 clearSettingFields()
-                paragraph ("<b>Configure a Google Maps API key in 'Additional Hubitat App Settings' -> 'Google Maps Settings' to allow radius bubbles to be displayed around the regions.</b>")
-                href(title: "Add Regions", description: "", style: "page", page: "addRegions")
-                href(title: "Edit Regions", description: "", style: "page", page: "editRegions")
-                href(title: "Delete Regions", description: "", style: "page", page: "deleteRegions")
+                paragraph("<b>Configure a Google Maps API key in 'Additional Hubitat App Settings' -> 'Google Maps Settings' to allow radius bubbles to be displayed around the regions.</b>")
+                href(title: 'Add Regions', description: '', style: 'page', page: 'addRegions')
+                href(title: 'Edit Regions', description: '', style: 'page', page: 'editRegions')
+                href(title: 'Delete Regions', description: '', style: 'page', page: 'deleteRegions')
             }
         }
         // only display if we don't have a Google maps API key, or our quota is expired
         if (!isMapAllowed(false)) {
-            section(getFormat("line", "")) {
-                input "homePlace", "enum", multiple: false, title:(homePlace ? '<div>' : '<div style="color:#ff0000">') + "Select your 'Home' place. ${(homePlace ? "" : "Use 'Configure Regions'->'Add Regions' to create a home location.")}" + '</div>', options: getNonFollowRegions(COLLECT_PLACES["desc_tst"]), submitOnChange: true
-                paragraph("<iframe src='${getRegionMapLink(getHomeRegion())}' style='height: 500px; width: 100%; border: none;'></iframe>")
+            section(styleFormat('line', '')) {
+                input 'homePlace', 'enum', multiple: false, title:(homePlace ? '<div>' : '<div style="color:#ff0000">') + "Select your 'Home' place. ${(homePlace ? '' : "Use 'Configure Regions'->'Add Regions' to create a home location.")}" + '</div>', options: getNonFollowRegions(COLLECT_PLACES['desc_tst']), submitOnChange: true
+                paragraph("<iframe src='${regionMapLink(homeRegion())}' style='height: 500px; width: 100%; border: none;'></iframe>")
             }
         }
         checkForHome()
-        section(getFormat("line", "")) {
-            input "getMobileRegions", "enum", multiple: true, title:"Hubitat can retrieve regions from a member's OwnTracks mobile device and merge them into the Hubitat region list. Select family member(s) to retrieve their region list on next location update.", options: getEnabledAndNotHiddenMembers()
+        section(styleFormat('line', '')) {
+            input 'getMobileRegions', 'enum', multiple: true, title:"Hubitat can retrieve regions from a member's OwnTracks mobile device and merge them into the Hubitat region list. Select family member(s) to retrieve their region list on next location update.", options: enabledAndNotHiddenMembers()
             if (secondaryHubURL && enableSecondaryHub) {
                 if (state.submit) {
                     paragraph "<b>${appButtonHandler(state.submit)}</b>"
-                    state.submit = ""
+                    state.submit = ''
                 }
-                input name: "sendRegionsToSecondaryButton", type: "button", title: "Send Region List to Secondary Hub", state: "submit"
-                input name: "getRegionsFromSecondaryButton", type: "button", title: "Retrieve Region List from Secondary Hub", state: "submit"
+                input name: 'sendRegionsToSecondaryButton', type: 'button', title: 'Send Region List to Secondary Hub', state: 'submit'
+                input name: 'getRegionsFromSecondaryButton', type: 'button', title: 'Retrieve Region List from Secondary Hub', state: 'submit'
             }
         }
     }
 }
 
 def configureGroups() {
-    return dynamicPage(name: "configureGroups", title: "", nextPage: "mainPage") {
-        section(getFormat("box", "Configure Groups")) {
-            paragraph ("<h3>Groups are used to create isolated friend 'bubbles' to prevent locations being shared with all members.</h3>" +
-                       "For example,\r" +
-                       "     There are two defined groups with 5 members:\r" +
-                       "         - Default: A, B, C, D\r" +
-                       "         - Group 1: B, E\r" +
-                       "     1. Members A, B, C, D will see each other, but not member E\r" +
-                       "     2. Member B will see members A, B, C, D and E\r" +
-                       "     3. Member E will only see members B and E\r\r" +
-                       "How the app interacts with members in isolated friend groups:\r" +
-                       "     1. Presence detection only occurs for members in the 'Default' group.\r" +
-                       "     2. Regions are only shared with members in the 'Default' group.\r" +
-                       "     3. Only members in the 'Default' group are sent to the OwnTracks Recorder.\r" +
-                       "     4. Member locations are shared with other members in intersecting groups.\r\r" +
-                       "How the Google Friend Map interacts with members in isolated friend groups:\r\n" +
-                       "     1. By default, only members in the 'Default' group are displayed.\r" +
-                       "     2. If a member name is passed in the '&member=' suffix of the URL, they will see all members in the groups that the member is assigned to.\r" +
-                       "     3. In the above example, using the URL suffix of '&member=E' would only show members B and E on the Google map."
-                      )
+    return dynamicPage(name: 'configureGroups', title: '', nextPage: 'mainPage') {
+        section(styleFormat('box', 'Configure Groups')) {
+            paragraph("""<h3>Groups are used to create isolated friend 'bubbles' to prevent locations being shared with all members.</h3>
+            |For example,\r
+            |    There are two defined groups with 5 members:\r
+            |        - Default: A, B, C, D\r
+            |        - Group 1: B, E\r
+            |    1. Members A, B, C, D will see each other, but not member E\r
+            |    2. Member B will see members A, B, C, D and E\r
+            |    3. Member E will only see members B and E\r\r
+            |How the app interacts with members in isolated friend groups:\r
+            |    1. Presence detection only occurs for members in the 'Default' group.\r
+            |    2. Regions are only shared with members in the 'Default' group.\r
+            |    3. Only members in the 'Default' group are sent to the OwnTracks Recorder.\r
+            |    4. Member locations are shared with other members in intersecting groups.\r\r
+            |How the Google Friend Map interacts with members in isolated friend groups:\r\n
+            |    1. By default, only members in the 'Default' group are displayed.\r
+            |    2. If a member name is passed in the '&member=' suffix of the URL, they will see all members in the groups that the member is assigned to.\r
+            |    3. In the above example, using the URL suffix of '&member=E' would only show members B and E on the Google map.
+            """.stripMargin())
         }
-        section() {
+        section {
             if (state.submit) {
                 paragraph "<b>${appButtonHandler(state.submit)}</b>"
-                state.submit = ""
+                state.submit = ''
             }
-            input name: "resetGroupsButton", type: "button", title: "Reset Member Groupings and Custom Names to Defaults", state: "submit"
-            input "selectGroup", "enum", multiple: false, title: "Select group to edit name or assign members.", options: state.groups.collectEntries{[it.id, it.name]}, submitOnChange: true
+            input name: 'resetGroupsButton', type: 'button', title: 'Reset Member Groupings and Custom Names to Defaults', state: 'submit'
+            input 'selectGroup', 'enum', multiple: false, title: 'Select group to edit name or assign members.', options: state.groups.collectEntries { [it.id, it.name] }, submitOnChange: true
             if (selectGroup) {
-                app.updateSetting("selectFamilyMembers",[value:state.members.findAll{it.groups.find{it == selectGroup}}.name.sort(),type:"enum"])
-                app.updateSetting("groupName",[value:state.groups.find{it.id == selectGroup}.name,type:"text"])
-                input "selectFamilyMembers", "enum", multiple: true, title:"Select family member(s) to assign to this group.", options: state.members.name.sort()
+                app.updateSetting('selectFamilyMembers', [value:state.members.findAll { it.groups.find { it == selectGroup } }.name.sort(), type:'enum'])
+                app.updateSetting('groupName', [value:state.groups.find { it.id == selectGroup }.name, type:'text'])
+                input 'selectFamilyMembers', 'enum', multiple: true, title:'Select family member(s) to assign to this group.', options: state.members.name.sort()
                 // prevent editing the default group name
                 if (selectGroup != "${DEFAULT_globalGroupNumber}") {
-                    input name: "groupName", type: "text", title: "Group Name", required: true
+                    input name: 'groupName', type: 'text', title: 'Group Name', required: true
                 }
 
-                input name: "saveGroupButton", type: "button", title: "Save Settings", state: "submit"
+                input name: 'saveGroupButton', type: 'button', title: 'Save Settings', state: 'submit'
             }
         }
     }
 }
 
 def configureNotifications() {
-    return dynamicPage(name: "configureNotifications", title: "", nextPage: "mainPage") {
-        section(getFormat("box", "Configure Stale Member Notifications")) {
-            input "notificationStaleList", "capability.notification", title: "Select device(s) to get notifications when members stop reporting locations and go stale.", multiple: true, required: false, offerAll: true, submitOnChange: true
+    return dynamicPage(name: 'configureNotifications', title: '', nextPage: 'mainPage') {
+        section(styleFormat('box', 'Configure Stale Member Notifications')) {
+            input 'notificationStaleList', 'capability.notification', title: 'Select device(s) to get notifications when members stop reporting locations and go stale.', multiple: true, required: false, offerAll: true, submitOnChange: true
         }
-        section(getFormat("box", "Configure Region Arrived/Departed Notifications")) {
-            input "notificationList", "capability.notification", title: "Global enable/disable of notification devices.  Select per member enter/leave notifications below for these devices.", multiple: true, required: false, offerAll: true, submitOnChange: true
+        section(styleFormat('box', 'Configure Region Arrived/Departed Notifications')) {
+            input 'notificationList', 'capability.notification', title: 'Global enable/disable of notification devices.  Select per member enter/leave notifications below for these devices.', multiple: true, required: false, offerAll: true, submitOnChange: true
         }
-        section(getFormat("line", "")) {
+        section(styleFormat('line', '')) {
             if (state.submit) {
                 paragraph "<b>${appButtonHandler(state.submit)}</b>"
-                state.submit = ""
+                state.submit = ''
             }
-            input "selectFamilyMembers", "enum", multiple: false, title:"Select family member to change arrived/departed notifications.", options: state.members.name.sort(), submitOnChange: true
+            input 'selectFamilyMembers', 'enum', multiple: false, title:'Select family member to change arrived/departed notifications.', options: state.members.name.sort(), submitOnChange: true
             // only clear on a change of selected member
             if (state.selectFamilyMembers != selectFamilyMembers) {
-                app.removeSetting("notificationEnter")
-                app.removeSetting("notificationEnterRegions")
-                app.removeSetting("notificationLeave")
-                app.removeSetting("notificationLeaveRegions")
+                app.removeSetting('notificationEnter')
+                app.removeSetting('notificationEnterRegions')
+                app.removeSetting('notificationLeave')
+                app.removeSetting('notificationLeaveRegions')
             }
             if (selectFamilyMembers) {
-                input name: "clearNotificationsButton", type: "button", title: "Clear Settings", state: "submit"
+                input name: 'clearNotificationsButton', type: 'button', title: 'Clear Settings', state: 'submit'
                 state.selectFamilyMembers = selectFamilyMembers
-                input "notificationEnter", "enum", title: "Select device(s) to get notifications when this member <b>enters</b> selected region(s).", multiple: true, offerAll: true, required: false, options: notificationList.collect{entry -> entry.displayName}, defaultValue: state.members.find {it.name==selectFamilyMembers}?.enterDevices
-                input "notificationEnterRegions", "enum", multiple: true, offerAll: true, title: "Trigger notifications when this member <b>enters</b> these region(s).", options: getNonFollowRegions(COLLECT_PLACES["desc_tst"]), defaultValue: state.members.find {it.name==selectFamilyMembers}?.enterRegions
+                input 'notificationEnter', 'enum', title: 'Select device(s) to get notifications when this member <b>enters</b> selected region(s).', multiple: true, offerAll: true, required: false, options: notificationList*.displayName, defaultValue: state.members.find { it.name == selectFamilyMembers }?.enterDevices
+                input 'notificationEnterRegions', 'enum', multiple: true, offerAll: true, title: 'Trigger notifications when this member <b>enters</b> these region(s).', options: getNonFollowRegions(COLLECT_PLACES['desc_tst']), defaultValue: state.members.find { it.name == selectFamilyMembers }?.enterRegions
 
-                input "notificationLeave", "enum", title: "Select device(s) to get notifications when this member <b>leaves</b> selected region(s).", multiple: true, offerAll: true, required: false, options: notificationList.collect{entry -> entry.displayName}, defaultValue: state.members.find {it.name==selectFamilyMembers}?.leaveDevices
-                input "notificationLeaveRegions", "enum", multiple: true, offerAll: true, title: "Trigger notifications when this member <b>leaves</b> these region(s).", options: getNonFollowRegions(COLLECT_PLACES["desc_tst"]), defaultValue: state.members.find {it.name==selectFamilyMembers}?.leaveRegions
-                input name: "saveNotificationsButton", type: "button", title: "Save Settings", state: "submit"
+                input 'notificationLeave', 'enum', title: 'Select device(s) to get notifications when this member <b>leaves</b> selected region(s).', multiple: true, offerAll: true, required: false, options: notificationList*.displayName, defaultValue: state.members.find { it.name == selectFamilyMembers }?.leaveDevices
+                input 'notificationLeaveRegions', 'enum', multiple: true, offerAll: true, title: 'Trigger notifications when this member <b>leaves</b> these region(s).', options: getNonFollowRegions(COLLECT_PLACES['desc_tst']), defaultValue: state.members.find { it.name == selectFamilyMembers }?.leaveRegions
+                input name: 'saveNotificationsButton', type: 'button', title: 'Save Settings', state: 'submit'
             }
         }
-        section(getFormat("line", "")) {
-            input name: "addNewRegionsToMemberNotificationList", type: "bool", title: "Add each new created region to all member notifications", defaultValue: DEFAULT_addNewRegionsToMemberNotificationList
-            input name: "useCustomNotificationMessage", type: "bool", title: "Use a custom notification message.  The default message format is '<b>$DEFAULT_notificationMessage</b>'", defaultValue: DEFAULT_useCustomNotificationMessage, submitOnChange: true
+        section(styleFormat('line', '')) {
+            input name: 'addNewRegionsToMemberNotificationList', type: 'bool', title: 'Add each new created region to all member notifications', defaultValue: DEFAULT_addNewRegionsToMemberNotificationList
+            input name: 'useCustomNotificationMessage', type: 'bool', title: "Use a custom notification message.  The default message format is '<b>$DEFAULT_notificationMessage</b>'", defaultValue: DEFAULT_useCustomNotificationMessage, submitOnChange: true
             if (useCustomNotificationMessage) {
-                input name: "notificationMessage", type: "textarea", title: "Enter notification message.  Variables are case sensitive.", defaultValue: DEFAULT_notificationMessage, submitOnChange: true
+                input name: 'notificationMessage', type: 'textarea', title: 'Enter notification message.  Variables are case sensitive.', defaultValue: DEFAULT_notificationMessage, submitOnChange: true
             }
         }
     }
@@ -994,20 +993,16 @@ def configureNotifications() {
 
 def memberInGlobalMemberGroup(member) {
     // check if the member is part of the global member group (undefined or zero), or is a secondary hub update
-    if ((member.name == COMMON_CHILDNAME) || (member?.groups == null) || (member?.groups?.find {it=="${DEFAULT_globalGroupNumber}"})) {
-        return(true)
-    } else {
-        return(false)
-    }
+    return ((member.name == COMMON_CHILDNAME) || (member?.groups == null) || (member?.groups?.find { it == "${DEFAULT_globalGroupNumber }" }))
 }
 
 def getMatchingGroupMembersForMember(member) {
     groupMembers = []
     // find all enabled members that contain the passed in member's group
-    settings?.enabledMembers.each { enabled->
-        enabledMember = state.members.find {it.name==enabled}
+    settings?.enabledMembers.each { enabled ->
+        enabledMember = state.members.find { it.name == enabled }
         // if the member is part of the enabled members group, add them to the map
-        if (!(settings?.privateMembers.find {it==enabled}) && ((member?.groups == null) || (enabledMember?.groups?.intersect(member?.groups)))) {
+        if (!(settings?.privateMembers.find { it == enabled }) && ((member?.groups == null) || (enabledMember?.groups?.intersect(member?.groups)))) {
             groupMembers << enabledMember
         }
     }
@@ -1015,24 +1010,20 @@ def getMatchingGroupMembersForMember(member) {
     return(groupMembers)
 }
 
-def getEnabledAndNotHiddenMembers() {
+def enabledAndNotHiddenMembers() {
     allowedMembers = []
     // build a list of enabled and not hidden members, and deal with global membership
-    settings?.enabledMembers.each { enabled->
-        enabledMember = state.members.find {it.name==enabled}
-        if (!(settings?.privateMembers.find {it==enabled}) && memberInGlobalMemberGroup(enabledMember)) {
+    settings?.enabledMembers.each { enabled ->
+        enabledMember = state.members.find { it.name == enabled }
+        if (!(settings?.privateMembers.find { it == enabled }) && memberInGlobalMemberGroup(enabledMember)) {
             allowedMembers << enabled
         }
     }
-    if (allowedMembers) {
-        return (allowedMembers.sort())
-    } else {
-        return (allowedMembers)
-    }
+    return (allowedMembers ? allowedMembers.sort() : allowedMembers)
 }
 
 def getEnabledAndNotHiddenMemberData(memberName) {
-    member = state.members.find {it.name.toLowerCase()==memberName?.toLowerCase()}
+    member = state.members.find { it.name.toLowerCase() == memberName?.toLowerCase() }
     // in case no member name is passed in, only allow global members
     if (member == null) {
         member = []
@@ -1046,8 +1037,8 @@ def getNonFollowRegions(collectRegions) {
     allowedRegions = []
 
     // build a list of regions that don't start with '+' to screen off the '+follow' iOS regions
-    state.places.each { place->
-        if (place.desc[0] != "+") {
+    state.places.each { place ->
+        if (place.desc[0] != '+') {
             allowedRegions << place
         }
     }
@@ -1057,11 +1048,9 @@ def getNonFollowRegions(collectRegions) {
             case 0:
                 // collecton of names
                 return (allowedRegions.desc.sort())
-            break
             case 1:
                 // collecton of names and timestamp
-                return (allowedRegions.collectEntries{[it.tst, it.desc]})
-            break
+                return (allowedRegions.collectEntries { [it.tst, it.desc] })
         }
     }
 
@@ -1069,17 +1058,17 @@ def getNonFollowRegions(collectRegions) {
     return (allowedRegions)
 }
 
-def getHomeRegion() {
-    return ((homePlace ? state.places.find {it.tst==homePlace.toInteger()} : []))
+def homeRegion() {
+    return ((homePlace ? state.places.find { it.tst == homePlace.toInteger() } : []))
 }
 
-def getAttributeURL(urlSource, path) {
+def attributeURL(urlSource, path) {
     // remove the []
-    urlSource = urlSource.substring(1, (urlSource.length()-1))
+    cleanUrlSource = urlSource.substring(1, (urlSource.length() - 1))
 
     // get the cloud or local URL
-    if (fullApiServerUrl().indexOf(urlSource, 0) >= 0) {
-        return(fullApiServerUrl().replaceAll("null","${path}?access_token=${state.accessToken}"))
+    if (fullApiServerUrl().indexOf(cleanUrlSource, 0) >= 0) {
+        return(fullApiServerUrl().replaceAll('null', "${path}?access_token=${state.accessToken}"))
     } else {
         return(getFullLocalApiServerUrl() + "/${path}" + "?access_token=${state.accessToken}")
     }
@@ -1087,7 +1076,7 @@ def getAttributeURL(urlSource, path) {
 
 def displayRegionsPendingDelete() {
     // get the names of any regions that are pending deletion
-    pendingDelete = state?.places.findAll{it.lat == INVALID_COORDINATE}.collect{place -> place.desc}
+    pendingDelete = state?.places.findAll { it.lat == INVALID_COORDINATE }*.desc
     if (pendingDelete) {
         paragraph "<div style='color:#ff0000'><b>${pendingDelete} pending deletion once all members report a location update.</b></div>"
     }
@@ -1101,123 +1090,125 @@ def displayMissingHomePlace() {
 }
 
 def addRegions() {
-    return dynamicPage(name: "addRegions", title: "", nextPage: "configureRegions") {
-        section(getFormat("box", "Add a Region")) {
+    return dynamicPage(name: 'addRegions', title: '', nextPage: 'configureRegions') {
+        section(styleFormat('box', 'Add a Region')) {
             if (state.submit) {
                 paragraph "<b>${appButtonHandler(state.submit)}</b>"
-                state.submit = ""
+                state.submit = ''
             }
-            paragraph ("1. Add the region to be information.\r" +
-                       "2. Once 'Save' is selected, all enabled members will automatically receive the changes on their next location report.\r"
-            )
-            if (geocodeProvider == "0") {
-                paragraph ("<b>Configure a geocode provider in 'Additional Hubitat App Settings' -> 'Geocode Settings' to enable address to latitude/longitude lookup.</b>")
+            paragraph("""
+            |1. Add the region to be information.\r
+            |2. Once 'Save' is selected, all enabled members will automatically receive the changes on their next location report.\r
+            """.stripMargin())
+            if (geocodeProvider == '0') {
+                paragraph("<b>Configure a geocode provider in 'Additional Hubitat App Settings' -> 'Geocode Settings' to enable address to latitude/longitude lookup.</b>")
             } else {
-                input "regionAddress", "text", title: "Enter address to populate the latitude/longitude.  Confirm the location is correct using the map below.", submitOnChange: true
+                input 'regionAddress', 'text', title: 'Enter address to populate the latitude/longitude.  Confirm the location is correct using the map below.', submitOnChange: true
                 if (regionAddress) {
                     (addressLat, addressLon) = geocode(regionAddress)
-                    app.updateSetting("regionLat",[value:addressLat,type:"double"])
-                    app.updateSetting("regionLon",[value:addressLon,type:"double"])
+                    app.updateSetting('regionLat', [value:addressLat, type:'double'])
+                    app.updateSetting('regionLon', [value:addressLon, type:'double'])
                 }
             }
         }
-        section(getFormat("line", "")) {
+        section(styleFormat('line', '')) {
             // assign defaults so the map populates properly
-            if (settings["regionLat"] == null) settings["regionLat"] = location.getLatitude()
-            if (settings["regionLon"] == null) settings["regionLon"] = location.getLongitude()
+            if (settings['regionLat'] == null) { settings['regionLat'] = location.getLatitude() }
+            if (settings['regionLon'] == null) { settings['regionLon'] = location.getLongitude() }
 
-            //createRegionMap(lat,lon,rad)
-            paragraph("<iframe src='${getRegionMapLink(createRegionMap(settings["regionLat"],settings["regionLon"],settings["regionRadius"]))}' style='height: 500px; width:100%; border: none;'></iframe>")
-            input "regionName", "text", title: "Name", submitOnChange: true
-            input name: "regionRadius", type: "number", title: "Detection radius (${getSmallUnits()}) (${displayMFtVal(50)}..${displayMFtVal(1000)})", range: "${displayMFtVal(50)}..${displayMFtVal(1000)}", defaultValue: displayMFtVal(DEFAULT_RADIUS), submitOnChange: true
-            input name: "regionLat", type: "double", title: "Latitude (-90.0..90.0)", range: "-90.0..90.0", defaultValue: location.getLatitude(), submitOnChange: true
-            input name: "regionLon", type: "double", title: "Longitude (-180.0..180.0)", range: "-180.0..180.0", defaultValue: location.getLongitude(), submitOnChange: true
-            input name: "addRegionButton", type: "button", title: "Save", state: "submit"
+            //newRegionMap(lat,lon,rad)
+            paragraph("<iframe src='${regionMapLink(newRegionMap(settings['regionLat'], settings['regionLon'], settings['regionRadius']))}' style='height: 500px; width:100%; border: none;'></iframe>")
+            input 'regionName', 'text', title: 'Name', submitOnChange: true
+            input name: 'regionRadius', type: 'number', title: "Detection radius (${smallUnits()}) (${displayMFtVal(50)}..${displayMFtVal(1000)})", range: "${displayMFtVal(50)}..${displayMFtVal(1000)}", defaultValue: displayMFtVal(DEFAULT_RADIUS), submitOnChange: true
+            input name: 'regionLat', type: 'double', title: 'Latitude (-90.0..90.0)', range: '-90.0..90.0', defaultValue: location.getLatitude(), submitOnChange: true
+            input name: 'regionLon', type: 'double', title: 'Longitude (-180.0..180.0)', range: '-180.0..180.0', defaultValue: location.getLongitude(), submitOnChange: true
+            input name: 'addRegionButton', type: 'button', title: 'Save', state: 'submit'
         }
     }
 }
 
 def addRegionToEdit() {
-    input "regionToEdit", "enum", multiple: false, title:"Select region to edit", options: getNonFollowRegions(COLLECT_PLACES["desc"]), submitOnChange: true
+    input 'regionToEdit', 'enum', multiple: false, title:'Select region to edit', options: getNonFollowRegions(COLLECT_PLACES['desc']), submitOnChange: true
 }
 
 def editRegions() {
-    return dynamicPage(name: "editRegions", title: "", nextPage: "configureRegions") {
-        section(getFormat("box", "Edit a Region")) {
+    return dynamicPage(name: 'editRegions', title: '', nextPage: 'configureRegions') {
+        section(styleFormat('box', 'Edit a Region')) {
             if (state.submit) {
                 paragraph "<b>${appButtonHandler(state.submit)}</b>"
-                state.submit = ""
+                state.submit = ''
             }
-            paragraph ("1. Select the region to be edited.\r" +
-                       "2. Once 'Save' is selected, all enabled members will automatically receive the changes on their next location report.\r"
-            )
+            paragraph("""
+            |1. Select the region to be edited.\r
+            |2. Once 'Save' is selected, all enabled members will automatically receive the changes on their next location report.\r
+            """.stripMargin())
             addRegionToEdit()
             if (regionToEdit) {
                 // get the place map and assign the current values
-                def foundPlace = state.places.find {it.desc==regionToEdit}
-                app.updateSetting("regionName",[value:foundPlace.desc,type:"text"])
+                def foundPlace = state.places.find { it.desc == regionToEdit }
+                app.updateSetting('regionName', [value:foundPlace.desc, type:'text'])
                 if (state.previousRegionName != regionName) {
-                    app.updateSetting("regionRadius",[value:displayMFtVal(foundPlace.rad.toInteger()),type:"number"])
-                    app.updateSetting("regionLat",[value:foundPlace.lat,type:"double"])
-                    app.updateSetting("regionLon",[value:foundPlace.lon,type:"double"])
+                    app.updateSetting('regionRadius', [value:displayMFtVal(foundPlace.rad.toInteger()), type:'number'])
+                    app.updateSetting('regionLat', [value:foundPlace.lat, type:'double'])
+                    app.updateSetting('regionLon', [value:foundPlace.lon, type:'double'])
                 }
                 // save the name in so we can retrieve the values should it get changed below
                 state.previousRegionName = regionName
-                paragraph("<iframe src='${getRegionMapLink(createRegionMap(settings["regionLat"],settings["regionLon"],settings["regionRadius"]))}' style='height: 500px; width:100%; border: none;'></iframe>")
-                input name: "regionName", type: "text", title: "Name", required: true
-                input name: "regionRadius", type: "number", title: "Detection radius (${getSmallUnits()})", required: true, range: "${displayMFtVal(50)}..${displayMFtVal(1000)}", submitOnChange: true
-                input name: "regionLat", type: "double", title: "Latitude (-90.0..90.0)", required: true, range: "-90.0..90.0", submitOnChange: true
-                input name: "regionLon", type: "double", title: "Longitude (-180.0..180.0)", required: true, range: "-180.0..180.0", submitOnChange: true
-                input name: "editRegionButton", type: "button", title: "Save", state: "submit"
+                paragraph("<iframe src='${regionMapLink(newRegionMap(settings['regionLat'], settings['regionLon'], settings['regionRadius']))}' style='height: 500px; width:100%; border: none;'></iframe>")
+                input name: 'regionName', type: 'text', title: 'Name', required: true
+                input name: 'regionRadius', type: 'number', title: "Detection radius (${smallUnits()})", required: true, range: "${displayMFtVal(50)}..${displayMFtVal(1000)}", submitOnChange: true
+                input name: 'regionLat', type: 'double', title: 'Latitude (-90.0..90.0)', required: true, range: '-90.0..90.0', submitOnChange: true
+                input name: 'regionLon', type: 'double', title: 'Longitude (-180.0..180.0)', required: true, range: '-180.0..180.0', submitOnChange: true
+                input name: 'editRegionButton', type: 'button', title: 'Save', state: 'submit'
             }
         }
     }
 }
 
 def deleteRegions() {
-    return dynamicPage(name: "deleteRegions", title: "", nextPage: "configureRegions") {
-        section(getFormat("box", "Delete Region")) {
+    return dynamicPage(name: 'deleteRegions', title: '', nextPage: 'configureRegions') {
+        section(styleFormat('box', 'Delete Region')) {
             if (state.submit) {
-                paragraph "<b>${getFormat("redText", appButtonHandler(state.submit))}</b>"
-                state.submit = ""
+                paragraph "<b>${styleFormat('redText', appButtonHandler(state.submit))}</b>"
+                state.submit = ''
             }
             displayRegionsPendingDelete()
-            input "regionName", "enum", multiple: false, title:"Select region to delete", options: getNonFollowRegions(COLLECT_PLACES["desc"]), submitOnChange: true
+            input 'regionName', 'enum', multiple: false, title:'Select region to delete', options: getNonFollowRegions(COLLECT_PLACES['desc']), submitOnChange: true
             if (regionName) {
-                deleteRegion = state.places.find {it.desc==regionName}
-                paragraph("<iframe src='${getRegionMapLink(createRegionMap(deleteRegion?.lat,deleteRegion?.lon,deleteRegion?.rad))}' style='height: 500px; width:100%; border: none;'></iframe>")
-                paragraph("<h3><b>Delete Region from Hub Only - Manually Delete Region from Mobile</b></h3>" +
-                          "1. Click the 'Delete Region from Hubitat ONLY' button.\r" +
-                          "2. On each mobile phone, find and delete the region selected above.\r"
-                )
-                input name: "deleteRegionFromHubButton", type: "button", title: "Delete Region from Hubitat ONLY", state: "submit"
-                paragraph ("<h3><b>Automatically Delete Region from Hub and Mobile after Location Update</b></h3>" +
-                           "1. Selected region will be assigned an invalid lat/lon.\r" +
-                           "2. The region will remain in the list until <b>ALL</b> enabled users have sent a location report.\r" +
-                           "3. Once the last user has sent a location report, the region will be deleted from Hubitat.\r"
-                )
-                input name: "deleteRegionFromAllButton", type: "button", title: "Delete Region from Hubitat and Mobile(s)", state: "submit"
+                deleteRegion = state.places.find { it.desc == regionName }
+                paragraph("<iframe src='${regionMapLink(newRegionMap(deleteRegion?.lat, deleteRegion?.lon, deleteRegion?.rad))}' style='height: 500px; width:100%; border: none;'></iframe>")
+                paragraph("""<h3><b>Delete Region from Hub Only - Manually Delete Region from Mobile</b></h3>'
+                |    1. Click the 'Delete Region from Hubitat ONLY' button.\r
+                |    2. On each mobile phone, find and delete the region selected above.\r
+                """.stripMargin())
+                input name: 'deleteRegionFromHubButton', type: 'button', title: 'Delete Region from Hubitat ONLY', state: 'submit'
+                paragraph("""<h3><b>Automatically Delete Region from Hub and Mobile after Location Update</b></h3>'
+                |    1. Selected region will be assigned an invalid lat/lon.\r
+                |    2. The region will remain in the list until <b>ALL</b> enabled users have sent a location report.\r
+                |    3. Once the last user has sent a location report, the region will be deleted from Hubitat.\r
+                """.stripMargin())
+                input name: 'deleteRegionFromAllButton', type: 'button', title: 'Delete Region from Hubitat and Mobile(s)', state: 'submit'
             }
         }
     }
 }
 
 def sendRegionsToSecondaryHub() {
-    data = [ "_type":"waypoints", "waypoints":state.places ]
-    def postParams = [ uri: secondaryHubURL?.trim(), requestContentType: 'application/json', contentType: 'application/json', headers: ["X-limit-u" : COMMON_CHILDNAME, "X-limit-d" : COMMON_CHILDNAME], body : (new JsonBuilder(data)).toPrettyString() ]
-    asynchttpPost("httpCallbackMethod", postParams)
+    data = [ '_type':'waypoints', 'waypoints':state.places ]
+    def postParams = [ uri: secondaryHubURL?.trim(), requestContentType: 'application/json', contentType: 'application/json', headers: ['X-limit-u' : COMMON_CHILDNAME, 'X-limit-d' : COMMON_CHILDNAME], body : (new JsonBuilder(data)) ]
+    asynchttpPost('httpCallbackMethod', postParams)
 }
 
 def retrieveRegionsFromSecondaryHub() {
     data = sendReportWaypointsRequest([ name:COMMON_CHILDNAME ])
-    def postParams = [ uri: secondaryHubURL?.trim(), requestContentType: 'application/json', contentType: 'application/json', headers: ["X-limit-u" : COMMON_CHILDNAME, "X-limit-d" : COMMON_CHILDNAME], body : (new JsonBuilder(data)).toPrettyString() ]
-    asynchttpPost("httpCallbackMethod", postParams)
+    def postParams = [ uri: secondaryHubURL?.trim(), requestContentType: 'application/json', contentType: 'application/json', headers: ['X-limit-u' : COMMON_CHILDNAME, 'X-limit-d' : COMMON_CHILDNAME], body : (new JsonBuilder(data)) ]
+    asynchttpPost('httpCallbackMethod', postParams)
 }
 
-def getDisabledMembers() {
+def disabledMembers() {
     disabledMembers = []
-    state.members.each { member->
-        if (!settings?.enabledMembers.find {it==member.name}) {
+    state.members.each { member ->
+        if (!settings?.enabledMembers.find { it == member.name }) {
             disabledMembers << member
         }
     }
@@ -1225,43 +1216,43 @@ def getDisabledMembers() {
 }
 
 def deleteMembers() {
-    return dynamicPage(name: "deleteMembers", title: "", nextPage: "mainPage") {
-        section(getFormat("box", "Deactivate Family Member(s)")) {
+    return dynamicPage(name: 'deleteMembers', title: '', nextPage: 'mainPage') {
+        section(styleFormat('box', 'Deactivate Family Member(s)')) {
             if (state.submit) {
-                paragraph "<b>${getFormat("redText", appButtonHandler(state.submit))}</b>"
-                state.submit = ""
+                paragraph "<b>${styleFormat('redText', appButtonHandler(state.submit))}</b>"
+                state.submit = ''
             }
-            input "selectDeactivateFamilyMembers", "enum", multiple: true, title:"Select family member(s) to delete their phone URL and waypoints.  Only members that are not enabled are listed.", options: getDisabledMembers()?.name?.sort(), submitOnChange: true
-            paragraph("<b>NOTE: Selected user(s) will be deactivated on their next location update.  They will no longer be able to reach the OwnTracks app without configuration!</b>")
-            input name: "deactivateMembersButton", type: "button", title: "Deactivate", state: "submit"
+            input 'selectDeactivateFamilyMembers', 'enum', multiple: true, title:'Select family member(s) to delete their phone URL and waypoints.  Only members that are not enabled are listed.', options: disabledMembers()?.name?.sort(), submitOnChange: true
+            paragraph('<b>NOTE: Selected user(s) will be deactivated on their next location update.  They will no longer be able to reach the OwnTracks app without configuration!</b>')
+            input name: 'deactivateMembersButton', type: 'button', title: 'Deactivate', state: 'submit'
         }
-        section(getFormat("box", "Delete Family Member(s)")) {
+        section(styleFormat('box', 'Delete Family Member(s)')) {
             if (state.submit) {
-                paragraph "<b>${getFormat("redText", appButtonHandler(state.submit))}</b>"
-                state.submit = ""
+                paragraph "<b>${styleFormat('redText', appButtonHandler(state.submit))}</b>"
+                state.submit = ''
             }
-            input "selectFamilyMembers", "enum", multiple: true, title:"Select family member(s) to delete.", options: state.members.name.sort(), submitOnChange: true
+            input 'selectFamilyMembers', 'enum', multiple: true, title:'Select family member(s) to delete.', options: state.members.name.sort(), submitOnChange: true
 
-            paragraph("<b>NOTE: Selected user(s) will be deleted from the app and their corresponding child device will be removed.  Ensure no automations are dependent on their device before proceeding!</b>")
-            input name: "deleteMembersButton", type: "button", title: "Delete", state: "submit"
+            paragraph('<b>NOTE: Selected user(s) will be deleted from the app and their corresponding child device will be removed.  Ensure no automations are dependent on their device before proceeding!</b>')
+            input name: 'deleteMembersButton', type: 'button', title: 'Delete', state: 'submit'
         }
     }
 }
 
 def resetDefaults() {
-    return dynamicPage(name: "resetDefaults", title: "", nextPage: "mainPage") {
-        section(getFormat("box", "Reset to Recommended Default Settings")) {
+    return dynamicPage(name: 'resetDefaults', title: '', nextPage: 'mainPage') {
+        section(styleFormat('box', 'Reset to Recommended Default Settings')) {
             if (state.submit) {
-                paragraph "<b>${getFormat("redText", appButtonHandler(state.submit))}</b>"
-                state.submit = ""
+                paragraph "<b>${styleFormat('redText', appButtonHandler(state.submit))}</b>"
+                state.submit = ''
             }
-            paragraph("Reset Hubitat and Mobile Settings to Recommended Defaults.  <b>NOTE:  Members, Regions, Recorder and Secondary Hub settings will not be deleted.</b>")
-            input name: "resetAllDefaultsButton", type: "button", title: "Restore Defaults for All Settings", state: "submit"
+            paragraph('Reset Hubitat and Mobile Settings to Recommended Defaults.  <b>NOTE:  Members, Regions, Recorder and Secondary Hub settings will not be deleted.</b>')
+            input name: 'resetAllDefaultsButton', type: 'button', title: 'Restore Defaults for All Settings', state: 'submit'
         }
-        section(getFormat("line", "")) {
-            input name: "resetHubDefaultsButton", type: "button", title: "Restore Defaults for 'Additional Hub App Settings'", state: "submit"
-            input name: "resetLocationDefaultsButton", type: "button", title: "Restore Defaults for 'Mobile App Location Settings'", state: "submit"
-            input name: "resetDisplayDefaultsButton", type: "button", title: "Restore Defaults for 'Mobile App Display Settings'", state: "submit"
+        section(styleFormat('line', '')) {
+            input name: 'resetHubDefaultsButton', type: 'button', title: "Restore Defaults for 'Additional Hub App Settings'", state: 'submit'
+            input name: 'resetLocationDefaultsButton', type: 'button', title: "Restore Defaults for 'Mobile App Location Settings'", state: 'submit'
+            input name: 'resetDisplayDefaultsButton', type: 'button', title: "Restore Defaults for 'Mobile App Display Settings'", state: 'submit'
         }
     }
 }
@@ -1269,63 +1260,63 @@ def resetDefaults() {
 String appButtonHandler(btn) {
     def success = false
     def updateMember = false
-    def result = ""
+    def result = ''
 
     switch (btn) {
-        case "addRegionButton":
+        case 'addRegionButton':
             // check if there are any regions selected
             if (regionName) {
                 // check if we are duplicating a region, and delete the name if so
-                if (state.places.find {it.desc==regionName}) {
+                if (state.places.find { it.desc == regionName }) {
                     result = "Region '${regionName}' already exists."
                     logWarn(result)
                     // clear the region name
-                    app.removeSetting("regionName")
+                    app.removeSetting('regionName')
                 } else {
                     if (!regionName || !regionLat || !regionLon || !regionRadius) {
-                        result = "All fields need to be populated."
+                        result = 'All fields need to be populated.'
                         logWarn(result)
                     } else {
                         // create the waypoint map - NOTE: the app keys off the "tst" field as a unique identifier
-                        currentTst = (now()/1000).toInteger()
-                        def newPlace = [ "_type": "waypoint", "desc": "${regionName}", "lat": regionLat.toDouble().round(6), "lon": regionLon.toDouble().round(6), "rad": convertToMeters(regionRadius), "tst": currentTst ]
+                        currentTst = (now() / 1000).toInteger()
+                        def newPlace = [ '_type': 'waypoint', 'desc': "${regionName}", 'lat': regionLat.toDouble().round(6), 'lon': regionLon.toDouble().round(6), 'rad': convertToMeters(regionRadius), 'tst': currentTst ]
                         // add the new place
                         state.places << newPlace
                         result = "Region '${regionName}' has been added."
                         logDescriptionText(result)
                         success = true
                         updateMember = true
-            			// update the member notifications if enabled
-			            addPlaceToMemberNotifications(currentTst)
+                        // update the member notifications if enabled
+                        addPlaceToMemberNotifications(currentTst)
                     }
                 }
             }
-        break
-        case "editRegionButton":
+            break
+        case 'editRegionButton':
             // find the existing place to update.
-            def foundPlace = state.places.find {it.desc==state.previousRegionName}
+            def foundPlace = state.places.find { it.desc == state.previousRegionName }
             // create the updated waypoint map - NOTE: the app keys off the "tst" field as a unique identifier
-            def newPlace = [ "_type": "waypoint", "desc": "${regionName}", "lat": regionLat.toDouble().round(6), "lon": regionLon.toDouble().round(6), "rad": convertToMeters(regionRadius), "tst": foundPlace.tst ]
+            def newPlace = [ '_type': 'waypoint', 'desc': "${regionName}", 'lat': regionLat.toDouble().round(6), 'lon': regionLon.toDouble().round(6), 'rad': convertToMeters(regionRadius), 'tst': foundPlace.tst ]
             // overwrite the existing place
             foundPlace << newPlace
             result = "Updating region '${newPlace.desc}'"
             logDescriptionText(result)
             success = true
             updateMember = true
-        break
-        case "deleteRegionFromAllButton":
-        case "deleteRegionFromHubButton":
+            break
+        case 'deleteRegionFromAllButton':
+        case 'deleteRegionFromHubButton':
             // check if there are any regions selected
             if (regionName) {
-                // unvalidate all the places that need to be removed
-                place = state.places.find {it.desc==regionName}
+                // invalidate all the places that need to be removed
+                place = state.places.find { it.desc == regionName }
                 // check if we are deleting our home location
                 if (homePlace?.toInteger() == place.tst) {
-                    app.removeSetting("homePlace")
+                    app.removeSetting('homePlace')
                 }
-                if (btn == "deleteRegionFromHubButton") {
+                if (btn == 'deleteRegionFromHubButton') {
                     // remove the place from our current list but don't trigger a member update
-                    deleteIndex = state.places.findIndexOf {it.desc==regionName}
+                    deleteIndex = state.places.findIndexOf { it.desc == regionName }
                     if (deleteIndex >= 0) {
                         state.places.remove(deleteIndex)
                     }
@@ -1341,50 +1332,50 @@ String appButtonHandler(btn) {
                 logWarn(result)
                 success = true
             }
-        break
-        case "sendRegionsToSecondaryButton":
+            break
+        case 'sendRegionsToSecondaryButton':
             sendRegionsToSecondaryHub()
-            result = "Regions sent to secondary hub."
-        break
-        case "getRegionsFromSecondaryButton":
+            result = 'Regions sent to secondary hub.'
+            break
+        case 'getRegionsFromSecondaryButton':
             retrieveRegionsFromSecondaryHub()
-            result = "Regions requested from secondary hub."
-        case "deactivateMembersButton":
+            result = 'Regions requested from secondary hub.'
+        case 'deactivateMembersButton':
             if (selectDeactivateFamilyMembers) {
                 selectDeactivateFamilyMembers.each { name ->
-                    member = state.members.find {it.name==name}
+                    member = state.members.find { it.name == name }
                     // flag the member for deactivation
-                    member["deactivate"] = 1
+                    member['deactivate'] = 1
                 }
                 result = "Deactivating family members '${selectDeactivateFamilyMembers}'"
                 logWarn(result)
-                app.removeSetting("selectDeactivateFamilyMembers")
+                app.removeSetting('selectDeactivateFamilyMembers')
             }
-        break
-        case "deleteMembersButton":
+            break
+        case 'deleteMembersButton':
             if (selectFamilyMembers) {
                 selectFamilyMembers.each { name ->
-                    deleteIndex = state.members.findIndexOf {it.name==name}
+                    deleteIndex = state.members.findIndexOf { it.name == name }
                     def deviceWrapper = getChildDevice(state.members[deleteIndex].id)
                     try {
                         deleteChildDevice(deviceWrapper.deviceNetworkId)
-                    } catch(e) {
+                    } catch (e) {
                         logDebug("Device for ${name} does not exist.")
                     }
                     state.members.remove(deleteIndex)
                 }
                 result = "Deleting family members '${selectFamilyMembers}'"
                 logWarn(result)
-                app.removeSetting("selectFamilyMembers")
+                app.removeSetting('selectFamilyMembers')
             }
-        break
-        case "resetGroupsButton":
+            break
+        case 'resetGroupsButton':
             initializeGroupList(true)
-            result = "Default grouping and names assigned to groups"
-        break
-        case "saveGroupButton":
+            result = 'Default grouping and names assigned to groups'
+            break
+        case 'saveGroupButton':
             if (selectGroup) {
-                group = state.groups.find{it.id == selectGroup}
+                group = state.groups.find { it.id == selectGroup }
                 // update the name
                 if (groupName?.trim()?.length()) {
                     if (group.name != groupName?.trim()) {
@@ -1396,16 +1387,16 @@ String appButtonHandler(btn) {
                     // first remove it
                     member.groups?.remove(group.id)
                     // if we have a match add it back
-                    if (selectFamilyMembers.find {it==member.name}) {
+                    if (selectFamilyMembers.find { it == member.name }) {
                         member.groups << group.id
                     }
                 }
-                result = "Updated group name and members"
+                result = 'Updated group name and members'
             }
-        break
-        case "clearNotificationsButton":
+            break
+        case 'clearNotificationsButton':
             if (selectFamilyMembers) {
-                member = state.members.find {it.name==selectFamilyMembers}
+                member = state.members.find { it.name == selectFamilyMembers }
                 member.enterDevices = null
                 member.enterRegions = null
                 member.leaveDevices = null
@@ -1413,81 +1404,81 @@ String appButtonHandler(btn) {
                 state.selectFamilyMembers = null
                 result = "Cleared notification settings for family member '${selectFamilyMembers}'"
             }
-        break
-        case "saveNotificationsButton":
+            break
+        case 'saveNotificationsButton':
             if (selectFamilyMembers) {
-                member = state.members.find {it.name==selectFamilyMembers}
-                if (notificationEnter)         (member.enterDevices = notificationEnter - "Toggle All On/Off") 			else member.enterDevices = null
-                if (notificationEnterRegions)  (member.enterRegions = notificationEnterRegions - "Toggle All On/Off") 	else member.enterRegions = null
-                if (notificationLeave)         (member.leaveDevices = notificationLeave - "Toggle All On/Off") 			else member.leaveDevices = null
-                if (notificationLeaveRegions)  (member.leaveRegions = notificationLeaveRegions - "Toggle All On/Off") 	else member.leaveRegions = null
+                member = state.members.find { it.name == selectFamilyMembers }
+                if (notificationEnter)         { (member.enterDevices = notificationEnter - 'Toggle All On/Off') }        else { member.enterDevices = null }
+                if (notificationEnterRegions)  { (member.enterRegions = notificationEnterRegions - 'Toggle All On/Off') } else { member.enterRegions = null }
+                if (notificationLeave)         { (member.leaveDevices = notificationLeave - 'Toggle All On/Off') }        else { member.leaveDevices = null }
+                if (notificationLeaveRegions)  { (member.leaveRegions = notificationLeaveRegions - 'Toggle All On/Off') } else { member.leaveRegions = null }
                 result = "Updated notification settings for family member '${selectFamilyMembers}'"
             }
-        break
-        case "resetAllDefaultsButton":
+            break
+        case 'resetAllDefaultsButton':
             initialize(true)
-            result = "All settings reset to recommended defaults."
+            result = 'All settings reset to recommended defaults.'
             logWarn(result)
-        break
-        case "resetHubDefaultsButton":
+            break
+        case 'resetHubDefaultsButton':
             initializeHub(true)
-            result = "Hub settings reset to recommended defaults."
+            result = 'Hub settings reset to recommended defaults.'
             logWarn(result)
-        break
-        case "resetLocationDefaultsButton":
+            break
+        case 'resetLocationDefaultsButton':
             initializeMobileLocation(true)
-            result = "Mobile location settings reset to recommended defaults."
+            result = 'Mobile location settings reset to recommended defaults.'
             logWarn(result)
-        break
-        case "resetDisplayDefaultsButton":
+            break
+        case 'resetDisplayDefaultsButton':
             initializeMobileDisplay(true)
-            result = "Mobile display settings reset to recommended defaults."
+            result = 'Mobile display settings reset to recommended defaults.'
             logWarn(result)
-        break
-        case "sectionInstall":
+            break
+        case 'sectionInstall':
             state.show.install = state.show.install ? false : true
-        break
-        case "sectionLinks":
+            break
+        case 'sectionLinks':
             state.show.links = state.show.links ? false : true
-        break
-        case "sectionCommands":
+            break
+        case 'sectionCommands':
             state.show.commands = state.show.commands ? false : true
-        break
-        case "sectionOptional":
+            break
+        case 'sectionOptional':
             state.show.optional = state.show.optional ? false : true
-        break
-        case "sectionAdvanced":
+            break
+        case 'sectionAdvanced':
             state.show.advanced = state.show.advanced ? false : true
-        break
-        case "sectionMaintenance":
+            break
+        case 'sectionMaintenance':
             state.show.maintenance = state.show.maintenance ? false : true
-        break
-        case "sectionLogging":
+            break
+        case 'sectionLogging':
             state.show.logging = state.show.logging ? false : true
-        break
-        case "sectionHubsettings":
+            break
+        case 'sectionHubsettings':
             state.show.hubsettings = state.show.hubsettings ? false : true
-        break
-        case "sectionGeocode":
+            break
+        case 'sectionGeocode':
             state.show.geocode = state.show.geocode ? false : true
-        break
-        case "sectionMap":
+            break
+        case 'sectionMap':
             state.show.map = state.show.map ? false : true
-        break
-        case "sectionRegion":
+            break
+        case 'sectionRegion':
             state.show.region = state.show.region ? false : true
-        break
+            break
         default:
-            result = ""
-            logWarn ("Unhandled button: $btn")
-        break
+            result = ''
+            logWarn("Unhandled button: $btn")
+            break
     }
 
     if (success) {
         // clear the setting fields
         clearSettingFields()
         // force an update of all users
-        setUpdateFlag([ "name":"" ], "updateWaypoints", updateMember, true)
+        setUpdateFlag([ 'name':'' ], 'updateWaypoints', updateMember, true)
     }
 
     return (result)
@@ -1495,29 +1486,29 @@ String appButtonHandler(btn) {
 
 def clearSettingFields() {
     // clear the setting fields
-    app.removeSetting("regionToEdit")
-    app.removeSetting("regionAddress")
-    app.removeSetting("regionName")
-    app.removeSetting("regionRadius")
-    app.removeSetting("regionLat")
-    app.removeSetting("regionLon")
-    app.removeSetting("selectDeactivateFamilyMembers")
-    app.removeSetting("selectFamilyMembers")
-    app.removeSetting("notificationEnter")
-    app.removeSetting("notificationEnterRegions")
-    app.removeSetting("notificationLeave")
-    app.removeSetting("notificationLeaveRegions")
-    app.removeSetting("selectMemberGlyph")
-    app.removeSetting("memberGlyphColor")
-    app.removeSetting("selectGroup")
-    app.removeSetting("groupName")
+    app.removeSetting('regionToEdit')
+    app.removeSetting('regionAddress')
+    app.removeSetting('regionName')
+    app.removeSetting('regionRadius')
+    app.removeSetting('regionLat')
+    app.removeSetting('regionLon')
+    app.removeSetting('selectDeactivateFamilyMembers')
+    app.removeSetting('selectFamilyMembers')
+    app.removeSetting('notificationEnter')
+    app.removeSetting('notificationEnterRegions')
+    app.removeSetting('notificationLeave')
+    app.removeSetting('notificationLeaveRegions')
+    app.removeSetting('selectMemberGlyph')
+    app.removeSetting('memberGlyphColor')
+    app.removeSetting('selectGroup')
+    app.removeSetting('groupName')
     state.previousRegionName = null
     state.selectFamilyMembers = null
     state.selectMemberGlyph = null
 }
 
 def installed() {
-    log.info("Installed")
+    log.info('Installed')
     initialize(true)
     // clear the flag to indicate we finish installing the app -- we need this to have the map install fully in order to get a fixed URL for the mobile app
     state.installed = false
@@ -1530,34 +1521,34 @@ def uninstalled() {
 
 def initialize(forceDefaults) {
     // initialize the system states if undefined
-    if (state.show == null) state.show = [ install: true, links: false, commands: false, optional: false, advanced: false, maintenance: false, logging: false, hubsettings: false, geocode: false, map: false, region: false ]
-    if (state.accessToken == null) state.accessToken = ""
-    if (state.members == null) state.members = []
-    if (state.places == null) state.places = []
-    if (state.mapApiUsage == null) state.mapApiUsage = 0
-    if (state.lastGoogleFriendsLocationTime == null) state.lastGoogleFriendsLocationTime = 0
-    if (state.lastReportTime == null) state.lastReportTime = new SimpleDateFormat("E h:mm a yyyy-MM-dd").format(new Date())
-    if (state.googleMapsZoom == null) state.googleMapsZoom = DEFAULT_googleMapsZoom
-    if (state.googleMapsMember == null) state.googleMapsMember = DEFAULT_googleMapsMember
+    if (state.show == null) { state.show = [ install: true, links: false, commands: false, optional: false, advanced: false, maintenance: false, logging: false, hubsettings: false, geocode: false, map: false, region: false ] }
+    if (state.accessToken == null) { state.accessToken = '' }
+    if (state.members == null) { state.members = [] }
+    if (state.places == null) { state.places = [] }
+    if (state.mapApiUsage == null) { state.mapApiUsage = 0 }
+    if (state.lastGoogleFriendsLocationTime == null) { state.lastGoogleFriendsLocationTime = 0 }
+    if (state.lastReportTime == null) { state.lastReportTime = new SimpleDateFormat('E h:mm a yyyy-MM-dd').format(new Date()) }
+    if (state.googleMapsZoom == null) { state.googleMapsZoom = DEFAULT_googleMapsZoom }
+    if (state.googleMapsMember == null) { state.googleMapsMember = DEFAULT_googleMapsMember }
     GEOCODE_USAGE_COUNTER.eachWithIndex { entry, index ->
-        String provider = GEOCODE_USAGE_COUNTER[index+1]
+        String provider = GEOCODE_USAGE_COUNTER[index + 1]
         if (state."$provider" == null) {
             state."$provider" = 0
         }
     }
 
     // assign hubitat defaults
-    if (useLastGoogleFriendsMapMember == null) app.updateSetting("useLastGoogleFriendsMapMember", [value: DEFAULT_useLastGoogleFriendsMapMember, type: "bool"])
-    if (homeSSID == null) app.updateSetting("homeSSID", [value: "", type: "string"])
-    if (imperialUnits == null) app.updateSetting("imperialUnits", [value: DEFAULT_imperialUnits, type: "bool"])
-    if (disableCloudLinks == null) app.updateSetting("disableCloudLinks", [value: DEFAULT_disableCloudLinks, type: "bool"])
-    if (deviceNamePrefix == null) app.updateSetting("deviceNamePrefix", [value: DEFAULT_CHILDPREFIX, type: "string"])
-    if (forceDefaults || (imageCards == null)) app.updateSetting("imageCards", [value: DEFAULT_imageCards, type: "bool"])
-    if (forceDefaults || (highPowerMode == null)) app.updateSetting("highPowerMode", [value: DEFAULT_highPowerMode, type: "bool"])
-    if (forceDefaults || (lowPowerModeInRegion == null)) app.updateSetting("lowPowerModeInRegion", [value: DEFAULT_lowPowerModeInRegion, type: "bool"])
-    if (forceDefaults) app.updateSetting("descriptionTextOutput", [value: DEFAULT_descriptionTextOutput, type: "bool"])
-    if (forceDefaults) app.updateSetting("debugOutput", [value: DEFAULT_debugOutput, type: "bool"])
-    if (forceDefaults || (debugResetHours == null)) app.updateSetting("debugResetHours", [value: DEFAULT_debugResetHours, type: "number"])
+    if (useLastGoogleFriendsMapMember == null) { app.updateSetting('useLastGoogleFriendsMapMember', [value: DEFAULT_useLastGoogleFriendsMapMember, type: 'bool']) }
+    if (homeSSID == null) { app.updateSetting('homeSSID', [value: '', type: 'string']) }
+    if (imperialUnits == null) { app.updateSetting('imperialUnits', [value: DEFAULT_imperialUnits, type: 'bool']) }
+    if (disableCloudLinks == null) { app.updateSetting('disableCloudLinks', [value: DEFAULT_disableCloudLinks, type: 'bool']) }
+    if (deviceNamePrefix == null) { app.updateSetting('deviceNamePrefix', [value: DEFAULT_CHILDPREFIX, type: 'string']) }
+    if (forceDefaults || (imageCards == null)) { app.updateSetting('imageCards', [value: DEFAULT_imageCards, type: 'bool']) }
+    if (forceDefaults || (highPowerMode == null)) { app.updateSetting('highPowerMode', [value: DEFAULT_highPowerMode, type: 'bool']) }
+    if (forceDefaults || (lowPowerModeInRegion == null)) { app.updateSetting('lowPowerModeInRegion', [value: DEFAULT_lowPowerModeInRegion, type: 'bool']) }
+    if (forceDefaults) { app.updateSetting('descriptionTextOutput', [value: DEFAULT_descriptionTextOutput, type: 'bool']) }
+    if (forceDefaults) { app.updateSetting('debugOutput', [value: DEFAULT_debugOutput, type: 'bool']) }
+    if (forceDefaults || (debugResetHours == null)) { app.updateSetting('debugResetHours', [value: DEFAULT_debugResetHours, type: 'number']) }
 
     // assign the defaults to the hub settings
     initializeHub(forceDefaults)
@@ -1571,49 +1562,49 @@ def initialize(forceDefaults) {
 
 def initializeHub(forceDefaults) {
     if (forceDefaults) {
-        app.removeSetting("regionHighAccuracyRadius")
-        app.removeSetting("wifiPresenceKeepRadius")
-        app.removeSetting("geocodeProvider")
-        app.removeSetting("selectMemberGlyph")
-        app.removeSetting("memberGlyphColor")
+        app.removeSetting('regionHighAccuracyRadius')
+        app.removeSetting('wifiPresenceKeepRadius')
+        app.removeSetting('geocodeProvider')
+        app.removeSetting('selectMemberGlyph')
+        app.removeSetting('memberGlyphColor')
     }
-    if (forceDefaults || (regionHighAccuracyRadius == null)) app.updateSetting("regionHighAccuracyRadius", [value: DEFAULT_regionHighAccuracyRadius, type: "number"])
-    if (forceDefaults || (wifiPresenceKeepRadius == null)) app.updateSetting("wifiPresenceKeepRadius", [value: DEFAULT_wifiPresenceKeepRadius, type: "number"])
-    if (forceDefaults || (regionHighAccuracyRadiusHomeOnly == null)) app.updateSetting("regionHighAccuracyRadiusHomeOnly", [value: DEFAULT_regionHighAccuracyRadiusHomeOnly, type: "bool"])
-    if (forceDefaults || (warnOnNoUpdateHours == null)) app.updateSetting("warnOnNoUpdateHours", [value: DEFAULT_warnOnNoUpdateHours, type: "number"])
-    if (forceDefaults || (warnOnDisabledMember == null)) app.updateSetting("warnOnDisabledMember", [value: DEFAULT_warnOnDisabledMember, type: "bool"])
-    if (forceDefaults || (warnOnMemberSettings == null)) app.updateSetting("warnOnMemberSettings", [value: DEFAULT_warnOnMemberSettings, type: "bool"])
-    if (forceDefaults || (highAccuracyOnPing == null)) app.updateSetting("highAccuracyOnPing", [value: DEFAULT_highAccuracyOnPing, type: "bool"])
-    if (forceDefaults || (geocodeProvider == null)) app.updateSetting("geocodeProvider", [value: DEFAULT_geocodeProvider, type: "number"])
-    if (forceDefaults || (geocodeFreeOnly == null)) app.updateSetting("geocodeFreeOnly", [value: DEFAULT_geocodeFreeOnly, type: "bool"])
-    if (forceDefaults || (useCustomNotificationMessage == null)) app.updateSetting("useCustomNotificationMessage", [value: DEFAULT_useCustomNotificationMessage, type: "bool"])
-    if (forceDefaults || (addNewRegionsToMemberNotificationList == null)) app.updateSetting("addNewRegionsToMemberNotificationList", [value: DEFAULT_addNewRegionsToMemberNotificationList, type: "bool"])
-    if (forceDefaults || (notificationMessage == null)) app.updateSetting("notificationMessage", [value: DEFAULT_notificationMessage, type: "string"])
-    if (forceDefaults || (mapFreeOnly == null)) app.updateSetting("mapFreeOnly", [value: DEFAULT_mapFreeOnly, type: "bool"])
-    if (forceDefaults || (manualDeleteBehavior == null)) app.updateSetting("manualDeleteBehavior", [value: DEFAULT_manualDeleteBehavior, type: "bool"])
-    if (forceDefaults || (memberPinColor == null)) app.updateSetting("memberPinColor", [value: DEFAULT_MEMBER_PIN_COLOR, type: "string"])
-    if (forceDefaults || (regionPinColor == null)) app.updateSetting("regionPinColor", [value: DEFAULT_REGION_PIN_COLOR, type: "string"])
-    if (forceDefaults || (regionGlyphColor == null)) app.updateSetting("regionGlyphColor", [value: DEFAULT_REGION_GLYPH_COLOR, type: "string"])
-    if (forceDefaults || (regionHomeGlyphColor == null)) app.updateSetting("regionHomeGlyphColor", [value: DEFAULT_REGION_HOME_GLYPH_COLOR, type: "string"])
-    if (forceDefaults || (memberAccuracyRadiusOpacity == null)) app.updateSetting("memberAccuracyRadiusOpacity", [value: DEFAULT_memberAccuracyRadiusOpacity, type: "decimal"])
-    if (forceDefaults || (memberHistoryLength == null)) app.updateSetting("memberHistoryLength", [value: DEFAULT_memberHistoryLength, type: "number"])
-    if (forceDefaults || (memberHistoryScale == null)) app.updateSetting("memberHistoryScale", [value: DEFAULT_memberHistoryScale, type: "decimal"])
-    if (forceDefaults || (memberHistoryRepeat == null)) app.updateSetting("memberHistoryRepeat", [value: DEFAULT_memberHistoryRepeat, type: "number"])
-    if (forceDefaults || (memberDrawerScale == null)) app.updateSetting("memberDrawerScale", [value: DEFAULT_memberDrawerScale, type: "decimal"])
-    if (forceDefaults || (smartDisplayScale == null)) app.updateSetting("smartDisplayScale", [value: DEFAULT_smartDisplayScale, type: "decimal"])
-    if (forceDefaults || (displayAllMembersHistory == null)) app.updateSetting("displayAllMembersHistory", [value: DEFAULT_displayAllMembersHistory, type: "bool"])
-    if (forceDefaults || (useZoomWhenMembersAreClose == null)) app.updateSetting("useZoomWhenMembersAreClose", [value: DEFAULT_useZoomWhenMembersAreClose, type: "bool"])
-    if (forceDefaults || (memberTripIdleMarkerTime == null)) app.updateSetting("memberTripIdleMarkerTime", [value: DEFAULT_memberTripIdleMarkerTime, type: "number"])
-    if (forceDefaults || (memberMarkerBearingDifferenceDegrees == null)) app.updateSetting("memberMarkerBearingDifferenceDegrees", [value: DEFAULT_memberMarkerBearingDifferenceDegrees, type: "number"])
-    if (forceDefaults || (removeMemberMarkersWithSameBearing == null)) app.updateSetting("removeMemberMarkersWithSameBearing", [value: DEFAULT_removeMemberMarkersWithSameBearing, type: "bool"])
-    if (forceDefaults || (memberBoundsRadius == null)) app.updateSetting("memberBoundsRadius", [value: DEFAULT_memberBoundsRadius, type: "number"])
+    if (forceDefaults || (regionHighAccuracyRadius == null)) { app.updateSetting('regionHighAccuracyRadius', [value: DEFAULT_regionHighAccuracyRadius, type: 'number']) }
+    if (forceDefaults || (wifiPresenceKeepRadius == null)) { app.updateSetting('wifiPresenceKeepRadius', [value: DEFAULT_wifiPresenceKeepRadius, type: 'number']) }
+    if (forceDefaults || (regionHighAccuracyRadiusHomeOnly == null)) { app.updateSetting('regionHighAccuracyRadiusHomeOnly', [value: DEFAULT_regionHighAccuracyRadiusHomeOnly, type: 'bool']) }
+    if (forceDefaults || (warnOnNoUpdateHours == null)) { app.updateSetting('warnOnNoUpdateHours', [value: DEFAULT_warnOnNoUpdateHours, type: 'number']) }
+    if (forceDefaults || (warnOnDisabledMember == null)) { app.updateSetting('warnOnDisabledMember', [value: DEFAULT_warnOnDisabledMember, type: 'bool']) }
+    if (forceDefaults || (warnOnMemberSettings == null)) { app.updateSetting('warnOnMemberSettings', [value: DEFAULT_warnOnMemberSettings, type: 'bool']) }
+    if (forceDefaults || (highAccuracyOnPing == null)) { app.updateSetting('highAccuracyOnPing', [value: DEFAULT_highAccuracyOnPing, type: 'bool']) }
+    if (forceDefaults || (geocodeProvider == null)) { app.updateSetting('geocodeProvider', [value: DEFAULT_geocodeProvider, type: 'number']) }
+    if (forceDefaults || (geocodeFreeOnly == null)) { app.updateSetting('geocodeFreeOnly', [value: DEFAULT_geocodeFreeOnly, type: 'bool']) }
+    if (forceDefaults || (useCustomNotificationMessage == null)) { app.updateSetting('useCustomNotificationMessage', [value: DEFAULT_useCustomNotificationMessage, type: 'bool']) }
+    if (forceDefaults || (addNewRegionsToMemberNotificationList == null)) { app.updateSetting('addNewRegionsToMemberNotificationList', [value: DEFAULT_addNewRegionsToMemberNotificationList, type: 'bool']) }
+    if (forceDefaults || (notificationMessage == null)) { app.updateSetting('notificationMessage', [value: DEFAULT_notificationMessage, type: 'string']) }
+    if (forceDefaults || (mapFreeOnly == null)) { app.updateSetting('mapFreeOnly', [value: DEFAULT_mapFreeOnly, type: 'bool']) }
+    if (forceDefaults || (manualDeleteBehavior == null)) { app.updateSetting('manualDeleteBehavior', [value: DEFAULT_manualDeleteBehavior, type: 'bool']) }
+    if (forceDefaults || (memberPinColor == null)) { app.updateSetting('memberPinColor', [value: DEFAULT_MEMBER_PIN_COLOR, type: 'string']) }
+    if (forceDefaults || (regionPinColor == null)) { app.updateSetting('regionPinColor', [value: DEFAULT_REGION_PIN_COLOR, type: 'string']) }
+    if (forceDefaults || (regionGlyphColor == null)) { app.updateSetting('regionGlyphColor', [value: DEFAULT_REGION_GLYPH_COLOR, type: 'string']) }
+    if (forceDefaults || (regionHomeGlyphColor == null)) { app.updateSetting('regionHomeGlyphColor', [value: DEFAULT_REGION_HOME_GLYPH_COLOR, type: 'string']) }
+    if (forceDefaults || (memberAccuracyRadiusOpacity == null)) { app.updateSetting('memberAccuracyRadiusOpacity', [value: DEFAULT_memberAccuracyRadiusOpacity, type: 'decimal']) }
+    if (forceDefaults || (memberHistoryLength == null)) { app.updateSetting('memberHistoryLength', [value: DEFAULT_memberHistoryLength, type: 'number']) }
+    if (forceDefaults || (memberHistoryScale == null)) { app.updateSetting('memberHistoryScale', [value: DEFAULT_memberHistoryScale, type: 'decimal']) }
+    if (forceDefaults || (memberHistoryRepeat == null)) { app.updateSetting('memberHistoryRepeat', [value: DEFAULT_memberHistoryRepeat, type: 'number']) }
+    if (forceDefaults || (memberDrawerScale == null)) { app.updateSetting('memberDrawerScale', [value: DEFAULT_memberDrawerScale, type: 'decimal']) }
+    if (forceDefaults || (smartDisplayScale == null)) { app.updateSetting('smartDisplayScale', [value: DEFAULT_smartDisplayScale, type: 'decimal']) }
+    if (forceDefaults || (displayAllMembersHistory == null)) { app.updateSetting('displayAllMembersHistory', [value: DEFAULT_displayAllMembersHistory, type: 'bool']) }
+    if (forceDefaults || (useZoomWhenMembersAreClose == null)) { app.updateSetting('useZoomWhenMembersAreClose', [value: DEFAULT_useZoomWhenMembersAreClose, type: 'bool']) }
+    if (forceDefaults || (memberTripIdleMarkerTime == null)) { app.updateSetting('memberTripIdleMarkerTime', [value: DEFAULT_memberTripIdleMarkerTime, type: 'number']) }
+    if (forceDefaults || (memberMarkerBearingDifferenceDegrees == null)) { app.updateSetting('memberMarkerBearingDifferenceDegrees', [value: DEFAULT_memberMarkerBearingDifferenceDegrees, type: 'number']) }
+    if (forceDefaults || (removeMemberMarkersWithSameBearing == null)) { app.updateSetting('removeMemberMarkersWithSameBearing', [value: DEFAULT_removeMemberMarkersWithSameBearing, type: 'bool']) }
+    if (forceDefaults || (memberBoundsRadius == null)) { app.updateSetting('memberBoundsRadius', [value: DEFAULT_memberBoundsRadius, type: 'number']) }
 
-    if (forceDefaults || (state.memberBoundsRadius == null)) state.memberBoundsRadius = DEFAULT_memberBoundsRadius
+    if (forceDefaults || (state.memberBoundsRadius == null)) { state.memberBoundsRadius = DEFAULT_memberBoundsRadius }
     // if we are in imperial, convert the distances for displaying
     if (forceDefaults || (state.imperialUnitsHub != imperialUnits)) {
         state.imperialUnitsHub = imperialUnits
         // preload the settings field with the proper units
-        app.updateSetting("memberBoundsRadius", [value: displayKmMiVal(state.memberBoundsRadius).toInteger(), type: "number"])
+        app.updateSetting('memberBoundsRadius', [value: displayKmMiVal(state.memberBoundsRadius).toInteger(), type: 'number'])
     }
     // convert back to metric if in imperial to send out to the map
     state.memberBoundsRadius       = convertToKilometers(memberBoundsRadius)
@@ -1623,26 +1614,26 @@ def initializeHub(forceDefaults) {
 
 def initializeMobileLocation(forceDefaults) {
     if (forceDefaults) {
-        app.removeSetting("monitoring")
+        app.removeSetting('monitoring')
     }
-    if (forceDefaults || (monitoring == null)) app.updateSetting("monitoring", [value: DEFAULT_monitoring, type: "number"])
-    if (forceDefaults || (ignoreInaccurateLocations == null)) app.updateSetting("ignoreInaccurateLocations", [value: DEFAULT_ignoreInaccurateLocations, type: "number"])
-    if (forceDefaults || (ignoreStaleLocations == null)) app.updateSetting("ignoreStaleLocations", [value: DEFAULT_ignoreStaleLocations, type: "number"])
-    if (forceDefaults || (ping == null)) app.updateSetting("ping", [value: DEFAULT_ping, type: "number"])
-    if (forceDefaults || (pegLocatorFastestIntervalToInterval == null)) app.updateSetting("pegLocatorFastestIntervalToInterval", [value: DEFAULT_pegLocatorFastestIntervalToInterval, type: "bool"])
-    if (forceDefaults || (locatorDisplacement == null)) app.updateSetting("locatorDisplacement", [value: DEFAULT_locatorDisplacement, type: "number"])
-    if (forceDefaults || (locatorInterval == null)) app.updateSetting("locatorInterval", [value: DEFAULT_locatorInterval, type: "number"])
-    if (forceDefaults || (moveModeLocatorInterval == null)) app.updateSetting("moveModeLocatorInterval", [value: DEFAULT_moveModeLocatorInterval, type: "number"])
+    if (forceDefaults || (monitoring == null)) { app.updateSetting('monitoring', [value: DEFAULT_monitoring, type: 'number']) }
+    if (forceDefaults || (ignoreInaccurateLocations == null)) { app.updateSetting('ignoreInaccurateLocations', [value: DEFAULT_ignoreInaccurateLocations, type: 'number']) }
+    if (forceDefaults || (ignoreStaleLocations == null)) { app.updateSetting('ignoreStaleLocations', [value: DEFAULT_ignoreStaleLocations, type: 'number']) }
+    if (forceDefaults || (ping == null)) { app.updateSetting('ping', [value: DEFAULT_ping, type: 'number']) }
+    if (forceDefaults || (pegLocatorFastestIntervalToInterval == null)) { app.updateSetting('pegLocatorFastestIntervalToInterval', [value: DEFAULT_pegLocatorFastestIntervalToInterval, type: 'bool']) }
+    if (forceDefaults || (locatorDisplacement == null)) { app.updateSetting('locatorDisplacement', [value: DEFAULT_locatorDisplacement, type: 'number']) }
+    if (forceDefaults || (locatorInterval == null)) { app.updateSetting('locatorInterval', [value: DEFAULT_locatorInterval, type: 'number']) }
+    if (forceDefaults || (moveModeLocatorInterval == null)) { app.updateSetting('moveModeLocatorInterval', [value: DEFAULT_moveModeLocatorInterval, type: 'number']) }
 
-    if (forceDefaults || (state.locatorDisplacement == null)) state.locatorDisplacement = DEFAULT_locatorDisplacement
-    if (forceDefaults || (state.ignoreInaccurateLocations == null)) state.ignoreInaccurateLocations = DEFAULT_ignoreInaccurateLocations
-    if (forceDefaults || (state.imperialUnits == null)) state.imperialUnits = DEFAULT_imperialUnits
+    if (forceDefaults || (state.locatorDisplacement == null)) { state.locatorDisplacement = DEFAULT_locatorDisplacement }
+    if (forceDefaults || (state.ignoreInaccurateLocations == null)) { state.ignoreInaccurateLocations = DEFAULT_ignoreInaccurateLocations }
+    if (forceDefaults || (state.imperialUnits == null)) { state.imperialUnits = DEFAULT_imperialUnits }
     // if we are in imperial, convert the distances for displaying
     if (forceDefaults || (state.imperialUnits != imperialUnits)) {
         state.imperialUnits = imperialUnits
         // preload the settings field with the proper units
-        app.updateSetting("locatorDisplacement", [value: displayMFtVal(state.locatorDisplacement), type: "number"])
-        app.updateSetting("ignoreInaccurateLocations", [value: displayMFtVal(state.ignoreInaccurateLocations), type: "number"])
+        app.updateSetting('locatorDisplacement', [value: displayMFtVal(state.locatorDisplacement), type: 'number'])
+        app.updateSetting('ignoreInaccurateLocations', [value: displayMFtVal(state.ignoreInaccurateLocations), type: 'number'])
     }
     // convert back to metric if in imperial to send out to the phone
     state.locatorDisplacement             = convertToMeters(locatorDisplacement)
@@ -1650,29 +1641,29 @@ def initializeMobileLocation(forceDefaults) {
 }
 
 def initializeMobileDisplay(forceDefaults) {
-    if (forceDefaults || (replaceTIDwithUsername == null)) app.updateSetting("replaceTIDwithUsername", [value: DEFAULT_replaceTIDwithUsername, type: "bool"])
-    if (forceDefaults || (notificationEvents == null)) app.updateSetting("notificationEvents", [value: DEFAULT_notificationEvents, type: "bool"])
-    if (forceDefaults || (extendedData == null)) app.updateSetting("extendedData", [value: DEFAULT_extendedData, type: "bool"])
-    if (forceDefaults || (enableMapRotation == null)) app.updateSetting("enableMapRotation", [value: DEFAULT_enableMapRotation, type: "bool"])
-    if (forceDefaults || (showRegionsOnMap == null)) app.updateSetting("showRegionsOnMap", [value: DEFAULT_showRegionsOnMap, type: "bool"])
-    if (forceDefaults || (notificationLocation == null)) app.updateSetting("notificationLocation", [value: DEFAULT_notificationLocation, type: "bool"])
-    if (forceDefaults || (notificationGeocoderErrors == null)) app.updateSetting("notificationGeocoderErrors", [value: DEFAULT_notificationGeocoderErrors, type: "bool"])
+    if (forceDefaults || (replaceTIDwithUsername == null)) { app.updateSetting('replaceTIDwithUsername', [value: DEFAULT_replaceTIDwithUsername, type: 'bool']) }
+    if (forceDefaults || (notificationEvents == null)) { app.updateSetting('notificationEvents', [value: DEFAULT_notificationEvents, type: 'bool']) }
+    if (forceDefaults || (extendedData == null)) { app.updateSetting('extendedData', [value: DEFAULT_extendedData, type: 'bool']) }
+    if (forceDefaults || (enableMapRotation == null)) { app.updateSetting('enableMapRotation', [value: DEFAULT_enableMapRotation, type: 'bool']) }
+    if (forceDefaults || (showRegionsOnMap == null)) { app.updateSetting('showRegionsOnMap', [value: DEFAULT_showRegionsOnMap, type: 'bool']) }
+    if (forceDefaults || (notificationLocation == null)) { app.updateSetting('notificationLocation', [value: DEFAULT_notificationLocation, type: 'bool']) }
+    if (forceDefaults || (notificationGeocoderErrors == null)) { app.updateSetting('notificationGeocoderErrors', [value: DEFAULT_notificationGeocoderErrors, type: 'bool']) }
 }
 
 def initializeGroupList(forceDefaults) {
     // recreate the default groups
     if (forceDefaults || (state?.groups == null)) {
         state.groups = []
-        for (id=0; id<DEFAULT_maxGroups; id++) {
+        for (id = 0; id < DEFAULT_maxGroups; id++) {
             if (id == DEFAULT_globalGroupNumber) {
                 groupName = DEFAULT_globalGroupName
             } else {
                 groupName = DEFAULT_groupNames + id
             }
-            state.groups << [ "name": "${groupName}", "id": "${id}" ]
+            state.groups << [ 'name': "${groupName}", 'id': "${id}" ]
         }
         if (state?.members) {
-	        state.members.each { member->
+            state.members.each { member ->
                 // assign the default group number to all members
                 member.groups = []
                 member.groups << "${DEFAULT_globalGroupNumber}"
@@ -1687,44 +1678,44 @@ def updatePlusFollow() {
     plusFollow.desc = "+${locatorInterval}follow"
 
     // if the +follow location changed
-    deletePlace = state.places.find {it.desc[0] == plusFollow.desc[0]}
+    deletePlace = state.places.find { it.desc[0] == plusFollow.desc[0] }
     if (deletePlace?.desc != plusFollow.desc) {
         logDescriptionText("Deleting place: ${deletePlace}")
         state.places.remove(deletePlace)
         // add the new one
-        addPlace([ "name":"" ], plusFollow, false)
+        addPlace([ 'name':'' ], plusFollow, false)
     }
 }
 
 def updateGetRegion() {
-	state.members.each { member->
+    state.members.each { member ->
         // if we selected member(s) to retrieve their regions
-        if (settings?.getMobileRegions.find {it==member.name}) {
+        if (settings?.getMobileRegions.find { it == member.name }) {
             member.getRegions = true
         }
     }
-    app.updateSetting("getMobileRegions",[value:"",type:"enum"])
+    app.updateSetting('getMobileRegions', [value:'', type:'enum'])
 }
 
 def updated() {
     unschedule()
     unsubscribe()
-    logDescriptionText("Updated")
+    logDescriptionText('Updated')
 
     // cleanup up the recorder URL if necessary by removing the trailing /pub or /
     formatRecorderURL()
 
     // create the common child if it doesn't exist
-    createCommonChild()
+    newCommonChild()
 
     // create a presence child device for each enabled member - we will need to manually removed children unless the app is uninstalled
-    settings?.enabledMembers.each { enabledMember->
-        member = state.members.find {it.name==enabledMember}
+    settings?.enabledMembers.each { enabledMember ->
+        member = state.members.find { it.name == enabledMember }
         // default to false
         syncSettings = false
         // create the child if it doesn't exist
         if ((member.id == null) || (getChildDevice(member.id) == null)) {
-            createChild(member.name)
+            newChild(member.name)
             // force the update to the new device
             syncSettings = true
         } else {
@@ -1735,7 +1726,7 @@ def updated() {
         getChildDevice(member.id)?.generateTiles()
 
         // if we selected member(s) to update settings
-        if (settings?.syncMobileSettings.find {it==member.name}) {
+        if (settings?.syncMobileSettings.find { it == member.name }) {
             syncSettings = true
         }
         // if the configuration has changed, trigger the member update
@@ -1751,7 +1742,7 @@ def updated() {
         pruneMemberHistory(member)
     }
     // clear the settings flags to prevent the configurations from being forced to the display on each entry
-    app.updateSetting("syncMobileSettings",[value:"",type:"enum"])
+    app.updateSetting('syncMobileSettings', [value:'', type:'enum'])
 
     // check to see if home was assigned
     checkForHome()
@@ -1763,7 +1754,7 @@ def updated() {
     state.installed = true
     // clear the debug logging if set
     if (debugOutput) {
-        runIn(debugResetHours*3600, resetLogging)
+        runIn(debugResetHours * 3600, resetLogging)
     }
 
     /*
@@ -1783,7 +1774,7 @@ def updated() {
     }
     schedule("0 0 $timeZoneOffset * * ? *", dailyScheduler)
     // refresh the maps nightly
-    schedule("0 0 0 * * ? *", nightlyMaintenance)
+    schedule('0 0 0 * * ? *', nightlyMaintenance)
     nightlyMaintenance()
     removePlaces()
 }
@@ -1801,18 +1792,18 @@ def pruneMemberHistory(member) {
         }
         try {
             // calculate the trip numbers and populate the history
-            tripNumber = 1;
-            for (i=(member.history.size-1); i>=0; i--) {
+            tripNumber = 1
+            for (i = (member.history.size - 1); i >= 0; i--) {
                 // if we have no trip started yet
-                if ((member.history.mkr[i] == memberBeginMarker) && (i == (member.history.size-1))) {
-                    tripNumber = 0;
+                if ((member.history.mkr[i] == memberBeginMarker) && (i == (member.history.size - 1))) {
+                    tripNumber = 0
                 }
                 // increment the trip marker
                 if (member.history.mkr[i] == memberEndMarker) {
-                    tripNumber++;
+                    tripNumber++
                 }
                 memberHistory = member.history[i]
-                memberHistory["tp"] = tripNumber;
+                memberHistory['tp'] = tripNumber
             }
         } catch (e) {
             // do nothing -- once we have configured and received enough history points, this will succeed
@@ -1826,20 +1817,16 @@ def childGetWarnOnNonOptimalSettings() {
 }
 
 def getImageURL(memberName) {
-    if (imageCards) {
-        return ("http://${location.hubs[0].getDataValue("localIP")}/local/${memberName}.jpg")
-    } else {
-        return ("")
-    }
+    return (imageCards ? "http://${location.hubs[0].getDataValue('localIP')}/local/${memberName}.jpg" : '')
 }
 
 def getEmbeddedImage(memberName) {
-    def thumbnail = ""
+    def thumbnail = ''
     if (imageCards) {
         try {
-            thumbnail = "data:image/png;base64," + downloadHubFile("${memberName}.jpg").encodeBase64().toString()
+            thumbnail = 'data:image/png;base64,' + downloadHubFile("${memberName}.jpg").encodeBase64()
         } catch (e) {
-            // use the default blank if no thumbnail was found
+        // use the default blank if no thumbnail was found
         }
     }
     return (thumbnail)
@@ -1854,17 +1841,17 @@ def formatRecorderURL() {
     // cleanup up the recorder URL if necessary by removing the trailing /pub or /
     properURL = recorderURL?.trim()?.minus(RECORDER_PUBLISH_FOLDER)
     if (recorderURL != properURL) {
-        app.updateSetting("recorderURL",[value: properURL, type: "string"])
+        app.updateSetting('recorderURL', [value: properURL, type: 'string'])
     }
 }
 
 def generateStaleNotification() {
     // collect the names of the members that are stale
-    staleMembers = state?.members.findAll{it.staleReport == true}.collect{member -> member.name}
+    staleMembers = (state?.members ?: []).findAll { it.staleReport }*.name
     // send notification to mobile if selected
     if (staleMembers && notificationStaleList) {
         def date = new Date()
-        def dateFormat = "hh:mm a yyyy-MM-dd"
+        def dateFormat = 'hh:mm a yyyy-MM-dd'
         SimpleDateFormat newDate = new SimpleDateFormat(dateFormat)
         messageToSend = "Members ${staleMembers} have stale locations ${newDate.format(date)}"
         notificationStaleList.each { val ->
@@ -1874,14 +1861,14 @@ def generateStaleNotification() {
 }
 
 def generateTransitionNotification(memberName, transitionEvent, transitionRegion, transitionTime) {
-    member = state.members.find {it.name==memberName}
-    place = state.places.find {it.desc==transitionRegion}
-    if (transitionEvent == "arrived at") {
+    member = state.members.find { it.name == memberName }
+    place = state.places.find { it.desc == transitionRegion }
+    if (transitionEvent == 'arrived at') {
         notificationDevices = member?.enterDevices
-        notificationDeviceRegion = member?.enterRegions.find {it.toInteger()==place.tst}
+        notificationDeviceRegion = member?.enterRegions.find { it.toInteger() == place.tst }
     } else {
         notificationDevices = member?.leaveDevices
-        notificationDeviceRegion = member?.leaveRegions.find {it.toInteger()==place.tst}
+        notificationDeviceRegion = member?.leaveRegions.find { it.toInteger() == place.tst }
     }
 
     if (useCustomNotificationMessage) {
@@ -1891,15 +1878,15 @@ def generateTransitionNotification(memberName, transitionEvent, transitionRegion
         messageToSend = DEFAULT_notificationMessage
     }
     // parse the notification message
-    messageToSend = messageToSend.replace("NAME",   "${memberName}")
-    messageToSend = messageToSend.replace("EVENT",  "${transitionEvent}")
-    messageToSend = messageToSend.replace("REGION", "${transitionRegion}")
-    messageToSend = messageToSend.replace("TIME",   "${transitionTime}")
+    messageToSend = messageToSend.replace('NAME',   "${memberName}")
+    messageToSend = messageToSend.replace('EVENT',  "${transitionEvent}")
+    messageToSend = messageToSend.replace('REGION', "${transitionRegion}")
+    messageToSend = messageToSend.replace('TIME',   "${transitionTime}")
 
     // send notification to mobile if selected
     if (notificationDevices && notificationDeviceRegion) {
         notificationList.each { val ->
-            if (notificationDevices.find {it==val.displayName}) {
+            if (notificationDevices.find { it == val.displayName }) {
                 val.deviceNotification(messageToSend)
             }
         }
@@ -1913,7 +1900,7 @@ def checkForHome() {
 }
 
 def locationFixWatchdog() {
-    logDebug("Check members for stale locations.")
+    logDebug('Check members for stale locations.')
     // update each member with their last report times
     checkStaleMembers()
     // reschedule the watchdog
@@ -1922,11 +1909,11 @@ def locationFixWatchdog() {
 
 def checkStaleMembers() {
     // loop through all the members
-    state.members.each { member->
+    state.members.each { member ->
         // generate the stale report times
         if (member.lastReportTime) {
             long lastReportTime = member.lastReportTime.toLong()
-            member.lastReportDate = new SimpleDateFormat("E h:mm a   yyyy-MM-dd").format(new Date(lastReportTime))
+            member.lastReportDate = new SimpleDateFormat('E h:mm a   yyyy-MM-dd').format(new Date(lastReportTime))
             // true if no update the selected number of hours
             member.staleReport = ((now() - lastReportTime) > (warnOnNoUpdateHours * 3600000))
             // number of hours since last report
@@ -1934,13 +1921,13 @@ def checkStaleMembers() {
         } else {
             // force a stale report if no time was reported
             member.staleReport = true
-            member.lastReportDate = "None"
-            member.numberHoursReport = "?"
+            member.lastReportDate = 'None'
+            member.numberHoursReport = '?'
         }
         // generate the stale location times
         if (member.timeStamp) {
             long lastFixTime = member.timeStamp.toLong() * 1000
-            member.lastFixDate = new SimpleDateFormat("E h:mm a   yyyy-MM-dd").format(new Date(lastFixTime))
+            member.lastFixDate = new SimpleDateFormat('E h:mm a   yyyy-MM-dd').format(new Date(lastFixTime))
             // true if no update the selected number of hours
             member.staleFix = ((now() - lastFixTime) > (warnOnNoUpdateHours * 3600000))
             // number of hours since last report
@@ -1948,8 +1935,8 @@ def checkStaleMembers() {
         } else {
             // force a stale fix if no time was reported
             member.staleFix = true
-            member.lastFixDate = "None"
-            member.numberHoursFix = "?"
+            member.lastFixDate = 'None'
+            member.numberHoursFix = '?'
         }
 
         // if auto request location is enabled and the position fix is stale, flag the user
@@ -1963,7 +1950,7 @@ def checkStaleMembers() {
 }
 
 def displayMemberStatus() {
-    String tableData = "";
+    String tableData = ''
 
     if (state.members) {
         tableData += '<div style="overflow-x:auto;">'
@@ -1983,20 +1970,20 @@ def displayMemberStatus() {
         // update each member with their last report times
         checkStaleMembers()
         // loop through all the members
-        state.members.each { member->
+        state.members.each { member ->
             // check if member is enabled
-            memberEnabled = settings?.enabledMembers.find {it==member.name}
+            memberEnabled = settings?.enabledMembers.find { it == member.name }
             deviceWrapper = getChildDevice(member.id)
-            memberName = "<a href='" + "http://${location.hubs[0].getDataValue('localIP')}/device/edit/" + deviceWrapper?.getId() + "' target='_blank'>" + member.name + "</a>"
+            memberName = "<a href='http://${location.hubs[0].getDataValue('localIP')}/device/edit/" + deviceWrapper?.getId() + "' target='_blank'>" + member.name + '</a>'
 
             tableData += '<tr>'
             tableData += '<td>' + (memberEnabled ? memberName : '<s>' + memberName + '</s>') + '</td>'
             tableData += (memberEnabled ? ((member.staleReport ? '<td style="color:#ff0000">' + member.lastReportDate + ' (' + member.numberHoursReport + ' hrs ago)' : '<td>' + member.lastReportDate) + '</td>') : '<td style="color:#b3b3b3"><s>' + member.lastReportDate + '</s></td>')
             tableData += (memberEnabled ? ((member.staleFix ? '<td style="color:#ff0000">' + member.lastFixDate + ' (' + member.numberHoursFix + ' hrs ago)' : '<td>' + member.lastFixDate) + '</td>') : '<td style="color:#b3b3b3"><s>' + member.lastFixDate + '</s></td>')
             tableData += (memberEnabled ? (member.updateWaypoints ? '<td style="color:#ff9900">Pending' : '<td>No') + '</td>' : '<td style="color:#b3b3b3"><s>--</s></td>')
-            tableData += (memberEnabled ? ((member.updateLocation | member.updateDisplay) ? '<td style="color:#ff9900">Pending' : '<td>No') + '</td>' : '<td style="color:#b3b3b3"><s>--</s></td>')
+            tableData += (memberEnabled ? ((member.updateLocation || member.updateDisplay) ? '<td style="color:#ff9900">Pending' : '<td>No') + '</td>' : '<td style="color:#b3b3b3"><s>--</s></td>')
             tableData += (memberEnabled ? (member.getRegions ? '<td style="color:#ff9900">Pending' : '<td>No') + '</td>' : '<td style="color:#b3b3b3"><s>--</s></td>')
-            tableData += (memberEnabled ? (member.requestLocation ? '<td style="color:#ff9900">Pending' : '<td>No') + '</td>' : (member?.deactivate ? '<td style="color:#ff0000">' + (member?.deactivate == 1 ? 'Deactivating' : 'Deactivated') +'</td>' : '<td style="color:#b3b3b3"><s>--</s></td>'))
+            tableData += (memberEnabled ? (member.requestLocation ? '<td style="color:#ff9900">Pending' : '<td>No') + '</td>' : (member?.deactivate ? '<td style="color:#ff0000">' + (member?.deactivate == 1 ? 'Deactivating' : 'Deactivated') + '</td>' : '<td style="color:#b3b3b3"><s>--</s></td>'))
             tableData += '</tr>'
             // display members in non-optimal configurations
             tableData += '<tr style="color:#ff0000">'
@@ -2015,7 +2002,7 @@ def displayMemberStatus() {
     } else {
         tableData = "<h3>'Select family member(s) to monitor' to add members.</h3>"
     }
-    paragraph( tableData )
+    paragraph(tableData)
 }
 
 def splitTopic(topic) {
@@ -2025,16 +2012,16 @@ def splitTopic(topic) {
     //     [1] = "username"
     //     [2] = "deviceID"
     //     [3] = event type: "waypoint", "waypoints", "event".  Does not get populated for "location".
-   return(topic.split("/"))
+    return(topic.split('/'))
 }
 
 def nightlyMaintenance() {
     // runs at midnight to refresh the map contents
-    createRecorderFriendsLocationTile()
-    createGoogleFriendsLocationTile()
+    newRecorderFriendsLocationTile()
+    newGoogleFriendsLocationTile()
     // loop through all the enabled members
-    settings?.enabledMembers.each { enabledMember->
-        member = state.members.find {it.name==enabledMember}
+    settings?.enabledMembers.each { enabledMember ->
+        member = state.members.find { it.name == enabledMember }
         deviceWrapper = getChildDevice(member.id)
         deviceWrapper?.generatePastLocationsTile()
     }
@@ -2055,38 +2042,32 @@ def webhookEventHandler() {
     } else if (!sourceName || !sourceDeviceID) {
         // catch the exception if a webhook comes in without being configured properly
         logError("Username: '${sourceName}' / Device ID: '${sourceDeviceID}' not configured in the OwnTracks app - Deactivating unknown user.  Ensure the 'Username' and 'Device ID' are set on the OwnTracks mobile app.")
-        result = sendDeactivateUpdate([ "name":"${sourceDeviceID}" ])
+        result = sendDeactivateUpdate([ 'name':"${sourceDeviceID}" ])
     } else {
         // strip the [] around these values
-        sourceName = sourceName.substring(1, (sourceName.length()-1))
-        sourceDeviceID = sourceDeviceID.substring(1, (sourceDeviceID.length()-1))
+        sourceName = sourceName.substring(1, (sourceName.length() - 1))
+        sourceDeviceID = sourceDeviceID.substring(1, (sourceDeviceID.length() - 1))
         // check if this a message from the service device.  If not, check for a matching member
         if (sourceName == COMMON_CHILDNAME) {
-            findMember = [ name:COMMON_CHILDNAME, deviceID:COMMON_CHILDNAME, id:getCommonChildDNI() ]
+            findMember = [ name:COMMON_CHILDNAME, deviceID:COMMON_CHILDNAME, id:commonChildDNI() ]
         } else {
-            findMember = state.members.find {it.name==sourceName}
+            findMember = state.members.find { it.name == sourceName }
         }
 
         data = parseJson(request.body)
         logDebug("Received update' from user: '$sourceName', deviceID: '$sourceDeviceID', data: $data")
 
-        if (!findMember?.id) {
-            // add the new user to the list if they don't exist yet.  We will use the current time since not all incoming packets have a timestamp
-            if (findMember == null) {
-                state.members << [ name:sourceName, deviceID:sourceDeviceID, id:null, groups:["0"], timeStamp:(now()/1000).toInteger(), updateWaypoints:false, updateLocation:false, updateDisplay:false, dynamicLocaterAccuracy:false, getRegions:false, requestLocation:false ]
-            }
-            logWarn("User: '${sourceName}' not configured.  To enable this member, open the Hubitat OwnTracks app, select '${sourceName}' in 'Select family member(s) to monitor' box and then click 'Done'.")
-        } else {
+        if (findMember?.id) {
             // only process events from enabled members, or the service member
-            if ((settings?.enabledMembers.find {it==sourceName}) || (sourceName == COMMON_CHILDNAME)) {
+            if ((settings?.enabledMembers.find { it == sourceName }) || (sourceName == COMMON_CHILDNAME)) {
                 // Pass the location to a secondary hub if configured
                 if (secondaryHubURL && enableSecondaryHub) {
-                    def postParams = [ uri: secondaryHubURL?.trim(), requestContentType: 'application/json', contentType: 'application/json', headers: parsePostHeaders(request.headers), body : (new JsonBuilder(data)).toPrettyString() ]
-                    asynchttpPost("httpCallbackMethod", postParams)
+                    def postParams = [ uri: secondaryHubURL?.trim(), requestContentType: 'application/json', contentType: 'application/json', headers: parsePostHeaders(request.headers), body : (new JsonBuilder(data)) ]
+                    asynchttpPost('httpCallbackMethod', postParams)
                 }
                 // update the device ID should it have changed
                 findMember.deviceID = sourceDeviceID
-                result = parseMessage(request.headers, data, findMember);
+                result = parseMessage(request.headers, data, findMember)
             } else {
                 if (warnOnDisabledMember) {
                     logWarn("User: '${sourceName}' not enabled.  To enable this member, open the Hubitat OwnTracks app, select '${sourceName}' in 'Select family member(s) to monitor' box and then click 'Done'.")
@@ -2098,12 +2079,18 @@ def webhookEventHandler() {
                     logDebug("User: '${sourceName}' not enabled.  To enable this member, open the Hubitat OwnTracks app, select '${sourceName}' in 'Select family member(s) to monitor' box and then click 'Done'.")
                 }
             }
+        } else {
+            // add the new user to the list if they don't exist yet.  We will use the current time since not all incoming packets have a timestamp
+            if (findMember == null) {
+                state.members << [ name:sourceName, deviceID:sourceDeviceID, id:null, groups:['0'], timeStamp:(now() / 1000).toInteger(), updateWaypoints:false, updateLocation:false, updateDisplay:false, dynamicLocaterAccuracy:false, getRegions:false, requestLocation:false ]
+            }
+            logWarn("User: '${sourceName}' not configured.  To enable this member, open the Hubitat OwnTracks app, select '${sourceName}' in 'Select family member(s) to monitor' box and then click 'Done'.")
         }
     }
 
     // app requires a non-empty JSON response, or it will display HTTP 500
-    payload = new JsonBuilder(result).toPrettyString()
-    return render(contentType: "text/html", data: payload, status: 200)
+    payload = new JsonBuilder(result)
+    return render(contentType: 'text/html', data: payload, status: 200)
 }
 
 def parseMessage(headers, data, member) {
@@ -2111,15 +2098,15 @@ def parseMessage(headers, data, member) {
     payload = []
 
     switch (data._type) {
-        case "location":
-        case "transition":
+        case 'location':
+        case 'transition':
             // store the last report time for the Google friends map
-            state.lastReportTime = new SimpleDateFormat("E h:mm a yyyy-MM-dd").format(new Date())
+            state.lastReportTime = new SimpleDateFormat('E h:mm a yyyy-MM-dd').format(new Date())
             // log the elapsed distance and time
             logDistanceTraveledAndElapsedTime(member, data)
             updateMemberAttributes(headers, data, member)
             // flag the data as private if necessary, but let the raw message pass to the secondary hub to be filtered
-            data.private = ((settings?.privateMembers.find {it==member.name}) ? true : false)
+            data.private = ((settings?.privateMembers.find { it == member.name }) ? true : false)
 
             // calculate how many minutes the incoming location message is from current time
             deltaTst = (((member.lastReportTime / 1000) - member?.timeStamp) / 60).toInteger()
@@ -2132,62 +2119,62 @@ def parseMessage(headers, data, member) {
             // return with the rest of the users positions and waypoints if pending
             payload = sendUpdate(member, data)
             // if the country code was not defined, replace with with hub timezone country
-            if (!data.cc) { data.cc = location.getTimeZone().getID().substring(0, 2).toUpperCase() }
+            data.cc = data.cc ?: location.getTimeZone().getID().substring(0, 2).toUpperCase()
             // if we have the OwnTracks recorder configured, and the timestamp is valid, and the user is not marked as private, pass the location data to it
             if (recorderURL && enableRecorder && !data.private && memberInGlobalMemberGroup(member)) {
-                def postParams = [ uri: recorderURL + RECORDER_PUBLISH_FOLDER, requestContentType: 'application/json', contentType: 'application/json', headers: parsePostHeaders(headers), body : (new JsonBuilder(data)).toPrettyString() ]
-                asynchttpPost("httpCallbackMethod", postParams)
+                def postParams = [ uri: recorderURL + RECORDER_PUBLISH_FOLDER, requestContentType: 'application/json', contentType: 'application/json', headers: parsePostHeaders(headers), body : (new JsonBuilder(data)) ]
+                asynchttpPost('httpCallbackMethod', postParams)
             }
             break
-        case "waypoint":
+        case 'waypoint':
             // append/update to the places list for global members only
             if (memberInGlobalMemberGroup(member)) {
                 addPlace(member, data, true)
             } else {
                 logDescriptionText("User ${member.name} is not in the default group.  Skipping waypoint update.")
             }
-        break
-        case "waypoints":
+            break
+        case 'waypoints':
             // update the places list for global members only
             if (memberInGlobalMemberGroup(member)) {
                 updatePlaces(member, data)
             } else {
                 logDescriptionText("User ${member.name} is not in the default group.  Skipping waypoint update.")
             }
-        break
-        case "cmd":
+            break
+        case 'cmd':
             // parse the action
             switch (data.action) {
-                case "setWaypoints":
+                case 'setWaypoints':
                     // update the waypoint list from the payload
                     updatePlaces(member, data.waypoints)
-                break
-                case "waypoints":
+                    break
+                case 'waypoints':
                     // send waypoints
                     payload = sendWaypoints(member)
-                break
-                case "reportLocation":
-                	// returns data.topic of the member to request from, and data._id for the unique id
-                	// http version cannot request from members, so this is not implemented
-                case "setConfiguration":
-                case "dump": 				// iOS
-                case "status": 				// iOS
-                case "reportSteps": 		// iOS
-                case "clearWaypoints": 		// iOS
+                    break
+                case 'reportLocation':
+                // returns data.topic of the member to request from, and data._id for the unique id
+                // http version cannot request from members, so this is not implemented
+                case 'setConfiguration':
+                case 'dump':                 // iOS
+                case 'status':                 // iOS
+                case 'reportSteps':         // iOS
+                case 'clearWaypoints':         // iOS
                 default:
-                    // do nothing
+                // do nothing
                 break
             }
-        break
-        case "status":
+            break
+        case 'status':
             // update the member status from the payload
             updateStatus(member, data)
-        break
-        case "card":
-        break
+            break
+        case 'card':
+            break
         default:
             logWarn("Unhandled message type: ${data._type}")
-        break
+            break
     }
 
     return (payload)
@@ -2197,9 +2184,9 @@ def parsePostHeaders(postHeaders) {
     def newHeaders = [:]
 
     // loop through each header and remove the surrounding [], and recreate a new header map
-    postHeaders.each { entry->
+    postHeaders.each { entry ->
         String parsedValue = entry.getValue()
-        newHeaders.put("${entry.getKey()}", "${parsedValue.substring(1, (parsedValue.length()-1))}")
+        newHeaders.put("${entry.getKey()}", "${parsedValue.substring(1, (parsedValue.length() - 1))}")
     }
 
     return (newHeaders)
@@ -2207,20 +2194,20 @@ def parsePostHeaders(postHeaders) {
 
 def httpCallbackMethod(response, data) {
     if (response.status == 200) {
-        logDebug "Posted successfully to OwnTracks URL."
+        logDebug 'Posted successfully to OwnTracks URL.'
         responseData = response?.getJson()
         responseHeaders = response?.getHeaders()
         if (responseData) {
             // parse the response
             try {
                 // for map of maps
-                for (i=0; i<responseData.size(); i++) {
+                for (i = 0; i < responseData.size(); i++) {
                     // ignore the returning member positions
-                    if (responseData[i]._type != "location") {
+                    if (responseData[i]._type != 'location') {
                         parseMessage(responseHeaders, responseData[i], [ name:COMMON_CHILDNAME ])
                     }
                 }
-            } catch(e) {
+            } catch (e) {
                 // single map
                 parseMessage(responseHeaders, responseData, [ name:COMMON_CHILDNAME ])
             }
@@ -2233,11 +2220,11 @@ def httpCallbackMethod(response, data) {
 def isSSIDMatch(dataString, deviceID) {
     result = false
     // check for matching SSID in the list
-    if (dataString && deviceID.currentValue("SSID")) {
+    if (dataString && deviceID.currentValue('SSID')) {
         // split the list in tokens, and trim the leading/trailing whitespace
-        SSIDList = dataString.split(',')
-        SSIDList.each { SSID ->
-            if (SSID.trim() == deviceID.currentValue("SSID")) {
+        sSIDList = dataString.split(',')
+        sSIDList.each { sSID ->
+            if (sSID.trim() == deviceID.currentValue('SSID')) {
                 result = true
             }
         }
@@ -2248,7 +2235,7 @@ def isSSIDMatch(dataString, deviceID) {
 
 def calcMemberVelocity(member, data) {
     try {
-        travelDistance = haversine(member.latitude.toDouble(), member.longitude.toDouble(),data.lat.toDouble(), data.lon.toDouble())
+        travelDistance = haversine(member.latitude.toDouble(), member.longitude.toDouble(), data.lat.toDouble(), data.lon.toDouble())
         // calcuate the member odometer
         member.odo = (member.odo ? (member.odo + travelDistance).round(1) : travelDistance.round(1))
         // if we received a speed -- wifi location updates will return with 0 speed, so ignore those and calculated based on the distance moved
@@ -2272,7 +2259,7 @@ def calcMemberVelocity(member, data) {
             member.bearing = data.cog
         } else {
             // calculate the bearing between the new and previous location point
-            member.bearing = angleFromCoordinate(member.latitude.toDouble(), member.longitude.toDouble(),data.lat.toDouble(), data.lon.toDouble()).toInteger()
+            member.bearing = angleFromCoordinate(member.latitude.toDouble(), member.longitude.toDouble(), data.lat.toDouble(), data.lon.toDouble()).toInteger()
             data.cog = member.bearing
         }
     } catch (e) {
@@ -2292,19 +2279,15 @@ def getCompassDifference(bearing1, bearing2) {
 
 def removeHistoryPoint(member) {
     // calculate the angle between the three points
-    d12 = haversine(member.latitude.toDouble(), member.longitude.toDouble(),member.history[member.history.size-1].lat.toDouble(), member.history[member.history.size-1].lng.toDouble())
-    d13 = haversine(member.latitude.toDouble(), member.longitude.toDouble(),member.history[member.history.size-2].lat.toDouble(), member.history[member.history.size-2].lng.toDouble())
-    d23 = haversine(member.history[member.history.size-1].lat.toDouble(), member.history[member.history.size-1].lng.toDouble(),member.history[member.history.size-2].lat.toDouble(), member.history[member.history.size-2].lng.toDouble())
+    d12 = haversine(member.latitude.toDouble(), member.longitude.toDouble(), member.history[member.history.size - 1].lat.toDouble(), member.history[member.history.size - 1].lng.toDouble())
+    d13 = haversine(member.latitude.toDouble(), member.longitude.toDouble(), member.history[member.history.size - 2].lat.toDouble(), member.history[member.history.size - 2].lng.toDouble())
+    d23 = haversine(member.history[member.history.size - 1].lat.toDouble(), member.history[member.history.size - 1].lng.toDouble(), member.history[member.history.size - 2].lat.toDouble(), member.history[member.history.size - 2].lng.toDouble())
 
     // check if the angle deviation is within range
-    if ((180 - Math.toDegrees(Math.acos(((d12*d12) + (d23*d23) - (d13*d13)) / (2*d12*d23)))) <= memberMarkerBearingDifferenceDegrees) {
-        return (true)
-    } else {
-        return (false)
-    }
+    return ((180 - Math.toDegrees(Math.acos(((d12 * d12) + (d23 * d23) - (d13 * d13)) / (2 * d12 * d23)))) <= memberMarkerBearingDifferenceDegrees)
 }
 
-def getHistoryMarker(member, data) {
+def getHistoryMarker(member) {
     // default to the "middle" marker
     marker = memberMiddleMarker
     try {
@@ -2358,9 +2341,9 @@ def parseAppVersion(appVersion) {
             tempString.substring(3, 5),
             tempString.substring(5, 8)
         ]
-        versionString = "Android: v" + parts.collect { it.toInteger() }.join('.')
+        versionString = 'Android: v' + parts*.toInteger().join('.')
     } else {
-        versionString = "iOS: v" + parsedVersion[1].split(' ')[0]
+        versionString = 'iOS: v' + parsedVersion[1].split(' ')[0]
     }
     return (versionString)
 }
@@ -2375,8 +2358,8 @@ def updateMemberAttributes(headers, data, member) {
     }
 
     // pre-seed the member lat/lon for the first update address lookup
-    if (member.latitude == null)  member.latitude = data?.lat
-    if (member.longitude == null) member.longitude = data?.lon
+    if (member.latitude == null)  { member.latitude = data?.lat }
+    if (member.longitude == null) { member.longitude = data?.lon }
     // do a reverse lookup for the address if it doesn't exist, and we have an API enabled
     updateAddress(member, data)
     // add the street address and regions, if they exist
@@ -2393,11 +2376,11 @@ def updateMemberAttributes(headers, data, member) {
     member.accuracy                 = data?.acc
 
     // these are not present in transition messages
-    if (data?.tid  != null)         member.trackerID = data.tid
-    if (data?.batt != null)         member.battery   = data.batt
-    if (data?.alt  != null)         member.altitude  = data.alt
-    if (data?.bs   != null)         member.bs        = data.bs
-    if (data?.conn != null)         member.conn      = data.conn
+    if (data?.tid  != null)         { member.trackerID = data.tid }
+    if (data?.batt != null)         { member.battery   = data.batt }
+    if (data?.alt  != null)         { member.altitude  = data.alt }
+    if (data?.bs   != null)         { member.bs        = data.bs }
+    if (data?.conn != null)         { member.conn      = data.conn }
 
     // save the history
     if (member?.history == null) {
@@ -2407,7 +2390,7 @@ def updateMemberAttributes(headers, data, member) {
     // only save history on valid location types (ignore region and manual types)
     if (validLocationType(data.t)) {
         // first create the new member location so that the getHistoryMarker can clean up repeating events as necessary
-        def memberLocation = [ "lat": member.latitude, "lng": member.longitude, "acc": member.accuracy, "cog": member.bearing, "spd": member.speed, "odo": member.odo, "tst": member.timeStamp, "bat": member.battery, "bs": member.bs, "loc": data.streetAddress, "mkr": getHistoryMarker(member, data) ]
+        def memberLocation = [ 'lat': member.latitude, 'lng': member.longitude, 'acc': member.accuracy, 'cog': member.bearing, 'spd': member.speed, 'odo': member.odo, 'tst': member.timeStamp, 'bat': member.battery, 'bs': member.bs, 'loc': data.streetAddress, 'mkr': getHistoryMarker(member) ]
         try {
             // if the history buffer is full
             if (member.history.size == memberHistoryLength.toInteger()) {
@@ -2420,7 +2403,7 @@ def updateMemberAttributes(headers, data, member) {
                     member.history.remove(0)
                 }
             }
-        } catch(e) {
+        } catch (e) {
             // do nothing -- once we have configured and received enough history points, this will succeed
         }
         // add to the end of the list
@@ -2428,7 +2411,7 @@ def updateMemberAttributes(headers, data, member) {
         // remove the oldest of the history buffer if over full
         pruneMemberHistory(member)
     } else {
-        logDebug("Skipping history point save for trigger source '${(data.t ? TRIGGER_TYPE[data.t] : "Location")}', member: ${member.name}")
+        logDebug("Skipping history point save for trigger source '${(data.t ? TRIGGER_TYPE[data.t] : 'Location')}', member: ${member.name}")
     }
 }
 
@@ -2437,17 +2420,17 @@ def updateDevicePresence(member, data) {
     try {
         // find the appropriate child device based on app id and the device network id
         def deviceWrapper = getChildDevice(member.id)
-        logDebug("Updating '${(data.event ? "Event $data.event" : (data.t ? TRIGGER_TYPE[data.t] : "Location"))}' presence for member $deviceWrapper")
+        logDebug("Updating '${(data.event ? "Event $data.event" : (data.t ? TRIGGER_TYPE[data.t] : 'Location'))}' presence for member $deviceWrapper")
         // check if the user defined a home place
         if (homePlace) {
             // append the distance from home to the data packet
             data.currentDistanceFromHome = getDistanceFromHome(data)
             // check if the member is within our home geofence
-            memberHubHome = (data.currentDistanceFromHome <= ((getHomeRegion().rad.toDouble()) / 1000))
+            memberHubHome = (data.currentDistanceFromHome <= ((homeRegion().rad.toDouble()) / 1000))
             // or the mobile is reporting the member is home
-            memberMobileHome = (data?.inregions.find {it==getHomeRegion().desc} || ((data?.desc == getHomeRegion().desc) && (data?.event == 'enter')))
+            memberMobileHome = (data?.inregions.find { it == homeRegion().desc } || ((data?.desc == homeRegion().desc) && (data?.event == 'enter')))
             // needed for safe migration from 1.7.11
-            if (wifiPresenceKeepRadius == null) app.updateSetting("wifiPresenceKeepRadius", [value: DEFAULT_wifiPresenceKeepRadius, type: "number"])
+            if (wifiPresenceKeepRadius == null) { app.updateSetting('wifiPresenceKeepRadius', [value: DEFAULT_wifiPresenceKeepRadius, type: 'number']) }
             // or connected to a listed SSID and within the next geofence
             data.memberWiFiHome = (data.currentDistanceFromHome < (wifiPresenceKeepRadius?.toDouble() / 1000)) && isSSIDMatch(homeSSID, deviceWrapper)
 
@@ -2455,7 +2438,7 @@ def updateDevicePresence(member, data) {
             if (memberHubHome || memberMobileHome || data.memberWiFiHome) {
                 data.memberAtHome = true
                 // if the home name isn't present, at it to the regions
-                addRegionToInregions(getHomeRegion().desc, data)
+                addRegionToInregions(homeRegion().desc, data)
             } else {
                 data.memberAtHome = false
             }
@@ -2464,19 +2447,17 @@ def updateDevicePresence(member, data) {
             logWarn("No 'Home' location has been defined.  Create a 'Home' region to enable presence detection.")
         }
         // update the child information
-        deviceWrapper.generateLocationEvent(member, getHomeRegion().desc, data)
-    } catch(e) {
+        deviceWrapper.generateLocationEvent(member, homeRegion().desc, data)
+    } catch (e) {
         logError("updateDevicePresence: Exception for member: ${member.name}  $e")
     }
 }
 
 def addRegionToInregions(place, data) {
     // if there was no defined regions, create a blank list
-    if (!data.inregions) {
-        data.inregions = []
-    }
+    data.inregions = data.inregions ?: []
     // if the region isn't present, then add it
-    if (!data.inregions.find {it==place}) {
+    if (!data.inregions.find { it == place }) {
         data.inregions << place
     }
 }
@@ -2492,19 +2473,19 @@ def addStreetAddressAndRegions(data) {
         // street address, city
         // lat, lon
         // if the first digit of the first entry is not a number, but the second is, then we were returned a place, street adress
-        if ( !((addressList[0])[0])?.isNumber() && (((addressList[1])[0])?.isNumber() || (addressList.size() > 4)) ) {
+        if (!((addressList[0])[0])?.isNumber && (((addressList[1])[0])?.isNumber || (addressList.size() > 4))) {
             // save the place to the region list if we don't already have a region defined
-            if (!data.inregions) addRegionToInregions(addressList[0], data)
+            if (!data.inregions) { addRegionToInregions(addressList[0], data) }
             data.streetAddress = addressList[1]
             // remove the place from the address
-            data.address = data.address.substring(data.address.indexOf(",") + 1)?.trim()
+            data.address = data.address.substring(data.address.indexOf(',') + 1)?.trim()
         } else {
             // if the first entry is not a number, then we have a street address
-            if (!addressList[0]?.isNumber()) {
-                data.streetAddress = addressList[0]
-            } else {
+            if (addressList[0]?.isNumber()) {
                 // pass through since it is a lat,lon or a format we don't know how to parse
                 data.streetAddress = data.address
+            } else {
+                data.streetAddress = addressList[0]
             }
         }
     } catch (e) {
@@ -2520,9 +2501,9 @@ def checkRegionConfiguration(member, data) {
         def closestWaypointDistance = -1
 
         // loop through all the waypoints, and find the one that is closet to the location
-        state.places.each { waypoint->
+        state.places.each { waypoint ->
             // check our distance from the waypoint
-            distanceToWaypoint = ((haversine(data.lat.toDouble(), data.lon.toDouble(), waypoint.lat.toDouble(), waypoint.lon.toDouble()))*1000).round(0)
+            distanceToWaypoint = ((haversine(data.lat.toDouble(), data.lon.toDouble(), waypoint.lat.toDouble(), waypoint.lon.toDouble())) * 1000).round(0)
             // if we are closest, then save that waypoint
             if ((closestWaypointDistance == -1) || (distanceToWaypoint < closestWaypointDistance)) {
                 closestWaypointDistance = distanceToWaypoint.toDouble()
@@ -2539,8 +2520,8 @@ def checkRegionConfiguration(member, data) {
         // check if we need to apply this to the home region only then we will overwrite the all regions
         if (regionHighAccuracyRadiusHomeOnly) {
             // only switch to faster reporting when near home
-            closestWaypointDistance = (getDistanceFromHome(data)*1000).toDouble()
-            closestWaypointRadius = getHomeRegion()?.rad.toDouble()
+            closestWaypointDistance = (getDistanceFromHome(data) * 1000).toDouble()
+            closestWaypointRadius = homeRegion()?.rad.toDouble()
         }
 
         // catch the exception if no regions have been defined
@@ -2551,26 +2532,26 @@ def checkRegionConfiguration(member, data) {
         }
 
         // check if we are outside our region radius, and within our greater than the radius + regionHighAccuracyRadius
-        return (createConfiguration(member, currentlyInRegion, ((closestWaypointDistance > closestWaypointRadius) && (closestWaypointDistance < (closestWaypointRadius + regionHighAccuracyRadius.toDouble())))))
+        return(newConfiguration(member, currentlyInRegion, ((closestWaypointDistance > closestWaypointRadius) && (closestWaypointDistance < (closestWaypointRadius + regionHighAccuracyRadius.toDouble())))))
     }
 }
 
-def createConfiguration(member, currentlyInRegion, useDynamicLocaterAccuracy) {
+def newConfiguration(member, currentlyInRegion, useDynamicLocaterAccuracy) {
     def updateConfiguration = false
 
     // check if we need to force a high accuracy update
     if (useDynamicLocaterAccuracy) {
         // switch to locatorPriority=high power and pegLocatorFastestIntervalToInterval=false (dynamic interval)
-        configurationList = [ "_type": "configuration",
-                             "pegLocatorFastestIntervalToInterval": DYNAMIC_INTERVALS.pegLocatorFastestIntervalToInterval,
-                             "locatorPriority": DYNAMIC_INTERVALS.locatorPriority,
+        configurationList = [ '_type': 'configuration',
+                             'pegLocatorFastestIntervalToInterval': DYNAMIC_INTERVALS.pegLocatorFastestIntervalToInterval,
+                             'locatorPriority': DYNAMIC_INTERVALS.locatorPriority,
                             ]
     } else {
         // switch to settings.  Recommended locatorPriority=balanced power and pegLocatorFastestIntervalToInterval=true (fixed interval)
         // if in a region, use balanced power to prevent location jitter
-        configurationList = [ "_type": "configuration",
-                             "pegLocatorFastestIntervalToInterval": pegLocatorFastestIntervalToInterval,
-                             "locatorPriority": getLocatorPriority(currentlyInRegion),
+        configurationList = [ '_type': 'configuration',
+                             'pegLocatorFastestIntervalToInterval': pegLocatorFastestIntervalToInterval,
+                             'locatorPriority': getLocatorPriority(currentlyInRegion),
                             ]
     }
     if (member?.dynamicLocaterAccuracy != useDynamicLocaterAccuracy) {
@@ -2583,28 +2564,24 @@ def createConfiguration(member, currentlyInRegion, useDynamicLocaterAccuracy) {
         member.currentlyInRegion = currentlyInRegion
         updateConfiguration = true
     }
-    if (updateConfiguration) {
-        // return with the dynamic configuration
-        return( [ "_type":"cmd","action":"setConfiguration", "configuration": configurationList ] )
-    } else {
-        // return nothing
-        return
-    }
+
+    // return with the dynamic configuration
+    return(updateConfiguration ? [_type: 'cmd', action: 'setConfiguration', configuration: configurationList] : [])
 }
 
 def sendClearURLConfiguration(currentMember) {
     logDescriptionText("Clear URL for user ${currentMember.name}")
     // remove the URL to prevent the device from calling home
-    configurationList = [ "_type": "configuration", "url": "" ]
+    configurationList = [ '_type': 'configuration', 'url': '' ]
 
-    return( [ "_type":"cmd","action":"setConfiguration", "configuration": configurationList ] )
+    return([ '_type':'cmd', 'action':'setConfiguration', 'configuration': configurationList ])
 }
 
-private def getDistanceFromHome(data) {
+def getDistanceFromHome(data) {
     // return distance in kilometers, rounded to 3 decimal places (meters)
     distance = 0.0
     try {
-        distance = haversine(data.lat.toDouble(), data.lon.toDouble(), getHomeRegion()?.lat.toDouble(), getHomeRegion()?.lon.toDouble()).round(3)
+        distance = haversine(data.lat.toDouble(), data.lon.toDouble(), homeRegion()?.lat.toDouble(), homeRegion()?.lon.toDouble()).round(3)
     } catch (e) {
         logError("Unable to get distance from home.  Confirm a 'Home' region is assigned. Error reported: $e")
     }
@@ -2612,12 +2589,12 @@ private def getDistanceFromHome(data) {
     return (distance)
 }
 
-private def logDistanceTraveledAndElapsedTime(member, data) {
+def logDistanceTraveledAndElapsedTime(member, data) {
     // log the elapsed distance and time between location events
     try {
-        logDebug ("${app.label}: Delta between location events, member: ${member.name}, Distance: ${displayMFtVal(haversine(data.lat.toDouble(), data.lon.toDouble(), member.latitude.toDouble(), member.longitude.toDouble()).round(3)*1000)} ${getSmallUnits()}, Time: ${data.tst-member.timeStamp} s")
-    } catch(e) {
-        // only gets here on a first time user
+        logDebug("${app.label}: Delta between location events, member: ${member.name}, Distance: ${displayMFtVal(haversine(data.lat.toDouble(), data.lon.toDouble(), member.latitude.toDouble(), member.longitude.toDouble()).round(3) * 1000)} ${smallUnits()}, Time: ${data.tst - member.timeStamp} s")
+    } catch (e) {
+    // only gets here on a first time user
     }
 }
 
@@ -2627,15 +2604,15 @@ def removePlaces() {
     // default to true
     def deleteEntries = true
     // loop through all the enabled members to see if any have outstanding waypoint updates
-    settings?.enabledMembers.each { enabledMember->
-        if (state.members.find {it.name==enabledMember}?.updateWaypoints) {
-            deleteEntries = false;
+    settings?.enabledMembers.each { enabledMember ->
+        if (state.members.find { it.name == enabledMember }?.updateWaypoints) {
+            deleteEntries = false
         }
     }
 
     // remove all regions flagged for deletion
     if (deleteEntries) {
-        deleteIndex = state.places.findIndexOf {it.lat == INVALID_COORDINATE}
+        deleteIndex = state.places.findIndexOf { it.lat == INVALID_COORDINATE }
         // remove the place from our current list
         if (deleteIndex >= 0) {
             state.places.remove(deleteIndex)
@@ -2643,7 +2620,7 @@ def removePlaces() {
     }
 
     // remove regions from each member's notification list if they no longer exist
-    state?.members.each { member->
+    state?.members.each { member ->
         if (member.enterRegions) {
             member.enterRegions -= removeDeletedPlaces(member.enterRegions)
         }
@@ -2656,7 +2633,7 @@ def removePlaces() {
 def removeDeletedPlaces(regionList) {
     removeList = []
     regionList.each { entry ->
-        if (state.places.find {it.tst==entry.toInteger()} == null) {
+        if (state.places.find { it.tst == entry.toInteger() } == null) {
             // add to the list to be removed
             removeList += entry
         }
@@ -2667,30 +2644,32 @@ def removeDeletedPlaces(regionList) {
 
 def updatePlaces(findMember, data) {
     // only add places from non-private members
-    if (!(settings?.privateMembers.find {it==findMember.name})) {
-        logDescriptionText("Updating places")
+    if ((settings?.privateMembers.find { it == findMember.name })) {
+        logDebug('Ignoring waypoints due to private member.')
+    } else {
+        logDescriptionText('Updating places')
 
         // loop through all the waypoints
-        data.waypoints.each { waypoint->
+        data.waypoints.each { waypoint ->
             addPlace(findMember, waypoint, true)
         }
         logDebug("Updating places: ${state.places}")
-    } else {
-        logDebug("Ignoring waypoints due to private member.")
     }
 }
 
 def addPlace(findMember, data, verboseAdd) {
     // only add places from non-private members
-    if (!(settings?.privateMembers.find {it==findMember.name})) {
+    if (settings?.privateMembers.find { it == findMember.name }) {
+        logDebug('Ignoring waypoint due to private member.')
+    } else {
         // create a new map removing the MQTT topic
-        def newPlace = [ "_type": "${data._type}", "desc": "${data.desc}", "lat": data.lat.toDouble().round(6), "lon": data.lon.toDouble().round(6), "rad": data.rad, "tst": data.tst ]
+        def newPlace = [ '_type': "${data._type}", 'desc': "${data.desc}", 'lat': data.lat.toDouble().round(6), 'lon': data.lon.toDouble().round(6), 'rad': data.rad, 'tst': data.tst ]
 
         // check if we have an existing place with the same timestamp
-        place = state.places.find {it.tst==newPlace.tst}
+        def place = state.places.find { it.tst == newPlace.tst }
 
         // no changes to existing place, or a member is returing the +follow region
-        if ((place == newPlace) || (findMember.name && (data?.desc[0] == "+"))) {
+        if ((place == newPlace) || (findMember.name && (data?.desc[0] == '+'))) {
             if (verboseAdd) {
                 logDescriptionText("Skipping, no change to place: ${newPlace}")
             }
@@ -2706,22 +2685,20 @@ def addPlace(findMember, data, verboseAdd) {
                 state.places << newPlace
             }
             // force the users to get the update place list
-            setUpdateFlag(findMember, "updateWaypoints", true, true)
+            setUpdateFlag(findMember, 'updateWaypoints', true, true)
             // update the member notifications if enabled
             addPlaceToMemberNotifications(data.tst)
         }
-    } else {
-        logDebug("Ignoring waypoint due to private member.")
     }
 }
 
 def addPlaceToMemberNotifications(tst) {
     if (addNewRegionsToMemberNotificationList) {
-	    // add regions from each member's notification list if they allowed
-    	state?.members.each { member->
-            if (member.enterRegions)  (member.enterRegions << tst) else (member.enterRegions = [ tst ])
-            if (member.leaveRegions)  (member.leaveRegions << tst) else (member.leaveRegions = [ tst ])
-            logDescriptionText("Adding enter/leave notifications for region '${state.places.find {it.tst==tst}.desc}' to member ${member.name}")
+        // add regions from each member's notification list if they allowed
+        state?.members.each { member ->
+            if (member.enterRegions)  { (member.enterRegions << tst) } else { (member.enterRegions = [ tst ]) }
+            if (member.leaveRegions)  { (member.leaveRegions << tst) } else { (member.leaveRegions = [ tst ]) }
+            logDescriptionText("Adding enter/leave notifications for region '${ state.places.find { it.tst == tst }.desc}' to member ${member.name}")
         }
     }
 }
@@ -2754,10 +2731,10 @@ def updateStatus(findMember, data) {
     logDebug("Updating status: ${findMember.name}")
 }
 
-private def setUpdateFlag(currentMember, newSetting, newValue, globalOnly) {
+def setUpdateFlag(currentMember, newSetting, newValue, globalOnly) {
     // loop through all the enabled members
-    settings?.enabledMembers.each { enabledMember->
-        member = state.members.find {it.name==enabledMember}
+    settings?.enabledMembers.each { enabledMember ->
+        def member = state.members.find { it.name == enabledMember }
         // filter out group members if the request is for global members only
         if ((globalOnly && memberInGlobalMemberGroup(member)) || !globalOnly) {
             // don't set the flag for the member that triggered the update
@@ -2769,61 +2746,63 @@ private def setUpdateFlag(currentMember, newSetting, newValue, globalOnly) {
     }
 }
 
-private def sendReportLocationRequest(currentMember) {
+def sendReportLocationRequest(currentMember) {
     logDescriptionText("Request location for user ${currentMember.name}")
     // Forces the device to get a GPS fix for higher accuracy
 
-    return ([ "_type":"cmd","action":"reportLocation" ])
+    return ([ '_type':'cmd', 'action':'reportLocation' ])
 }
 
-private def sendReportWaypointsRequest(currentMember) {
+def sendReportWaypointsRequest(currentMember) {
     logDescriptionText("Request waypoints for user ${currentMember.name}")
     // Requests the waypoints list from the device
 
-    return ([ "_type":"cmd","action":"waypoints" ])
+    return ([ '_type':'cmd', 'action':'waypoints' ])
 }
 
-private def sendClearWaypointsRequest(currentMember) {
+def sendClearWaypointsRequest(currentMember) {
     logDescriptionText("Clear waypoints for user ${currentMember.name}")
     // Clears the waypoints list from the device
 
-    return ([ "_type":"cmd","action":"clearWaypoints" ])
+    return ([ '_type':'cmd', 'action':'clearWaypoints' ])
 }
 
-private def sendReportStatusRequest(currentMember) {
+def sendReportStatusRequest(currentMember) {
     logDescriptionText("Request status for user ${currentMember.name}")
     // Requests the status from the device
 
-    return ([ "_type":"cmd","action":"status" ])
+    return ([ '_type':'cmd', 'action':'status' ])
 }
 
-private def sendGetConfigurationRequest(currentMember) {
+def sendGetConfigurationRequest(currentMember) {
     logDescriptionText("Request configuration for user ${currentMember.name}")
     // Requests the configuration from the device
 
-    return ([ "_type":"cmd","action":"dump" ])
+    return ([ '_type':'cmd', 'action':'dump' ])
 }
 
-private def sendMemberPositions(currentMember, data) {
+def sendMemberPositions(currentMember, data) {
     def positions = []
     // check if a member has been configured to not see other member locations
-    if (!settings?.privateMembers.find {it==currentMember.name}) {
+    if (settings?.privateMembers.find { it == currentMember.name }) {
+        logDebug("${currentMember.name} is configured to not receive member updates.")
+    } else {
         // loop through all the enabled group members
         groupMembers = getMatchingGroupMembersForMember(currentMember)
-        groupMembers?.each { member->
+        groupMembers?.each { member ->
             // Don't send the member's location back to them.  NOTE: iOS users will make a duplicate of themselves, and Android has a lag between the app displayed thumbnail and the current phone location
             // Don't send locations if a member has been configured to not see other member location
-            if ((currentMember != member) && !(settings?.privateMembers.find {it==member.name}) ) {
+            if ((currentMember != member) && !(settings?.privateMembers.find { it == member.name })) {
                 // populating the tracker ID field with a name allows the name to be displayed in the Friends list and map bubbles and load the OwnTrack support parameters
-                def memberLocation = [ "_type": "location", "t": "u", "lat": member.latitude, "lon": member.longitude, "tst": member.timeStamp ]
+                def memberLocation = [ '_type': 'location', 't': 'u', 'lat': member.latitude, 'lon': member.longitude, 'tst': member.timeStamp ]
 
                 // check if fields are valid before adding
-                if (member.trackerID != null)   memberLocation["tid"]  = member.trackerID
-                if (member.battery != null)     memberLocation["batt"] = member.battery
-                if (member.accuracy != null)    memberLocation["acc"]  = member.accuracy
-                if (member.altitude != null)    memberLocation["alt"]  = member.altitude
-                if (member.speed != null)       memberLocation["vel"]  = member.speed
-                if (member.bs != null)          memberLocation["bs"]   = member.bs
+                if (member.trackerID != null)   { memberLocation['tid']  = member.trackerID }
+                if (member.battery != null)     { memberLocation['batt'] = member.battery }
+                if (member.accuracy != null)    { memberLocation['acc']  = member.accuracy }
+                if (member.altitude != null)    { memberLocation['alt']  = member.altitude }
+                if (member.speed != null)       { memberLocation['vel']  = member.speed }
+                if (member.bs != null)          { memberLocation['bs']   = member.bs }
 
                 positions << memberLocation
 
@@ -2836,25 +2815,19 @@ private def sendMemberPositions(currentMember, data) {
                 }
             }
         }
-    } else {
-        logDebug("${currentMember.name} is configured to not receive member updates.")
     }
 
     return (positions)
 }
 
-private def getRandomID() {
-    return((Math.random() * 0xFFFFFFFF).toInteger())
-}
-
-private def getMemberCard(member) {
+def getMemberCard(member) {
     def card = []
 
     // send the image cards for the user if enabled
     if (imageCards) {
-        try{
+        try {
             // append each enabled user's card with encoded image
-            card = [ "_type": "card", "name": "${member.name}", "face": "${downloadHubFile("${member.name}.jpg").encodeBase64().toString()}", "tid": "${member.trackerID}" ]
+            card = [ '_type': 'card', 'name': "${member.name}", 'face': "${downloadHubFile("${member.name}.jpg").encodeBase64()}", 'tid': "${member.trackerID}" ]
         }
         catch (e) {
             logError("No ${member.name}.jpg image stored in 'Settings->File Manager'")
@@ -2864,84 +2837,79 @@ private def getMemberCard(member) {
     return (card)
 }
 
-private def logMemberCardJSON() {
+def logMemberCardJSON() {
     // creates "trace" outputs in the Hubitat logs for each user card to be saved into a .JSON file for OwnTracks Recorder
-    settings?.enabledMembers.each { enabledMember->
-        member = state.members.find {it.name==enabledMember}
+    settings?.enabledMembers.each { enabledMember ->
+        member = state.members.find { it.name == enabledMember }
         card = getMemberCard(member)
         if (card) {
             // for recorder, this debug must be captured and saved to: <STORAGEDIR>/cards/<user>/<user>.json
             // or use: https://avanc.github.io/owntracks-cards/ to create and save the JSON
-            log.trace("For recorder cards, copy the bold JSON text between |  |, and save this file to 'STORAGEDIR/cards/${member.name}/${member.name}.json': |<b>${(new JsonBuilder(card)).toPrettyString()}</b>|")
+            log.trace("For recorder cards, copy the bold JSON text between |  |, and save this file to 'STORAGEDIR/cards/${member.name}/${member.name}.json': |<b>${(new JsonBuilder(card))}</b>|")
         }
     }
 }
 
-private def sendWaypoints(currentMember) {
+def sendWaypoints(currentMember) {
     logDescriptionText("Updating waypoints for user ${currentMember.name}")
     // If the member isn't public, then only send the home place
-    if (settings?.privateMembers.find {it==currentMember.name}) {
-        return ([ "_type":"cmd","action":"setWaypoints", "waypoints": [ "_type":"waypoints", "waypoints":getHomeRegion() ] ])
-    } else {
-        // if the member is an android user, then do not send the +follow region
-        return ([ "_type":"cmd","action":"setWaypoints", "waypoints": [ "_type":"waypoints", "waypoints":(isAndroidMember(currentMember?.appVersion) ? getNonFollowRegions(COLLECT_PLACES["map"]) : state.places) ] ])
-    }
+    return (settings?.privateMembers?.find { member -> member == currentMember.name } ?
+        [ _type:'cmd', action:'setWaypoints', waypoints:[ _type:'waypoints', waypoints:homeRegion() ] ] :
+        [ _type:'cmd', action:'setWaypoints', waypoints:[ _type:'waypoints', waypoints:(isAndroidMember(currentMember?.appVersion) ? getNonFollowRegions(COLLECT_PLACES['map']) : state.places) ] ])
 }
 
-private def sendConfiguration(currentMember) {
+def sendConfiguration(currentMember) {
     logDescriptionText("Updating configuration for user ${currentMember.name}")
 
     // create the configuration response.  Note: Configuration below are only the HTTP from the exported config.otrc file values based on the build version below
     def configurationList = [
-                                "_type" :                               	"configuration",
+                                '_type' :                                   'configuration',
 
                                 // static configuration
-                                "mode" :                                	3,                                   	// Endpoint protocol mode: 0=MQTT, 3=HTTP
-                                "autostartOnBoot" :                     	true,                                	// Autostart the app on device boot
-                                "cmd" :                                 	true,                                	// Respond to cmd messages
-                                "remoteConfiguration" :                 	true,                                	// Allow remote configuration
-                                "allowRemoteLocation" :                 	true,                                	// Allow remote location command
-                                "reverseGeocodeProvider" :              	"Device",                            	// Reverse Geocode provider -- use device (Google for Android)
-                                "allowRemoteLocation" :                 	true,                                	// required for 'reportLocation' to be processed
-                                "connectionTimeoutSeconds" :            	30,
-                                "debugLog" :                            	false,
-                                "dontReuseHttpClient" :                 	false,
-                                "experimentalFeatures" :                	[],
-                                "fusedRegionDetection" :                	true,
-                                "notificationHigherPriority" :          	false,
-                                "opencageApiKey" :                      	"",
+                                'mode' :                                    3,                                       // Endpoint protocol mode: 0=MQTT, 3=HTTP
+                                'autostartOnBoot' :                         true,                                    // Autostart the app on device boot
+                                'cmd' :                                     true,                                    // Respond to cmd messages
+                                'remoteConfiguration' :                     true,                                    // Allow remote configuration
+                                'reverseGeocodeProvider' :                  'Device',                                // Reverse Geocode provider -- use device (Google for Android)
+                                'allowRemoteLocation' :                     true,                                    // required for 'reportLocation' to be processed
+                                'connectionTimeoutSeconds' :                30,
+                                'debugLog' :                                false,
+                                'dontReuseHttpClient' :                     false,
+                                'experimentalFeatures' :                    [],
+                                'fusedRegionDetection' :                    true,
+                                'notificationHigherPriority' :              false,
+                                'opencageApiKey' :                          '',
                             ]
-
 
     def deviceLocatorList = [
                                 // dynamic configurations
-                                "pegLocatorFastestIntervalToInterval" : 	pegLocatorFastestIntervalToInterval, 	// Request that the location provider deliver updates no faster than the requested locator interval
-                                "monitoring" :                          	monitoring.toInteger(),              	// Monitoring mode (quiet, manual, significant, move)
-                                "locatorPriority" :                     	getLocatorPriority(false),           	// source/power setting for location updates (no power, low power, balanced power, high power)
-                                "locatorDisplacement" :                 	state.locatorDisplacement,           	// How far should the device travel (in metres) before receiving another location
-                                "locatorInterval" :                     	locatorInterval,                     	// How often should locations be requested from the device (seconds)
-                                "moveModeLocatorInterval" :             	moveModeLocatorInterval,             	// How often should locations be requested from the device whilst in Move mode (seconds)
-                                "ignoreInaccurateLocations" :           	state.ignoreInaccurateLocations,     	// Ignore location, if the accuracy is greater than the given meters.  NOTE: Build 420412000 occasionally reports events with acc=1799.999
-                                "ignoreStaleLocations" :                	ignoreStaleLocations,                	// Number of days after which location updates are assumed stale
-                                "ping" :                                	ping,                                	// Device will send a location interval at this heart beat interval (minutes).  Minimum 15, seems to be fixed at 30 minutes.
-                                "discardNetworkLocationThresholdSeconds" : 	(discardNetworkLocationThresholdSeconds ?: DEFAULT_discardNetworkLocationThresholdSeconds), // Ignore network locations if a high accuracy location occured this many seconds ago.
+                                'pegLocatorFastestIntervalToInterval' :     pegLocatorFastestIntervalToInterval,     // Request that the location provider deliver updates no faster than the requested locator interval
+                                'monitoring' :                              monitoring.toInteger(),                  // Monitoring mode (quiet, manual, significant, move)
+                                'locatorPriority' :                         getLocatorPriority(false),               // source/power setting for location updates (no power, low power, balanced power, high power)
+                                'locatorDisplacement' :                     state.locatorDisplacement,               // How far should the device travel (in metres) before receiving another location
+                                'locatorInterval' :                         locatorInterval,                         // How often should locations be requested from the device (seconds)
+                                'moveModeLocatorInterval' :                 moveModeLocatorInterval,                 // How often should locations be requested from the device whilst in Move mode (seconds)
+                                'ignoreInaccurateLocations' :               state.ignoreInaccurateLocations,         // Ignore location, if the accuracy is greater than the given meters.  NOTE: Build 420412000 occasionally reports events with acc=1799.999
+                                'ignoreStaleLocations' :                    ignoreStaleLocations,                    // Number of days after which location updates are assumed stale
+                                'ping' :                                    ping,                                    // Device will send a location interval at this heart beat interval (minutes).  Minimum 15, seems to be fixed at 30 minutes.
+                                'discardNetworkLocationThresholdSeconds' :     (discardNetworkLocationThresholdSeconds ?: DEFAULT_discardNetworkLocationThresholdSeconds), // Ignore network locations if a high accuracy location occured this many seconds ago.
                             ]
 
     def deviceDisplayList = [
-                                "notificationLocation" :                	notificationLocation,                	// Display last reported location and time in ongoing notification
-                                "extendedData" :                        	extendedData,                        	// Include extended data in location reports
-                                "notificationEvents" :                  	notificationEvents,                  	// Notify about received events
-                                "enableMapRotation" :                   	enableMapRotation,                   	// Allow the map to be rotated
-                                "showRegionsOnMap" :                    	showRegionsOnMap,                    	// Display the region pins/bubbles on the map
-                                "notificationGeocoderErrors" :          	notificationGeocoderErrors,          	// Display Geocoder errors in the notification banner
+                                'notificationLocation' :                    notificationLocation,                    // Display last reported location and time in ongoing notification
+                                'extendedData' :                            extendedData,                            // Include extended data in location reports
+                                'notificationEvents' :                      notificationEvents,                      // Notify about received events
+                                'enableMapRotation' :                       enableMapRotation,                       // Allow the map to be rotated
+                                'showRegionsOnMap' :                        showRegionsOnMap,                        // Display the region pins/bubbles on the map
+                                'notificationGeocoderErrors' :              notificationGeocoderErrors,              // Display Geocoder errors in the notification banner
                             ]
 
     // if we enabled a high accuracy location fix, then mark the user
     if (highAccuracyOnPing) {
-//        configurationList.experimentalFeatures = "showExperimentalPreferenceUI,locationPingUsesHighAccuracyLocationRequest"
-        configurationList.experimentalFeatures = "locationPingUsesHighAccuracyLocationRequest"
+        //        configurationList.experimentalFeatures = "showExperimentalPreferenceUI,locationPingUsesHighAccuracyLocationRequest"
+        configurationList.experimentalFeatures = 'locationPingUsesHighAccuracyLocationRequest'
     } else {
-        configurationList.experimentalFeatures = ""
+        configurationList.experimentalFeatures = ''
     }
 
     // append the extra app configurations if enabled
@@ -2954,13 +2922,13 @@ private def sendConfiguration(currentMember) {
         configurationList << deviceDisplayList
     }
 
-    def configuration = [ "_type":"cmd","action":"setConfiguration", "configuration": configurationList ]
+    def configuration = [ '_type':'cmd', 'action':'setConfiguration', 'configuration': configurationList ]
 
     logDebug("Updating configuration: ${configuration}")
     return (configuration)
 }
 
-private def sendUpdate(currentMember, data) {
+def sendUpdate(currentMember, data) {
     def update = []
 
     // only send the position updates on a ping or manual update
@@ -2999,7 +2967,7 @@ private def sendUpdate(currentMember, data) {
     }
 
     // report status on ping message type -- user generated location already generates the status message
-    if (data.t == "p") {
+    if (data.t == 'p') {
         update += sendReportStatusRequest(currentMember)
     }
 
@@ -3007,33 +2975,29 @@ private def sendUpdate(currentMember, data) {
     return (update)
 }
 
-private def sendDeactivateUpdate(currentMember) {
+def sendDeactivateUpdate(currentMember) {
     def update = []
     // indidate we have sent the commands
-    currentMember["deactivate"] = 2
+    currentMember['deactivate'] = 2
 
     // clear the waypoints list and URL
-	update += sendClearWaypointsRequest(currentMember)
-	update += sendClearURLConfiguration(currentMember)
-	logWarn("Deactivating user: ${currentMember.name} with data: ${update}")
+    update += sendClearWaypointsRequest(currentMember)
+    update += sendClearURLConfiguration(currentMember)
+    logWarn("Deactivating user: ${currentMember.name} with data: ${update}")
 
     return (update)
 }
 
-private def sendCmdToMember(currentMember) {
+def sendCmdToMember(currentMember) {
     // check if there are commands to send to the member
-    if ((currentMember?.updateWaypoints) || (currentMember?.updateLocation) || (currentMember?.updateDisplay) || (currentMember?.getRegions)) {
-        return (true)
-    } else {
-        return (false)
-    }
+    return ((currentMember?.updateWaypoints) || (currentMember?.updateLocation) || (currentMember?.updateDisplay) || (currentMember?.getRegions))
 }
 
-def getAndroidMembers() {
+def androidMembers() {
     // returns a list of Android members
-    members = []
-    settings?.enabledMembers.each { enabledMember->
-        member = state.members.find {it.name==enabledMember}
+    def members = []
+    settings?.enabledMembers.each { enabledMember ->
+        member = state.members.find { it.name == enabledMember }
         if (isAndroidMember(member?.appVersion)) {
             members << member.name
         }
@@ -3044,10 +3008,10 @@ def getAndroidMembers() {
 
 def getiOSMembers() {
     // returns a list of iOS members
-    members = []
-    settings?.enabledMembers.each { enabledMember->
-        member = state.members.find {it.name==enabledMember}
-        if (member?.appVersion?.toString()?.indexOf(ANDROID_USER_AGENT,0) < 0) {
+    def members = []
+    settings?.enabledMembers.each { enabledMember ->
+        member = state.members.find { it.name == enabledMember }
+        if (member?.appVersion?.toString()?.indexOf(ANDROID_USER_AGENT, 0) < 0) {
             members << member.name
         }
     }
@@ -3056,54 +3020,50 @@ def getiOSMembers() {
 }
 
 def isAndroidMember(appVersion) {
-    if (appVersion?.toString()?.indexOf(ANDROID_USER_AGENT,0) >= 0) {
-        return (true)
-    } else {
-        return (false)
-    }
+    return (appVersion?.toString()?.indexOf(ANDROID_USER_AGENT, 0) >= 0)
 }
 
 def isAllAndroidMembers() {
     // check if all users are Android
-    return(settings?.enabledMembers?.size() == getAndroidMembers()?.size() ? true : false)
+    return(settings?.enabledMembers?.size() == androidMembers()?.size())
 }
 
 def validPositionType(locationType) {
     // allow update if ping or manual location
-    return ((locationType == "p") || (locationType == "u"))
+    return ((locationType == 'p') || (locationType == 'u'))
 }
 
 def validLocationType(locationType) {
     // allow if not a region or manual update
-    return ((locationType != "l") && (locationType != "u"))
+    return ((locationType != 'l') && (locationType != 'u'))
 }
 
-private def createRecorderFriendsLocationTile() {
-    def deviceWrapper = getChildDevice(getCommonChildDNI())
+def newRecorderFriendsLocationTile() {
+    def deviceWrapper = getChildDevice(commonChildDNI())
     if (deviceWrapper) {
         deviceWrapper.generateRecorderFriendsLocationTile()
     }
 }
 
-def createGoogleFriendsLocationTile() {
-    def deviceWrapper = getChildDevice(getCommonChildDNI())
+def newGoogleFriendsLocationTile() {
+    def deviceWrapper = getChildDevice(commonChildDNI())
     if (deviceWrapper) {
         deviceWrapper.generateGoogleFriendsLocationTile()
     }
 }
 
-private def getCommonChildDNI() {
+def commonChildDNI() {
     return("${app.id}.${COMMON_CHILDNAME}")
 }
 
-private def createCommonChild() {
+def newCommonChild() {
     // common device to allow the app to do across family member tasks
-    def deviceWrapper = getChildDevice(getCommonChildDNI())
+    def deviceWrapper = getChildDevice(commonChildDNI())
     if (!deviceWrapper) {
-        logDescriptionText("Creating OwnTracks Common Device: $COMMON_CHILDNAME:${getCommonChildDNI()}")
-        try{
-            addChildDevice("lpakula", "OwnTracks Common Driver", getCommonChildDNI(), ["name": COMMON_CHILDNAME, isComponent: false])
-            logDescriptionText("Common Child Device Successfully Created")
+        logDescriptionText("Creating OwnTracks Common Device: $COMMON_CHILDNAME:${commonChildDNI()}")
+        try {
+            addChildDevice('lpakula', 'OwnTracks Common Driver', commonChildDNI(), ['name': COMMON_CHILDNAME, isComponent: false])
+            logDescriptionText('Common Child Device Successfully Created')
         }
         catch (e) {
             logError("Common Child device creation failed with error ${e}")
@@ -3113,39 +3073,39 @@ private def createCommonChild() {
     deviceWrapper?.push()
 }
 
-private def createChild(name) {
+def newChild(name) {
     // the unique ID will be the EPOCH timestamp
     id = now()
-    def DNI = "${app.id}.${id}"
+    def dNI = "${app.id}.${id}"
 
-    logDescriptionText("Creating OwnTracks Device: $name:$DNI")
-    try{
-        def deviceName = createDeviceName(name)
-        addChildDevice("lpakula", "OwnTracks Driver", DNI, ["name": "${deviceName}", isComponent: false])
-        state.members.find {it.name==name}.id = DNI
-        logDescriptionText("Child Device Successfully Created")
+    logDescriptionText("Creating OwnTracks Device: $name:$dNI")
+    try {
+        def deviceName = newDeviceName(name)
+        addChildDevice('lpakula', 'OwnTracks Driver', dNI, ['name': "${deviceName}", isComponent: false])
+        state.members.find { it.name == name }.id = dNI
+        logDescriptionText('Child Device Successfully Created')
     }
     catch (e) {
         logError("Child device creation failed with error ${e}")
     }
 }
 
-private def updateChildName(member) {
+def updateChildName(member) {
     try {
         def deviceWrapper = getChildDevice(member.id)
-        def deviceName = createDeviceName(member.name)
+        def deviceName = newDeviceName(member.name)
         if (deviceWrapper.getName() != deviceName) {
             deviceWrapper.setName(deviceName)
             logWarn("Changing ${member.name} device name to '${deviceName}'")
         } else {
             logDebug("Leaving ${member.name} device name as '${deviceName}'")
         }
-    } catch(e) {
+    } catch (e) {
         logWarn("Leaving ${member.name} device name as '${deviceName}'")
     }
 }
 
-private def createDeviceName(name) {
+def newDeviceName(name) {
     if (deviceNamePrefix) {
         deviceName = "${deviceNamePrefix}${name}"
     } else {
@@ -3154,75 +3114,73 @@ private def createDeviceName(name) {
     return (deviceName?.trim())
 }
 
-private removeChildDevices(delete) {
+def removeChildDevices(delete) {
     delete.each {
         try {
             deleteChildDevice(it.deviceNetworkId)
-        } catch(e) {
+        } catch (e) {
             logDebug("Device ${it} does not exist.")
         }
     }
 }
 
-def haversine(lat1, lon1, lat2, lon2) {
-    def Double R = 6372.8
+double haversine(double lat1, double lon1, double lat2, double lon2) {
+    double r = 6372.8
     // In kilometers
-    def Double dLat = Math.toRadians(lat2 - lat1)
-    def Double dLon = Math.toRadians(lon2 - lon1)
-    lat1 = Math.toRadians(lat1)
-    lat2 = Math.toRadians(lat2)
+    double dLat = Math.toRadians(lat2 - lat1)
+    double dLon = Math.toRadians(lon2 - lon1)
 
-    def Double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2)
-    def Double c = 2 * Math.asin(Math.sqrt(a))
-    def Double d = R * c
+    double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+    double c = 2 * Math.asin(Math.sqrt(a))
+    double d = r * c
     return(d)
 }
 
-private angleFromCoordinate(lat1, lon1, lat2, lon2) {
-    double deltaLon = Math.toRadians(lon2 - lon1);
-    double y = Math.sin(deltaLon) * Math.cos(Math.toRadians(lat2));
-    double x = Math.cos(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) - Math.sin(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(deltaLon);
-    double angle = Math.toDegrees(Math.atan2(y, x));
+double angleFromCoordinate(double lat1, double lon1, double lat2, double lon2) {
+    double deltaLon = Math.toRadians(lon2 - lon1)
+    double y = Math.sin(deltaLon) * Math.cos(Math.toRadians(lat2))
+    double x = Math.cos(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2)) - Math.sin(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(deltaLon)
+    double angle = Math.toDegrees(Math.atan2(y, x))
 
-    return (angle + 360) % 360; // Normalize to 0-360 degrees
+    return((angle + 360) % 360) // Normalize to 0-360 degrees
 }
 
 def displayKmMiVal(val) {
-    return (imperialUnits ? (val?.toFloat()*0.621371)?.round(1) : val?.toFloat()?.round(1))
+    return (imperialUnits ? (val?.toFloat() * 0.621371)?.round(1) : val?.toFloat()?.round(1))
 }
 
 def displayMFtVal(val) {
     // round up and convert to an integer
-    return (imperialUnits ? (val?.toFloat()*3.28084)?.round(0)?.toInteger() : val?.toInteger())
+    return (imperialUnits ? (val?.toFloat() * 3.28084)?.round(0)?.toInteger() : val?.toInteger())
 }
 
 def convertToKilometers(val) {
     // round up and convert to an integer
-    return (imperialUnits ? (val?.toFloat()*1.60934)?.round(0)?.toInteger() : val?.toInteger())
+    return (imperialUnits ? (val?.toFloat() * 1.60934)?.round(0)?.toInteger() : val?.toInteger())
 }
 
 def convertToMeters(val) {
     // round up and convert to an integer
-    return (imperialUnits ? (val?.toFloat()*0.3048)?.round(0)?.toInteger() : val?.toInteger())
+    return (imperialUnits ? (val?.toFloat() * 0.3048)?.round(0)?.toInteger() : val?.toInteger())
 }
 
-def getLargeUnits() {
-    return (imperialUnits ? "mi" : "km")
+def largeUnits() {
+    return (imperialUnits ? 'mi' : 'km')
 }
 
-def getSmallUnits() {
-    return (imperialUnits ? "ft" : "m")
+def smallUnits() {
+    return (imperialUnits ? 'ft' : 'm')
 }
 
-def getVelocityUnits() {
-    return (imperialUnits ? "mph" : "kph")
+def velocityUnits() {
+    return (imperialUnits ? 'mph' : 'kph')
 }
 
 def isimperialUnits() {
     return (imperialUnits)
 }
 
-private isAddress(address) {
+def isAddress(address) {
     if (address) {
         addressList = address?.split(',')
         // check if the first two entries in the address are not numbers (lat,lon), then it's an address
@@ -3234,7 +3192,7 @@ private isAddress(address) {
     return (false)
 }
 
-private def updateAddress(currentMember, data) {
+def updateAddress(currentMember, data) {
     // check if the incoming coordinates within the hystersis of past coordinates, and we have a previously stored address
     if ((haversine(data.lat, data.lon, currentMember.latitude, currentMember.longitude) < DEFAULT_geocodeLookupHysteresis) && isAddress(currentMember.address) && !isAddress(data.address)) {
         data.address = currentMember.address
@@ -3245,7 +3203,7 @@ private def updateAddress(currentMember, data) {
     }
 }
 
-private def getReverseGeocodeAddress(data) {
+def getReverseGeocodeAddress(data) {
     try {
         // if we have received an address field from the phone
         if (isAddress(data?.address)) {
@@ -3253,55 +3211,55 @@ private def getReverseGeocodeAddress(data) {
             return(data.address)
         }
     } catch (e) {
-        // ignore the error and continue
+    // ignore the error and continue
     }
 
     // do a reverse geocode lookup to get the address
     return(reverseGeocode(data.lat, data.lon))
 }
 
-private def reverseGeocode(lat,lon) {
-    if ((geocodeProvider != "0") && (geocodeProvider != null) && isGeocodeAllowed()) {
+def reverseGeocode(lat, lon) {
+    if ((geocodeProvider != '0') && (geocodeProvider != null) && geocodeAllowed()) {
         // generate the reverse loopup URL based on the provider
         lookupUrl = GEOCODE_ADDRESS[geocodeProvider.toInteger()] + REVERSE_GEOCODE_REQUEST_LAT[geocodeProvider.toInteger()] + lat.toDouble().round(6) + REVERSE_GEOCODE_REQUEST_LON[geocodeProvider.toInteger()] + lon.toDouble().round(6) + GEOCODE_KEY[geocodeProvider.toInteger()] + settings["geocodeAPIKey_$geocodeProvider"]?.trim()
         String address = ADDRESS_JSON[geocodeProvider.toInteger()]
         // replace the spaces with %20 to make it URL friendly
-        response = syncHttpGet(lookupUrl.replaceAll(" ","%20"))
-        if (response != "") {
-            logDebug ("Coodindate lookup results in addess: ${response.results."$address"[0]}")
+        response = syncHttpGet(lookupUrl.replaceAll(' ', '%20'))
+        if (response != '') {
+            logDebug("Coodindate lookup results in addess: ${response.results."$address"[0]}")
             return(response.results."$address"[0])
         }
     }
     return("$lat,$lon")
 }
 
-private def geocode(address) {
-    Double lat = 0.0
-    Double lon = 0.0
-    if ((geocodeProvider != "0") && (geocodeProvider != null) && isGeocodeAllowed()) {
+def geocode(address) {
+    double lat = 0.0
+    double lon = 0.0
+    if ((geocodeProvider != '0') && (geocodeProvider != null) && geocodeAllowed()) {
         // generate the forward loopup URL based on the provider
         lookupUrl = GEOCODE_ADDRESS[geocodeProvider.toInteger()] + GEOCODE_REQUEST[geocodeProvider.toInteger()] + address + GEOCODE_KEY[geocodeProvider.toInteger()] + settings["geocodeAPIKey_$geocodeProvider"]?.trim()
         // replace the spaces with %20 to make it URL friendly
-        response = syncHttpGet(lookupUrl.replaceAll(" ","%20"))
-        if (response != "") {
+        response = syncHttpGet(lookupUrl.replaceAll(' ', '%20'))
+        if (response != '') {
             switch (geocodeProvider.toInteger()) {
                 case 1:
                     // Google
                     lat = response.results.geometry.location.lat[0]
                     lon = response.results.geometry.location.lng[0]
-                break
+                    break
                 case 2:
                     // Geoapify
                     lat = response.results.lat[0]
                     lon = response.results.lon[0]
-                break
+                    break
                 case 3:
                     // Opencage
                     lat = response.results.geometry.lat[0]
                     lon = response.results.geometry.lng[0]
-                break
+                    break
                 default:
-                    // do nothing
+                // do nothing
                 break
             }
             lat = lat?.toDouble()?.round(6)
@@ -3312,14 +3270,14 @@ private def geocode(address) {
         logWarn("Geocode not configured or quota has been exceeded.  Select 'Additional Hub App Settings' to configure/verify geocode provider.")
     }
 
-    return[lat,lon]
+    return[lat, lon]
 }
 
-def getGoogleMapsAPIKey() {
-    return(settings["googleMapsAPIKey"]?.trim())
+def googleMapsAPIKey() {
+    return(settings['googleMapsAPIKey']?.trim())
 }
 
-private def isGeocodeAllowed() {
+def geocodeAllowed() {
     String provider = GEOCODE_USAGE_COUNTER[geocodeProvider.toInteger()]
     // check if we are allowing paid lookups or we are under our quota and we have a key defined
     if (settings["geocodeAPIKey_$geocodeProvider"]?.trim() && (!geocodeFreeOnly || (state."$provider" < GEOCODE_QUOTA[geocodeProvider.toInteger()]))) {
@@ -3331,10 +3289,9 @@ private def isGeocodeAllowed() {
     }
 }
 
-private def isMapAllowed(incrementUsage) {
-    String provider = GEOCODE_USAGE_COUNTER[geocodeProvider.toInteger()]
+def isMapAllowed(incrementUsage) {
     // check if we are allowing paid lookups or we are under our quota and we have a key defined
-    if (getGoogleMapsAPIKey() && (!mapFreeOnly || (state.mapApiUsage < GOOGLE_MAP_API_QUOTA))) {
+    if (googleMapsAPIKey() && (!mapFreeOnly || (state.mapApiUsage < GOOGLE_MAP_API_QUOTA))) {
         if (incrementUsage) {
             // increment the usage counter
             state.mapApiUsage++
@@ -3346,16 +3303,16 @@ private def isMapAllowed(incrementUsage) {
 }
 
 def dailyScheduler() {
-    logDescriptionText("Running daily geocode quota maintenance.")
-    dayOfMonth = new SimpleDateFormat("d").format(new Date())
+    logDescriptionText('Running daily geocode quota maintenance.')
+    dayOfMonth = new SimpleDateFormat('d').format(new Date())
     // check if it's the first of the month
     if (dayOfMonth.toInteger() == 1) {
         state.mapApiUsage = 0
     }
     // runs midnight GMT - reset the quota's based on if the provider resets daily or monthly
     GEOCODE_USAGE_COUNTER.eachWithIndex { entry, index ->
-        String provider = GEOCODE_USAGE_COUNTER[index+1]
-        if (GEOCODE_QUOTA_INTERVAL_DAILY[index+1]) {
+        String provider = GEOCODE_USAGE_COUNTER[index + 1]
+        if (GEOCODE_QUOTA_INTERVAL_DAILY[index + 1]) {
             state."$provider" = 0
         } else {
             // check if it's the first of the month
@@ -3366,15 +3323,15 @@ def dailyScheduler() {
     }
 }
 
-def createRegionMap(lat,lon,rad) {
-    return(["lat":lat,"lon":lon,"rad":rad])
+def newRegionMap(lat, lon, rad) {
+    return(['lat':lat, 'lon':lon, 'rad':rad])
 }
 
-def getRegionMapLink(region) {
+def regionMapLink(region) {
     // if we have an API key that is still has quota left
     APIKey = googleMapsAPIKey?.trim()
     if (APIKey && isMapAllowed(true)) {
-        return(getFullLocalApiServerUrl() + "/regionmap/${createRegionMap(region?.lat,region?.lon,region?.rad)}?access_token=${state.accessToken}")
+        return(getFullLocalApiServerUrl() + "/regionmap/${newRegionMap(region?.lat, region?.lon, region?.rad)}?access_token=${state.accessToken}")
     } else {
         return("https://maps.google.com/?q=${region?.lat},${region?.lon}&z=17&output=embed&")
     }
@@ -3386,10 +3343,10 @@ def getMemberMapLink(memberName) {
 
 def generateRegionMap() {
     // convert the string back to a map
-    def region = evaluate((params.region).replaceAll("%20",""))
+    def region = evaluate((params.region).replaceAll('%20', ''))
 
-    String htmlData = "Google Maps API Not Configured or Quota Exceeded or Cloud Web Links are Disabled"
-    APIKey = getGoogleMapsAPIKey()
+    String htmlData = 'Google Maps API Not Configured or Quota Exceeded or Cloud Web Links are Disabled'
+    APIKey = googleMapsAPIKey()
     if (APIKey && isMapAllowed(true) && isCloudLinkEnabled(request.HOST)) {
         htmlData = """
         <div style="width:100%;height:100%;margin:5px">
@@ -3424,8 +3381,8 @@ def generateRegionMap() {
                                 lat:${region.lat},
                                 lng:${region.lon}
                             },
-                            content:i.element,
-							gmpClickable:true
+                            content:i,
+                            gmpClickable:true
                         }
                     );
                     // place the region radius
@@ -3449,19 +3406,19 @@ def generateRegionMap() {
         </div>"""
     }
 
-    return render(contentType: "text/html", data: (insertOwnTracksFavicon() + htmlData))
+    return render(contentType: 'text/html', data: (insertOwnTracksFavicon() + htmlData))
 }
 
 def generateConfigMap() {
-    String htmlData = "Google Maps API Not Configured or Quota Exceeded or Cloud Web Links are Disabled"
-    APIKey = getGoogleMapsAPIKey()
+    String htmlData = 'Google Maps API Not Configured or Quota Exceeded or Cloud Web Links are Disabled'
+    APIKey = googleMapsAPIKey()
     if (APIKey && isMapAllowed(true) && isCloudLinkEnabled(request.HOST)) {
-        htmlData = """
-		<html>
-		<head>
-			<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-		</head>
-		<body>
+        htmlData = '''
+        <html>
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+        </head>
+        <body>
             <div style="width:100%;height:100%;margin:5px">
                 <table style="width:100%">
                     <tr>
@@ -3471,12 +3428,12 @@ def generateConfigMap() {
                 </table>
                 <div id="map" style="width:100%;height:95%;"></div>
                 <script>
-                    const places = ["""
-                        getNonFollowRegions(COLLECT_PLACES["desc"]).each { region->
-                            place = state.places.find {it.desc==region}
-                            htmlData += """{lat:${place.lat},lng:${place.lon},rad:${place.rad},desc:"${place.desc}",tst:${place.tst}},"""
-                        }
-                        htmlData += """
+                    const places = ['''
+        getNonFollowRegions(COLLECT_PLACES['desc']).each { region ->
+            place = state.places.find { it.desc == region }
+            htmlData += """{lat:${place.lat},lng:${place.lon},rad:${place.rad},desc:"${place.desc}",tst:${place.tst}},"""
+        }
+        htmlData += """
                     ];
 
                     // get the params if they were passed
@@ -3485,13 +3442,13 @@ def generateConfigMap() {
                     const paramLon = urlParams.get("lon");
                     mapLat = ${location.getLatitude()};
                     mapLon = ${location.getLongitude()};
-                    homeRegion = "${getHomeRegion()?.tst}";
+                    homeRegion = "${homeRegion()?.tst}";
                     addNewPin = false;
                     mapStartingCoordinates();
 
                     function mapStartingCoordinates() {
-                        const homeLat = ${getHomeRegion()?.lat};
-                        const homeLon = ${getHomeRegion()?.lon};
+                        const homeLat = ${homeRegion()?.lat};
+                        const homeLon = ${homeRegion()?.lon};
                         // default to the hub lat/lon
                         // if we passed coordinates, use them, if not, use the home coordinates
                         // preference:  param coordinates -> home coordinates -> hub coordinates
@@ -3576,9 +3533,9 @@ def generateConfigMap() {
                                     },
                                     title: markerElement.desc,
                                     gmpDraggable: true,
-                                    content: pin.element,
+                                    content: pin,
                                     zIndex: markerElement.tst,
-									gmpClickable:true
+                                    gmpClickable:true
                                 }
                             );
                             const radius = new google.maps.Circle(
@@ -3605,7 +3562,7 @@ def generateConfigMap() {
                                 infoWindow.open(map, marker);
                                 updateRegionSelector()
                             });
-                            marker.addListener("gmp-click", (evt) => {
+                            marker.addListener("click", (evt) => {
                                 displayInfo({ lat: evt.latLng.lat(), lng: evt.latLng.lng() }, index, true);
                                 infoWindow.open(map, marker);
                                 updateRegionSelector()
@@ -3617,7 +3574,7 @@ def generateConfigMap() {
 
                         function changePinGlyph(index, pin, home) {
                             if (home) {
-                                pin.glyphColor = "${(regionHomeGlyphColor == null ? DEFAULT_REGION_HOME_GLYPH_COLOR : regionHomeGlyphColor)	}";
+                                pin.glyphColor = "${(regionHomeGlyphColor == null ? DEFAULT_REGION_HOME_GLYPH_COLOR : regionHomeGlyphColor)    }";
                                 pin.scale = 2.0;
                             } else {
                                 if (index == places.length) {
@@ -3669,7 +3626,7 @@ def generateConfigMap() {
                         function updateAddressInput() {
                             const address = document.getElementById("id-address");
                             address.value = "";
-                            address.placeholder = (${isGeocodeAllowed()} ? "Search for address" : "Requires a Geocode API key for address lookup")
+                            address.placeholder = (${geocodeAllowed()} ? "Search for address" : "Requires a Geocode API key for address lookup")
                         }
 
                         function displayInfo(event, index, addressLookup) {
@@ -3737,7 +3694,7 @@ def generateConfigMap() {
                                 if (event.key === 'Enter') {
                                     address = addressBox.value.trim();
                                     if (address) {
-                                        dataMap = {};
+                                        dataMap = { };
                                         dataMap["address"] = address;
                                         sendDataToHub(dataMap, "geocode");
                                     }
@@ -3748,7 +3705,7 @@ def generateConfigMap() {
                         };
 
                         function reverseGeocode(event, index) {
-                            const dataMap = {};
+                            const dataMap = { };
                             dataMap["lat"] = event.lat.toFixed(6);
                             dataMap["lon"] = event.lng.toFixed(6);
                             dataMap["index"] = index;
@@ -3870,7 +3827,7 @@ def generateConfigMap() {
                         }
 
                         function markerDataMap(marker) {
-                            dataMap = {};
+                            dataMap = { };
                             dataMap["_type"] = "waypoint";
                             dataMap["desc"] = marker.marker.title;
                             dataMap["lat"] = marker.marker.position.lat;
@@ -3882,11 +3839,11 @@ def generateConfigMap() {
                         }
 
                         function sendDataToHub(dataMap, action) {
-                            const postData = {};
+                            const postData = { };
                             postData["action"] = action;
                             postData["payload"] = dataMap;
 
-                            fetch("${getAttributeURL(request.headers.Host.toString(), "apidata")}", {
+                            fetch("${attributeURL(request.headers.Host.toString(), 'apidata')}", {
                                 method: "POST",
                                 body: JSON.stringify(postData),
                                 headers: {
@@ -3897,7 +3854,7 @@ def generateConfigMap() {
                             .then(data => {
                                 switch (data.action) {
                                     case "geocode":
-                                        center = {};
+                                        center = { };
                                         center["lat"] = parseFloat(data.lat);
                                         center["lng"] = parseFloat(data.lon);
                                         map.setCenter(center);
@@ -3908,7 +3865,7 @@ def generateConfigMap() {
                                         infoWindow.setContent(infoContent(data.address, data.index));
                                     break;
                                     default:
-                                        // do nothing
+                                    // do nothing
                                     break;
                                 }
                             })
@@ -3929,7 +3886,7 @@ def generateConfigMap() {
                                     "<td><input type='text' id='id-name'></td>" +
                                 "</tr>" +
                                 "<tr>" +
-                                    "<td><b>Radius (" + "${getSmallUnits()}" + "):</b></td>" +
+                                    "<td><b>Radius (" + "${smallUnits()}" + "):</b></td>" +
                                     "<td><input type='number' min='" + convertRadiusToFeet(25) + "' max='" + convertRadiusToFeet(10000) + "' step='" + convertRadiusToFeet(25) + "' id='id-rad'></td>" +
                                 "</tr>" +
                                 "<tr>" +
@@ -3956,18 +3913,18 @@ def generateConfigMap() {
                 </script>
                 <script src="https://maps.googleapis.com/maps/api/js?key=${APIKey}&loading=async&libraries=marker,maps&callback=initMap"></script>
             </div>
-		</body>
-		</html>
-		"""
+        </body>
+        </html>
+        """
     }
 
-    return render(contentType: "text/html", data: (insertOwnTracksFavicon() + htmlData))
+    return render(contentType: 'text/html', data: (insertOwnTracksFavicon() + htmlData))
 }
 
 def displayMemberMap() {
     // find the member from the member name in the parameters - this is returned in lowercase
-    member = state.members.find {it.name.toLowerCase()==params.member}
-    String htmlData = "Private Member"
+    member = state.members.find { it.name.toLowerCase() == params.member }
+    String htmlData = 'Private Member'
 
     if (isCloudLinkEnabled(request.HOST)) {
         def deviceWrapper = getChildDevice(member.id)
@@ -3979,16 +3936,16 @@ def displayMemberMap() {
             }
         }
     } else {
-        htmlData = "Cloud web links are disabled."
+        htmlData = 'Cloud web links are disabled.'
     }
 
-    return render(contentType: "text/html", data: (insertOwnTracksFavicon() + htmlData))
+    return render(contentType: 'text/html', data: (insertOwnTracksFavicon() + htmlData))
 }
 
 def displayMemberPresence() {
     // find the member from the member name in the parameters - this is returned in lowercase
-    member = state.members.find {it.name.toLowerCase()==params.member}
-    String htmlData = "Member Not Configured"
+    member = state.members.find { it.name.toLowerCase() == params.member }
+    String htmlData = 'Member Not Configured'
 
     if (isCloudLinkEnabled(request.HOST)) {
         def deviceWrapper = getChildDevice(member.id)
@@ -4000,16 +3957,16 @@ def displayMemberPresence() {
             }
         }
     } else {
-        htmlData = "Cloud web links are disabled."
+        htmlData = 'Cloud web links are disabled.'
     }
 
-    return render(contentType: "text/html", data: (insertOwnTracksFavicon() + htmlData))
+    return render(contentType: 'text/html', data: (insertOwnTracksFavicon() + htmlData))
 }
 
 def displayMemberPastLocations() {
     // find the member from the member name in the parameters - this is returned in lowercase
-    member = state.members.find {it.name.toLowerCase()==params.member}
-    String htmlData = "OwnTracks Recorder Not Configured or Private Member"
+    member = state.members.find { it.name.toLowerCase() == params.member }
+    String htmlData = 'OwnTracks Recorder Not Configured or Private Member'
 
     if (isCloudLinkEnabled(request.HOST)) {
         def deviceWrapper = getChildDevice(member.id)
@@ -4021,16 +3978,16 @@ def displayMemberPastLocations() {
             }
         }
     } else {
-        htmlData = "Cloud web links are disabled."
+        htmlData = 'Cloud web links are disabled.'
     }
 
-    return render(contentType: "text/html", data: (insertOwnTracksFavicon() + htmlData))
+    return render(contentType: 'text/html', data: (insertOwnTracksFavicon() + htmlData))
 }
 
 def processAPIData() {
     // process incoming data
-    response = []
-    data = parseJson(request.body)
+    def response = []
+    def data = parseJson(request.body)
     if (data.zoom) {
         state.googleMapsZoom = data.zoom
     }
@@ -4039,102 +3996,102 @@ def processAPIData() {
     }
     if (data.action) {
         switch (data.action) {
-            case "save":
+            case 'save':
                 // trigger and add/update of the region
-                addPlace([ "name":"" ], data.payload, false)
-            break;
-            case "home":
+                addPlace([ 'name':'' ], data.payload, false)
+                break
+            case 'home':
                 // set home to the place matching the timestamp
-                app.removeSetting("homePlace")
-                app.updateSetting("homePlace", [value: data.payload.tst, type: "number"])
-            break;
-            case "delete":
+                app.removeSetting('homePlace')
+                app.updateSetting('homePlace', [value: data.payload.tst, type: 'number'])
+                break
+            case 'delete':
                 // delete region from hub/mobile or just hub depending on setting
-                app.updateSetting("regionName",[value:data.payload.desc,type:"text"])
+                app.updateSetting('regionName', [value:data.payload.desc, type:'text'])
                 if (manualDeleteBehavior) {
-                    appButtonHandler("deleteRegionFromHubButton")
+                    appButtonHandler('deleteRegionFromHubButton')
                 } else {
-                    appButtonHandler("deleteRegionFromAllButton")
+                    appButtonHandler('deleteRegionFromAllButton')
                 }
-            break;
-            case "geocode":
+                break
+            case 'geocode':
                 (addressLat, addressLon) = geocode(data.payload.address)
-                response = ["lat" : addressLat, "lon" : addressLon, "action" : data.action]
-            break;
-            case "reversegeocode":
-                response = ["address" : reverseGeocode(data.payload.lat,data.payload.lon), "index" : data.payload.index, "action" : data.action]
-            break;
-            case "members":
+                response = ['lat' : addressLat, 'lon' : addressLon, 'action' : data.action]
+                break
+            case 'reversegeocode':
+                response = ['address' : reverseGeocode(data.payload.lat, data.payload.lon), 'index' : data.payload.index, 'action' : data.action]
+                break
+            case 'members':
                 // return with the consolidated list of member information
                 def memberLocations = []
                 publicMembers = getEnabledAndNotHiddenMemberData(data.payload?.member)
                 publicMembers.eachWithIndex { member, index ->
                     def deviceWrapper = getChildDevice(member.id)
                     def memberLocation = [
-                        "name" :        "${member.name}",
-                        "id" :          member.id,
-                        "lat" :         member.latitude,
-                        "lng" :         member.longitude,
-                        "cog" :         member.bearing,
-                        "spd" :         deviceWrapper?.currentValue("lastSpeed"),
-                        "bat" :         member?.battery,
-                        "acc" :         deviceWrapper?.currentValue("accuracy"),
-                        "wifi" :        member?.wifi,
-                        "ps" :          member?.ps,
-                        "hib" :         (member?.hib ? member?.hib : "0"),
-                        "bo" :          (member?.bo ? member?.bo : "0"),
-                        "per" :         (member?.loc ? member?.loc : "0"),
-                        "cmd" :         member?.cmd,
-                        "stale" :       member.staleReport,
-                        "bs" :          "${member?.bs}",
-                        "last" :        "${deviceWrapper?.currentValue("lastLocationtime")}",
-                        "since" :       "${deviceWrapper?.currentValue("since")}",
-                        "data" :        "${member?.conn}",
-                        "loc" :         "${deviceWrapper?.currentValue("location")}",
-                        "dfh" :         deviceWrapper?.currentValue("distanceFromHome"),
-                        "color":        (member?.color ? member?.color : DEFAULT_MEMBER_GLYPH_COLOR),
-                        "history":      (member?.history ? member?.history : []),
-                        "zIndex" :      index+1,
+                        'name' :        "${member.name}",
+                        'id' :          member.id,
+                        'lat' :         member.latitude,
+                        'lng' :         member.longitude,
+                        'cog' :         member.bearing,
+                        'spd' :         deviceWrapper?.currentValue('lastSpeed'),
+                        'bat' :         member?.battery,
+                        'acc' :         deviceWrapper?.currentValue('accuracy'),
+                        'wifi' :        member?.wifi,
+                        'ps' :          member?.ps,
+                        'hib' :         (member?.hib ? member?.hib : '0'),
+                        'bo' :          (member?.bo ? member?.bo : '0'),
+                        'per' :         (member?.loc ? member?.loc : '0'),
+                        'cmd' :         member?.cmd,
+                        'stale' :       member.staleReport,
+                        'bs' :          "${member?.bs}",
+                        'last' :        "${deviceWrapper?.currentValue('lastLocationtime')}",
+                        'since' :       "${deviceWrapper?.currentValue('since')}",
+                        'data' :        "${member?.conn}",
+                        'loc' :         "${deviceWrapper?.currentValue('location')}",
+                        'dfh' :         deviceWrapper?.currentValue('distanceFromHome'),
+                        'color':        (member?.color ? member?.color : DEFAULT_MEMBER_GLYPH_COLOR),
+                        'history':      (member?.history ? member?.history : []),
+                        'zIndex' :      index + 1,
                     ]
 
                     // split out the img since that is a large data payload that we only need once during the page init
-                    if (data.payload.request == "img") {
-                        memberLocation["img"] = "${getEmbeddedImage(member.name)}"
+                    if (data.payload.request == 'img') {
+                        memberLocation['img'] = "${getEmbeddedImage(member.name)}"
                         // don't send the history on the initial page load
-                        memberLocation["history"] = []
+                        memberLocation['history'] = []
                         // clear the flag to allow the member to sync to the map
                         member.lastMapTime = 0
                     }
-                    if (data.payload.request == "sync") {
+                    if (data.payload.request == 'sync') {
                         // clear the flag to allow the member to sync to the map
                         member.lastMapTime = 0
                     }
                     // only send new data to the map to minimize data traffic
                     if (member.lastMapTime != member.lastReportTime) {
+                        // store the last location report sent to the map
+                        member.lastMapTime = member.lastReportTime
                         memberLocations << memberLocation
                     }
-                    // store the last location report sent to the map
-                    member.lastMapTime = member.lastReportTime
                 }
-                response = [ "members" : memberLocations, "appVersion" : appVersion() ]
-            break;
-            case "update":
-                member = state.members.find {it.name==data.payload}
-                response = ["lastReportTime" : member?.lastReportTime]
-            break;
+                response = [ 'members' : memberLocations, 'appVersion' : appVersion() ]
+                break
+            case 'update':
+                member = state.members.find { it.name == data.payload }
+                response = ['lastReportTime' : member?.lastReportTime]
+                break
             default:
                 logWarn("Unhandled API action: ${data.action}")
-            break;
+                break
         }
     }
 
     // send back a success response
-    return render(contentType: "text/html", data: (new JsonBuilder(response)).toPrettyString(), status: 200)
+    return render(contentType: 'text/html', data: (new JsonBuilder(response)), status: 200)
 }
 
 def processMemberAPICommand() {
     try {
-        member = state.members.find {it.name.toLowerCase()==params.member.toLowerCase()}
+        member = state.members.find { it.name.toLowerCase() == params.member.toLowerCase() }
         def deviceWrapper = getChildDevice(member?.id)
         deviceWrapper."${params.cmd}"()
         response = "Command '${params.cmd}' successfully issued for member '${params.member}'."
@@ -4145,7 +4102,7 @@ def processMemberAPICommand() {
         status = 404
     }
 
-    return render(contentType: "text/html", data: (new JsonBuilder(response)).toPrettyString(), status: status)
+    return render(contentType: 'text/html', data: (new JsonBuilder(response)), status: status)
 }
 
 def retrieveGoogleFriendsMapZoom() {
@@ -4161,15 +4118,15 @@ def insertOwnTracksFavicon() {
 }
 
 def generateGoogleFriendsMap() {
-    String htmlData = "Google Maps API Not Configured or Quota Exceeded or Cloud Web Links are Disabled"
-    APIKey = getGoogleMapsAPIKey()
+    String htmlData = 'Google Maps API Not Configured or Quota Exceeded or Cloud Web Links are Disabled'
+    APIKey = googleMapsAPIKey()
     if (APIKey && isMapAllowed(true) && isCloudLinkEnabled(request.HOST)) {
         htmlData = """
-		<html>
-		<head>
-			<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-		</head>
-		<body>
+        <html>
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+        </head>
+        <body>
             <div style="width:100%;height:100%;margin:5px;overflow:hidden">
                 <div id="map" style="width:100%;height:100%"></div>
                 <div id="footer" style="position:relative;width:100%;text-align:center">
@@ -4189,7 +4146,7 @@ def generateGoogleFriendsMap() {
                     }
                     const webAppVersion = "${appVersion()}";
                     console.log("Google Friends Map version " + webAppVersion)
-					const scaleText = ${(memberDrawerScale == null ? DEFAULT_memberDrawerScale : memberDrawerScale)};
+                    const scaleText = ${(memberDrawerScale == null ? DEFAULT_memberDrawerScale : memberDrawerScale)};
                     document.getElementById("id-drawer").style.height = scaleText * 45 + "px";
                     document.getElementById("id-up_down").style.fontSize = scaleText + "em";
                     document.getElementById("id-lastTime").style.fontSize = scaleText + "em";
@@ -4228,27 +4185,27 @@ def generateGoogleFriendsMap() {
                         drawerExpanded = false;
                         const maxClickZoomLevel = 21;
                         const minClickZoomLevel = 14;
-						if (${(useZoomWhenMembersAreClose == null ? DEFAULT_useZoomWhenMembersAreClose : useZoomWhenMembersAreClose)}) {
-							minMapBoundsZoomLevel = 17;
-						} else {
-							minMapBoundsZoomLevel = 14;
-						}
+                        if (${(useZoomWhenMembersAreClose == null ? DEFAULT_useZoomWhenMembersAreClose : useZoomWhenMembersAreClose)}) {
+                            minMapBoundsZoomLevel = 17;
+                        } else {
+                            minMapBoundsZoomLevel = 14;
+                    }
                         addDrawerListener();
                         // get the member data with thumbnail images
                         retrieveMemberLocations("img");
 
-						// special corner case to zoom on the Nest Hubs - NOTE:  zoom breaks misalignment between the coordinate system and the history points
+                        // special corner case to zoom on the Nest Hubs - NOTE:  zoom breaks misalignment between the coordinate system and the history points
                         if ((window.innerWidth == 1024 && window.innerHeight == 600) || (window.innerWidth == 1280 && window.innerHeight == 800)) {
-							document.body.style.zoom = 100 * ${(smartDisplayScale == null ? DEFAULT_smartDisplayScale : smartDisplayScale)} + "%";
+                            document.body.style.zoom = 100 * ${(smartDisplayScale == null ? DEFAULT_smartDisplayScale : smartDisplayScale)} + "%";
                         }
 
-                        homePosition = new google.maps.LatLng(${getHomeRegion()?.lat}, ${getHomeRegion()?.lon});
+                        homePosition = new google.maps.LatLng(${homeRegion()?.lat}, ${homeRegion()?.lon});
                         const places = ["""
-                            getNonFollowRegions(COLLECT_PLACES["desc"]).each { region->
-                                place = state.places.find {it.desc==region}
-                                htmlData += """{lat:${place.lat},lng:${place.lon},rad:${place.rad},desc:"${place.desc}",tst:${place.tst}},"""
-                            }
-                            htmlData += """
+        getNonFollowRegions(COLLECT_PLACES['desc']).each { region ->
+            place = state.places.find { it.desc == region }
+            htmlData += """{lat:${place.lat},lng:${place.lon},rad:${place.rad},desc:"${place.desc}",tst:${place.tst}},"""
+        }
+        htmlData += """
                         ];
 
                         // restore the previous zoom level on the init
@@ -4274,7 +4231,7 @@ def generateGoogleFriendsMap() {
                             currentZoom = map.getZoom();
                             updateHistoryZoom(currentZoom);
                             showHideRegions();
-                            postData = {};
+                            postData = { };
                             postData["zoom"] = currentZoom;
                             sendDataToHub(postData);
                         });
@@ -4319,8 +4276,8 @@ def generateGoogleFriendsMap() {
                                         lng:position.lng,
                                     },
                                     title:position.desc,
-                                    content:i.element,
-									gmpClickable:true
+                                    content:i,
+                                    gmpClickable:true
                                 }
                             )
                             // place the region radius'
@@ -4344,7 +4301,7 @@ def generateGoogleFriendsMap() {
                                 mapRegionClick();
                             });
                             // change the home pin glyph
-                            if (position.tst == "${getHomeRegion()?.tst}") {
+                            if (position.tst == "${homeRegion()?.tst}") {
                                 i.glyphColor = "${(regionHomeGlyphColor == null ? DEFAULT_REGION_HOME_GLYPH_COLOR : regionHomeGlyphColor)}"
                                 i.scale = 1.3;
                             }
@@ -4364,7 +4321,7 @@ def generateGoogleFriendsMap() {
                                     // then release the member
                                     currentMember = "null";
                                     historyMember = "null";
-                                    postData = {};
+                                    postData = { };
                                     postData["member"] = currentMember;
                                     sendDataToHub(postData);
                                     infoWindowVisible = -2;
@@ -4395,13 +4352,13 @@ def generateGoogleFriendsMap() {
                             restoreMarkerIndex();
                             // if a marker is clicked, then assign it a higher index so it comes out in front
                             marker.zIndex = maxZIndex;
-							map.setCenter(marker.position);
+                            map.setCenter(marker.position);
                             infoWindowVisible = -1;
                             changeHistoryFocus(currentMember);
                             updateBottomBanner();
                             showHideHistory();
-							// update the Hub
-                            postData = {};
+                            // update the Hub
+                            postData = { };
                             postData["zoom"] = map.getZoom();
                             postData["member"] = currentMember.name;
                             sendDataToHub(postData);
@@ -4412,28 +4369,15 @@ def generateGoogleFriendsMap() {
                                 currentMember = getMember("${retrieveGoogleFriendsMapMember()}");
                             } else {
                                 currentMember = getMember("${DEFAULT_googleMapsMember}");
-                            }
+                        }
                             // place the members on the map
                             for (let member=0; member<locations.length; member++) {
-                                const namePin = document.createElement("div");
-                                namePin.textContent = locations[member].name;
-
-                                const imagePin = document.createElement("object");
-                                imagePin.data = locations[member].img;
-                                imagePin.type = "image/jpeg";
-                                imagePin.width = "40";
-                                imagePin.height = "40";
-                                imagePin.appendChild(namePin);
-
                                 const pin = new google.maps.marker.PinElement({
                                     scale: 2.5,
                                     background: "${(memberPinColor == null ? DEFAULT_MEMBER_PIN_COLOR : memberPinColor)}",
                                     borderColor: "${(memberPinColor == null ? DEFAULT_MEMBER_PIN_COLOR : memberPinColor)}",
-                                    glyphColor: locations[member].color
+                                    glyphSrc: locations[member].img
                                 });
-                                if (locations[member].img) {
-                                    pin.glyph = imagePin;
-                                }
 
                                 const marker = new google.maps.marker.AdvancedMarkerElement({
                                     map,
@@ -4443,8 +4387,8 @@ def generateGoogleFriendsMap() {
                                     },
                                     title: locations[member].name,
                                     zIndex: (currentMember.name == locations[member].name ? maxZIndex : locations[member].zIndex),
-                                    content: pin.element,
-									gmpClickable:true
+                                    content: pin,
+                                    gmpClickable:true
                                 });
 
                                 // place the member's accuracy radius
@@ -4456,7 +4400,7 @@ def generateGoogleFriendsMap() {
                                     },
                                     radius: locations[member].acc,
                                     strokeColor: "${(memberPinColor == null ? DEFAULT_MEMBER_PIN_COLOR : memberPinColor)}",
-                                    strokeOpacity: "${(memberAccuracyRadiusOpacity != 0 ? 0.17 : 0)}",
+                                    strokeOpacity: "${(memberAccuracyRadiusOpacity == 0 ? 0 : 0.17)}",
                                     strokeWeight: 1,
                                     fillColor: "${(memberPinColor == null ? DEFAULT_MEMBER_PIN_COLOR : memberPinColor)}",
                                     fillOpacity: 0.05 * "${(memberAccuracyRadiusOpacity == null ? DEFAULT_memberAccuracyRadiusOpacity : memberAccuracyRadiusOpacity)}",
@@ -4464,7 +4408,7 @@ def generateGoogleFriendsMap() {
                                 });
 
                                 // Add a click listener for each marker, and set up the info window
-                                marker.addListener("gmp-click", () => {
+                                marker.addListener("click", () => {
                                     infoWindow.close();
                                     infoWindow.setContent(infoContent(locations[member]));
                                     infoWindow.open(marker.map, marker);
@@ -4480,11 +4424,11 @@ def generateGoogleFriendsMap() {
                                                 currentZoom = maxClickZoomLevel;
                                             }
                                         }
-										incrementalZoom(currentZoom, marker);
-									} else {
-	                                    // assign the new current member so that the history can update
-    	                                followMemberMarker(marker);
-									}
+                                        incrementalZoom(currentZoom, marker);
+                                    } else {
+                                        // assign the new current member so that the history can update
+                                        followMemberMarker(marker);
+                                    }
                                 });
 
                                 // create history circles for the past locations
@@ -4602,7 +4546,7 @@ def generateGoogleFriendsMap() {
                         function followLocation() {
                             // refresh the member data
                             currentMember = getMember(currentMember.name);
-							incrementalZoom(map.getZoom());
+                            incrementalZoom(map.getZoom());
                             // member is selected, and the window is open
                             if (infoWindowVisible == -1) {
                                 infoWindow.setContent(infoContent(currentMember));
@@ -4610,7 +4554,7 @@ def generateGoogleFriendsMap() {
                             // member is selected, and the window is closed
                             if ((infoWindowVisible < 0) && !inhibitAutoZoom) {
                                 // center the map on the member
-                                center = {};
+                                center = { };
                                 center["lat"] = currentMember.lat;
                                 center["lng"] = currentMember.lng;
                                 // recenter the map if the marker is out of bounds, and the history window is closed
@@ -4653,8 +4597,8 @@ def generateGoogleFriendsMap() {
                                         if (!mapBounds.contains(markers[loc].marker.position)) {
                                             outsideMapBounds = true;
                                         }
-                                    }
                                 }
+                            }
 
                                 if (withinDistanceBounds) {
                                     // only fit if a member is off the map but within range
@@ -4664,7 +4608,7 @@ def generateGoogleFriendsMap() {
                                 } else {
                                     setMapBounds(allBounds);
                                 }
-                            }
+                        }
                         };
 
                         function fitBoundsToHistory() {
@@ -4684,11 +4628,11 @@ def generateGoogleFriendsMap() {
                             // set the map bounds, and restrict to a minimum zoom level
                             map.fitBounds(mapBounds);
                             currentZoom = map.getZoom()
-							// set the map bounds dynamically if members are moving or not
+                            // set the map bounds dynamically if members are moving or not
                             if (currentZoom > minMapBoundsZoomLevel) {
-								// Use map.setZoom instead of incrementalZoom to prevent zooming all the way in and then slowly back out
-								map.setZoom(minMapBoundsZoomLevel);
-                        	}
+                                // Use map.setZoom instead of incrementalZoom to prevent zooming all the way in and then slowly back out
+                                map.setZoom(minMapBoundsZoomLevel);
+                            }
                         };
 
                         function showHideRegions() {
@@ -4772,7 +4716,7 @@ def generateGoogleFriendsMap() {
                                                 markers[loc].history[past].radius.setVisible(false);
                                                 markers[loc].history[past].bearingLine.setVisible(false);
                                             }
-                                        }
+                                    }
                                         // change the radius stroke based on the trip markers
                                         // middle markers and the current begin marker use the default colors
                                         if ((locations[loc].history[past]?.mkr == "${memberMiddleMarker}") || (locations[loc].history[past+1]?.tst == null)) {
@@ -4808,9 +4752,9 @@ def generateGoogleFriendsMap() {
                                     } else {
                                         markers[loc].history[past].radius.setVisible(false);
                                         markers[loc].history[past].bearingLine.setVisible(false);
-                                    }
                                 }
                             }
+                        }
                         };
 
                         function updateHistoryZoom(zoomLevel) {
@@ -4837,11 +4781,11 @@ def generateGoogleFriendsMap() {
                                                 img = locations[loc] && locations[loc].img;
                                                 // update the location data
                                                 locations[loc] = data.members[mem];
-												if (img) {
-													locations[loc].img = img;
-												}
+                                                if (img) {
+                                                    locations[loc].img = img;
+                                                }
                                                 // update the marker data
-                                                center = {};
+                                                center = { };
                                                 center["lat"] = data.members[mem].lat;
                                                 center["lng"] = data.members[mem].lng;
                                                 markers[loc].marker.position = center;
@@ -4916,7 +4860,7 @@ def generateGoogleFriendsMap() {
 
                                 thumbnailSize = 50 * scaleText;
                                 membersContent +=
-									"<div class='member-block-wrapper' data-member='" + member + "'>" +
+                                    "<div class='member-block-wrapper' data-member='" + member + "'>" +
                                         "<table style='width:100%;font-size:" + scaleText + "em'>" +
                                             "<tr>" +
                                                 "<td align='center' rowspan='5'><img src='" + src + "' width='" + thumbnailSize + "' height='" + thumbnailSize + "' data-member='" + member + "'></td>" +
@@ -4929,17 +4873,17 @@ def generateGoogleFriendsMap() {
                                             "</tr>" +
                                             "<tr>" +
                                                 "<td align='left'>" + locations[member].loc + "</td>" +
-                                                "<td align='right'>" + (locations[member].dfh != 'null' ? locations[member].dfh + " ${getLargeUnits()}" : "&nbsp;") + "</td>" +
+                                                "<td align='right'>" + (locations[member].dfh != 'null' ? locations[member].dfh + " ${largeUnits()}" : "&nbsp;") + "</td>" +
                                             "</tr>" +
                                             "<tr>" +
                                                 "<td align='left'>" + "Since: " + locations[member].since + "</td>" +
-                                                "<td align='right'>" + locations[member].spd + " ${getVelocityUnits()} </td>" +
+                                                "<td align='right'>" + locations[member].spd + " ${velocityUnits()} </td>" +
                                             "</tr>" +
                                             "<tr>" +
                                                 "<td align='left' " + (locations[member].stale ? "style='color:red'>" : "style='color:gray'>") + "Last: " + locations[member].last + "</td>" +
                                             "</tr>" +
                                         "</table>" +
-									"</div>"
+                                    "</div>"
                             }
                             document.getElementById("id-members").innerHTML = membersContent;
                             if (registerDrawerListener) {
@@ -4955,11 +4899,11 @@ def generateGoogleFriendsMap() {
                         };
 
                         function retrieveMemberLocations(request) {
-                            const dataMap = {};
+                            const dataMap = { };
                             dataMap["request"] = request;
                             dataMap["member"] = paramMember;
 
-                            const postData = {};
+                            const postData = { };
                             postData["action"] = "members";
                             postData["payload"] = dataMap;
                             sendDataToHub(postData)
@@ -4967,7 +4911,7 @@ def generateGoogleFriendsMap() {
 
                         async function sendDataToHub(postData) {
                             try {
-                                const response = await fetch(`${getAttributeURL(request.headers.Host.toString(), "apidata")}`, {
+                                const response = await fetch(`${attributeURL(request.headers.Host.toString(), 'apidata')}`, {
                                     method: "POST",
                                     body: JSON.stringify(postData),
                                     headers: {
@@ -5030,7 +4974,14 @@ def generateGoogleFriendsMap() {
                                     drawer.style.height = drawerMinHeight + "px";
                                     document.body.style.overflow = "hidden";
 
+                                    // switch to the new member
                                     followMemberMarker(markers[loc].marker);
+
+                                    // update the info box
+                                    infoWindow.close();
+                                    infoWindow.setContent(infoContent(locations[member]));
+                                    infoWindow.open(map, markers[loc].marker);
+
                                     return;
                                 }
                             }
@@ -5077,13 +5028,13 @@ def generateGoogleFriendsMap() {
                         tripNumber = 0;
                         tripMember = position.name;
                         const contentString =
-						"<table style='width:100%;font-size:" + scaleText + "em'>" +
+                        "<table style='width:100%;font-size:" + scaleText + "em'>" +
                             "<tr>" +
                                 "<td align='left'" + (((position.wifi == "0") || (position.hib != "0") || (position.bo != "0") || (position.per != "0")) ? " style='color:red'>" : ">") + ((position.data == "m") ? "&#128246;" + (position.wifi != "null" ? (position.wifi == "0" ? "<s>&#128732;</s>" : "") : "") : (position.data == "w" ? "&#128732;" : "")) + "</td>" +
                                 "<td align='right'" + (position.ps ? " style='color:red'>" : ">") + (position.bs == "2" ? "&#9889;" : "&#128267;") + (position.bat != "null" ? position.bat + "%" : "") + "</td>" +
                             "</tr>" +
                         "</table>" +
-						"<table style='width:100%;font-size:" + scaleText + "em'>" +
+                        "<table style='width:100%;font-size:" + scaleText + "em'>" +
                             "<tr>" +
                                 "<td align='left'" + (((position.wifi == "0") || (position.hib != "0") || (position.bo != "0") || (position.per != "0")) ? " style='color:red'>" : ">") + "<b>" + position.name + "</b></td>" +
                                 "<td align='right'>" + getBearingIcon(position.cog) + "</td>" +
@@ -5096,26 +5047,26 @@ def generateGoogleFriendsMap() {
                             "</tr>" +
                         "</table>" +
                         "<hr>" +
-						"<table style='width:100%;font-size:" + scaleText + "em'>" +
+                        "<table style='width:100%;font-size:" + scaleText + "em'>" +
                             "<tr align='center'>" +
                                 (position.dfh != "null" ? "<th width=33%>&#127968;</th>" : "") +
                                 "<th width=33%>&#128270;</th>" +
                                 "<th width=33%>" + getSpeedIcon(position.spd) + "</th>" +
                             "</tr>" +
                             "<tr align='center'>" +
-                                (position.dfh != "null" ? "<td width=33%>" + position.dfh + " ${getLargeUnits()}</td>" : "") +
-                                "<td width=33%>" + position.acc + " ${getSmallUnits()}</td>" +
-                                "<td width=33%>" + position.spd + " ${getVelocityUnits()}</td>" +
+                                (position.dfh != "null" ? "<td width=33%>" + position.dfh + " ${largeUnits()}</td>" : "") +
+                                "<td width=33%>" + position.acc + " ${smallUnits()}</td>" +
+                                "<td width=33%>" + position.spd + " ${velocityUnits()}</td>" +
                             "</tr>" +
                         "</table>" +
                         "<hr>" +
-						"<div style='font-size:" + scaleText + "em'>" +
+                        "<div style='font-size:" + scaleText + "em'>" +
                             (position.stale ? "<div style='color:red'>" : "<div style='color:black'>") + "Last: " + position.last + "</div>" +
                             ((position.bo != "0") ? "<div style='color:red'>&#9940;App battery usage: Optimized/Restricted</div>" : "") +
                             ((position.hib != "0") ? "<div style='color:red'>&#9940;Permissions: App can pause</div>" : "") +
                             ((position.per != "0") ? "<div style='color:red'>&#9940;Location permission: Not allowed all the time</div>" : "") +
                             ((position.cmd == 0) ? "<div style='color:red'>&#9940;OwnTracks app setting 'Remote Configuration' is not enabled</div>" : "") +
-						"</div>"
+                        "</div>"
 
                         return (contentString);
                     };
@@ -5180,7 +5131,7 @@ def generateGoogleFriendsMap() {
                                     break;
                                 }
                             }
-                            tripStatus = position[index].odo + " ${getLargeUnits()} Trip #" + position[index].tp;
+                            tripStatus = position[index].odo + " ${largeUnits()} Trip #" + position[index].tp;
                         }
 
                         if ((findFullTrip && !tripEndFound) || (!findFullTrip && (position[index].mkr == "${memberMiddleMarker}"))) {
@@ -5204,7 +5155,7 @@ def generateGoogleFriendsMap() {
                             "<table style='white-space:nowrap;font-size:" + scaleText + "em'>" +
                                 "<tr>" +
                                     "<td align='left'><b>" + name + "</b></td>" +
-	                                "<td align='right'>" + (position[index].bs ? (position[index].bs == "2" ? "&#9889;" : "&#128267;") : "") + (position[index].bat ? position[index].bat + "%" : "") + "</td>" +
+                                    "<td align='right'>" + (position[index].bs ? (position[index].bs == "2" ? "&#9889;" : "&#128267;") : "") + (position[index].bat ? position[index].bat + "%" : "") + "</td>" +
                                 "</tr>" +
                                 "<tr>" +
                                     "<td align='left'>" + position[index].loc + "</td>" +
@@ -5234,8 +5185,8 @@ def generateGoogleFriendsMap() {
                                 "</tr>" +
                                 "<tr align='center'>" +
                                     "<td width=33%>" + position[index].cog + "&#176;</td>" +
-                                    "<td width=33%>" + convertMetersToFeet(position[index].acc) + " ${getSmallUnits()}</td>" +
-                                    "<td width=33%>" + convertKMToMiles(position[index].spd) + " ${getVelocityUnits()}</td>" +
+                                    "<td width=33%>" + convertMetersToFeet(position[index].acc) + " ${smallUnits()}</td>" +
+                                    "<td width=33%>" + convertKMToMiles(position[index].spd) + " ${velocityUnits()}</td>" +
                                 "</tr>" +
                             "</table>" +
                             "<hr>" +
@@ -5252,18 +5203,18 @@ def generateGoogleFriendsMap() {
                 </script>
                 <script src="https://maps.googleapis.com/maps/api/js?key=${APIKey}&loading=async&libraries=marker,maps&callback=initMap"></script>
             </div>
-		</body>
-		</html>
-		"""
+        </body>
+        </html>
+        """
     }
 
-    return render(contentType: "text/html", data: (insertOwnTracksFavicon() + htmlData))
+    return render(contentType: 'text/html', data: (insertOwnTracksFavicon() + htmlData))
 }
 
 def isHTTPsURL(url) {
-    parsedURL = url?.split(":")
+    parsedURL = url?.split(':')
 
-    return(parsedURL[0]?.toLowerCase() == "https")
+    return(parsedURL[0]?.toLowerCase() == 'https')
 }
 
 def recorderURLType() {
@@ -5281,16 +5232,16 @@ def recorderURLType() {
 }
 
 def generateRecorderFriendsLocation() {
-    String htmlData = "OwnTracks Recorder Not Configured"
+    String htmlData = 'OwnTracks Recorder Not Configured'
     if (getRecorderURL()) {
-        publicMembers = getEnabledAndNotHiddenMembers()
+        publicMembers = enabledAndNotHiddenMembers()
         urlPath = getRecorderURL() + '/last/index.html'
-        htmlData = """
+        htmlData = '''
         <div style="width:100%;height:100%;margin:4px;">
             <table align="center" style="width:100%;font-family:arial;padding-top:4px;padding-bottom:5px;">
-                <tr>"""
-                    publicMembers.each { name-> htmlData += """<td align="center">${insertThumbnailObject(name, 35, true)}</td>"""}
-                    htmlData += """
+                <tr>'''
+        publicMembers.each { name -> htmlData += """<td align="center">${insertThumbnailObject(name, 35, true) }</td>""" }
+        htmlData += """
                 </tr>
             </table>
             <table align="center" style="width:100%;height:calc(100% - 52px);">
@@ -5303,7 +5254,7 @@ def generateRecorderFriendsLocation() {
         </div>"""
     }
 
-    return render(contentType: "text/html", data: (insertOwnTracksFavicon() + htmlData))
+    return render(contentType: 'text/html', data: (insertOwnTracksFavicon() + htmlData))
 }
 
 def insertThumbnailObject(memberName, size, embed) {
@@ -5316,7 +5267,7 @@ def insertThumbnailObject(memberName, size, embed) {
 }
 
 def displayTile(recorderUrl, tileSource) {
-    String htmlData = ""
+    String htmlData = ''
 
     // set the local/cloud base URL as required
     if (recorderUrl) {
@@ -5328,7 +5279,7 @@ def displayTile(recorderUrl, tileSource) {
             urlSource = URL_SOURCE[0]
         }
     }
-    urlPath = getAttributeURL(urlSource, tileSource)
+    urlPath = attributeURL(urlSource, tileSource)
 
     // create the embedded tile frame
     htmlData += '<div style="width:100%;height:100%">'
@@ -5343,7 +5294,7 @@ def displayTile(recorderUrl, tileSource) {
 def checkAttributeLimit(tiledata) {
     // deal with the 1024 byte attribute limit
     if ((tiledata.length() + 11) > 1024) {
-        return ("Too much data to display.</br></br>Exceeds maximum tile length by " + ((tiledata.length() + 11) - 1024) + " characters.")
+        return ('Too much data to display.</br></br>Exceeds maximum tile length by ' + ((tiledata.length() + 11) - 1024) + ' characters.')
     } else {
         return (tiledata)
     }
@@ -5352,49 +5303,49 @@ def checkAttributeLimit(tiledata) {
 def generateMemberDeviceStatus() {
     def memberLocations = []
     // loop through all the enabled members
-    settings?.enabledMembers.each { enabledMember->
-        member = state.members.find {it.name==enabledMember}
+    settings?.enabledMembers.each { enabledMember ->
+        member = state.members.find { it.name == enabledMember }
         deviceWrapper = getChildDevice(member.id)
         if (deviceWrapper) {
             def memberLocation = [
-                "name" :                "${member.name}",
-                "SSID" :                "${deviceWrapper?.currentValue("SSID")}",
-                "accuracy" :            "${deviceWrapper?.currentValue("accuracy")}",
-                "address" :             "${deviceWrapper?.currentValue("address")}",
-                "altitude" :            "${deviceWrapper?.currentValue("altitude")}",
-                "battery" :             "${deviceWrapper?.currentValue("battery")}",
-                "batteryStatus" :       "${deviceWrapper?.currentValue("batteryStatus")}",
-                "bearing" :             "${deviceWrapper?.currentValue("bearing")}",
-                "dataConnection" :      "${deviceWrapper?.currentValue("dataConnection")}",
-                "distanceFromHome" :    "${deviceWrapper?.currentValue("distanceFromHome")}",
-                "imperialUnits" :       "${deviceWrapper?.currentValue("imperialUnits")}",
-                "lastLocationtime" :    "${deviceWrapper?.currentValue("lastLocationtime")}",
-                "lastSpeed" :           "${deviceWrapper?.currentValue("lastSpeed")}",
-                "lat" :                 "${deviceWrapper?.currentValue("lat")}",
-                "location" :            "${deviceWrapper?.currentValue("location")}",
-                "lon" :                 "${deviceWrapper?.currentValue("lon")}",
-                "monitoringMode" :      "${deviceWrapper?.currentValue("monitoringMode")}",
-                "presence" :            "${deviceWrapper?.currentValue("presence")}",
-                "since" :               "${deviceWrapper?.currentValue("since")}",
-                "sinceTime" :           "${deviceWrapper?.currentValue("sinceTime")}",
-                "sourceTopic" :         "${deviceWrapper?.currentValue("sourceTopic")}",
-                "streetAddress" :       "${deviceWrapper?.currentValue("streetAddress")}",
-                "switch" :              "${deviceWrapper?.currentValue("switch")}",
-                "transitionDirection" : "${deviceWrapper?.currentValue("transitionDirection")}",
-                "transitionRegion" :    "${deviceWrapper?.currentValue("transitionRegion")}",
-                "transitionTime" :      "${deviceWrapper?.currentValue("transitionTime")}",
-                "triggerSource" :       "${deviceWrapper?.currentValue("triggerSource")}",
-                "verticalAccuracy" :    "${deviceWrapper?.currentValue("verticalAccuracy")}",
-                "wifi" :                "${deviceWrapper?.currentValue("wifi")}",
+                'name' :                "${member.name}",
+                'SSID' :                "${deviceWrapper?.currentValue('SSID')}",
+                'accuracy' :            "${deviceWrapper?.currentValue('accuracy')}",
+                'address' :             "${deviceWrapper?.currentValue('address')}",
+                'altitude' :            "${deviceWrapper?.currentValue('altitude')}",
+                'battery' :             "${deviceWrapper?.currentValue('battery')}",
+                'batteryStatus' :       "${deviceWrapper?.currentValue('batteryStatus')}",
+                'bearing' :             "${deviceWrapper?.currentValue('bearing')}",
+                'dataConnection' :      "${deviceWrapper?.currentValue('dataConnection')}",
+                'distanceFromHome' :    "${deviceWrapper?.currentValue('distanceFromHome')}",
+                'imperialUnits' :       "${deviceWrapper?.currentValue('imperialUnits')}",
+                'lastLocationtime' :    "${deviceWrapper?.currentValue('lastLocationtime')}",
+                'lastSpeed' :           "${deviceWrapper?.currentValue('lastSpeed')}",
+                'lat' :                 "${deviceWrapper?.currentValue('lat')}",
+                'location' :            "${deviceWrapper?.currentValue('location')}",
+                'lon' :                 "${deviceWrapper?.currentValue('lon')}",
+                'monitoringMode' :      "${deviceWrapper?.currentValue('monitoringMode')}",
+                'presence' :            "${deviceWrapper?.currentValue('presence')}",
+                'since' :               "${deviceWrapper?.currentValue('since')}",
+                'sinceTime' :           "${deviceWrapper?.currentValue('sinceTime')}",
+                'sourceTopic' :         "${deviceWrapper?.currentValue('sourceTopic')}",
+                'streetAddress' :       "${deviceWrapper?.currentValue('streetAddress')}",
+                'switch' :              "${deviceWrapper?.currentValue('switch')}",
+                'transitionDirection' : "${deviceWrapper?.currentValue('transitionDirection')}",
+                'transitionRegion' :    "${deviceWrapper?.currentValue('transitionRegion')}",
+                'transitionTime' :      "${deviceWrapper?.currentValue('transitionTime')}",
+                'triggerSource' :       "${deviceWrapper?.currentValue('triggerSource')}",
+                'verticalAccuracy' :    "${deviceWrapper?.currentValue('verticalAccuracy')}",
+                'wifi' :                "${deviceWrapper?.currentValue('wifi')}",
             ]
             memberLocations << memberLocation
         }
     }
 
-    return(["members" : memberLocations])
+    return(['members' : memberLocations])
 }
 
-private def isCloudLinkEnabled(requestURL) {
+def isCloudLinkEnabled(requestURL) {
     if ((requestURL == HUBITAT_CLOUD_URL) && (disableCloudLinks == true)) {
         logWarn("Cloud links are disabled.  Open the Hubitat OwnTracks app, and enable in 'Dashboard Web Links'.")
         return(false)
@@ -5404,81 +5355,81 @@ private def isCloudLinkEnabled(requestURL) {
 }
 
 mappings {
-	path("/webhook") {
-    	action: [
-            POST: "webhookEventHandler",
-            GET:  "webhookGetHandler",        // used for testing through a web browser
+    path('/webhook') {
+        action: [
+            POST: 'webhookEventHandler',
+            GET:  'webhookGetHandler',        // used for testing through a web browser
         ]
     }
-	path("/apidata") {
-    	action: [
-            POST:  "processAPIData",
+    path('/apidata') {
+        action: [
+            POST:  'processAPIData',
         ]
     }
-	path("/membercmd/:member/:cmd") {
-    	action: [
-            GET:  "processMemberAPICommand",
+    path('/membercmd/:member/:cmd') {
+        action: [
+            GET:  'processMemberAPICommand',
         ]
     }
-	path("/googlemap") {
-    	action: [
-            GET:  "generateGoogleFriendsMap",
+    path('/googlemap') {
+        action: [
+            GET:  'generateGoogleFriendsMap',
         ]
     }
-	path("/recordermap") {
-    	action: [
-            GET:  "generateRecorderFriendsLocation",
+    path('/recordermap') {
+        action: [
+            GET:  'generateRecorderFriendsLocation',
         ]
     }
-	path("/regionmap/:region") {
-    	action: [
-            GET:  "generateRegionMap",
+    path('/regionmap/:region') {
+        action: [
+            GET:  'generateRegionMap',
         ]
     }
-	path("/configmap") {
-    	action: [
-            GET:  "generateConfigMap",
+    path('/configmap') {
+        action: [
+            GET:  'generateConfigMap',
         ]
     }
-	path("/membermap/:member") {
-    	action: [
-            GET:  "displayMemberMap",
+    path('/membermap/:member') {
+        action: [
+            GET:  'displayMemberMap',
         ]
     }
-	path("/memberpresence/:member") {
-    	action: [
-            GET:  "displayMemberPresence",
+    path('/memberpresence/:member') {
+        action: [
+            GET:  'displayMemberPresence',
         ]
     }
-	path("/memberpastlocations/:member") {
-    	action: [
-            GET:  "displayMemberPastLocations",
+    path('/memberpastlocations/:member') {
+        action: [
+            GET:  'displayMemberPastLocations',
         ]
     }
-    path("/regionupdate/:region") {
-    	action: [
-            GET:  "regionUpdate",
+    path('/regionupdate/:region') {
+        action: [
+            GET:  'regionUpdate',
         ]
     }
 }
 
-def regionUpdate() {
+private regionUpdate() {
     logWarn "Received 'regionUpdate' ${params.region}"
 }
 
-private def webhookGetHandler() {
+private webhookGetHandler() {
     if (isCloudLinkEnabled(request.HOST)) {
-        logDescriptionText("Web request for member device status.")
-        payload = new JsonBuilder(generateMemberDeviceStatus()).toPrettyString()
+        logDescriptionText('Web request for member device status.')
+        payload = new JsonBuilder(generateMemberDeviceStatus())
     } else {
-        logDescriptionText("Cloud web links are disabled.")
+        logDescriptionText('Cloud web links are disabled.')
         payload = []
     }
 
-    return render(contentType: "text/html", data: payload, status: 200)
+    return render(contentType: 'text/html', data: payload, status: 200)
 }
 
-private def syncHttpGet(url) {
+private syncHttpGet(url) {
     try {
         // limit the timeout since this is a blocking call
         httpGet(uri: url, headers: [timeout: 5]) {
@@ -5495,32 +5446,44 @@ private def syncHttpGet(url) {
     }
 }
 
-private def getSectionTitle(sectionState, sectionTitle) {
-    return((sectionState ? "&#10134;" : "&#10133;") + " " + sectionTitle)
+private sectionTitle(sectionState, sectionTitle) {
+    return((sectionState ? '&#10134;' : '&#10133;') + ' ' + sectionTitle)
 }
 
-private def getSectionStyle() {
+private sectionStyle() {
     return("width:100%;font-size:1.0em;text-align:left;color:#ffffff;background-color:${DEFAULT_APP_THEME_COLOR};padding-left:10px;padding-right:10px;margin-top:10px;margin-bottom:10px;border:1px solid #000000;box-shadow:3px 4px #575757;border-radius:1px")
 }
 
-private def getFormat(type, myText="", myError="") {
-    if (type == "box") return "<div style='color:#ffffff;font-weight:normal;background-color:${DEFAULT_APP_THEME_COLOR};padding:5px;padding-left:10px;margin-right:20px;border:1px solid #000000;box-shadow:3px 4px #575757;border-radius:1px'>${myText}<span style='color:red;padding-left:5px;font-weight:bold'>${myError}</span></div>"
-    if (type == "line") return "<hr style='background-color:${DEFAULT_APP_THEME_COLOR}; height:1px;border:0;'/>"
-    if (type == "title") return "<h2 style='color:${DEFAULT_APP_THEME_COLOR};font-weight: bold'>${myText}</h2>"
-    if (type == "redText") return "<div style='color:#ff0000'>${myText}</div>"
+private styleFormat(type, myText = '', myError = '') {
+    switch (type) {
+        case 'box':
+            return "<div style='color:#ffffff;font-weight:normal;background-color:${DEFAULT_APP_THEME_COLOR};padding:5px;padding-left:10px;margin-right:20px;border:1px solid #000000;box-shadow:3px 4px #575757;border-radius:1px'>${myText}<span style='color:red;padding-left:5px;font-weight:bold'>${myError}</span></div>"
+
+        case 'line':
+            return "<hr style='background-color:${DEFAULT_APP_THEME_COLOR}; height:1px;border:0;'/>"
+
+        case 'title':
+            return "<h2 style='color:${DEFAULT_APP_THEME_COLOR};font-weight: bold'>${myText}</h2>"
+
+        case 'redText':
+            return "<div style='color:#ff0000'>${myText}</div>"
+
+        default:
+            return ''
+    }
 }
 
-private def displayHeader(title, data) {
+private displayHeader(title, data) {
     if (title) {
-        if(title.contains("(Paused)")) {
+        if (title.contains('(Paused)')) {
             theName = title - " <span style='color:red'>(Paused)</span>"
         } else {
             theName = title
         }
     }
-    section() {
+    section {
         // display the error message
-        if ((data != null) && (data != "")) {
+        if ((data != null) && (data != '')) {
             bMes = "<div style='color:red;text-align:center;font-size:20px;font-weight:bold'>${data}</div>"
         } else {
             bMes = "<div style='color:#3C00BC;text-align:left;font-size:20px;font-weight:bold'>${theName}</div>"
@@ -5529,10 +5492,10 @@ private def displayHeader(title, data) {
     }
 }
 
-def resetLogging() {
+private resetLogging() {
     // clear the logging
-    app.updateSetting("debugOutput", [value: false, type: "bool"])
-    logWarn("Debug logging disabled.")
+    app.updateSetting('debugOutput', [value: false, type: 'bool'])
+    logWarn('Debug logging disabled.')
 }
 
 private logDebug(msg) {

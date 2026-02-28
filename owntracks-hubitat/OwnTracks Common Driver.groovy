@@ -1,5 +1,5 @@
 /**
- *  Copyright 2024 Lyle Pakula
+ *  Copyright 2026 Lyle Pakula
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -30,37 +30,37 @@
  *  1.8.0      2024-09-23      - Up-reved version to match app.
  *  1.8.1      2025-04-13      - Removed presence capability.
  *  1.8.2      2025-11-25      - Changed to dynamic tile URL.
+ *  1.8.3      2026-02-22      - Cleanup and lint.
  **/
 
-import java.text.SimpleDateFormat
 import groovy.transform.Field
 
-def driverVersion() { return "1.8.2" }
+def driverVersion() { return '1.8.3' }
 
-@Field Boolean DEFAULT_displayFriendsTile = false
+@Field static Boolean DEFAULT_displayFriendsTile = false
 
 metadata {
-  definition (
-      name:        "OwnTracks Common Driver",
-      namespace:   "lpakula",
-      author:      "Lyle Pakula",
-      importUrl:   "https://raw.githubusercontent.com/wir3z/hubitat/main/owntracks-hubitat/OwnTracks%20Common%20Driver.groovy"
+    definition(
+      name:        'OwnTracks Common Driver',
+      namespace:   'lpakula',
+      author:      'Lyle Pakula',
+      importUrl:   'https://raw.githubusercontent.com/wir3z/hubitat/main/owntracks-hubitat/OwnTracks%20Common%20Driver.groovy'
   ) {
-        capability "Actuator"
-        capability "Momentary"
+        capability 'Actuator'
+        capability 'Momentary'
 
-        attribute  "RecorderFriendsLocation", "string"
-        attribute  "GoogleFriendsLocation", "string"
-        attribute  "ConfigurationMap", "string"
-    }
+        attribute  'RecorderFriendsLocation', 'string'
+        attribute  'GoogleFriendsLocation', 'string'
+        attribute  'ConfigurationMap', 'string'
+  }
 }
 
 preferences {
-    input name: "displayRecorderFriendsLocation", type: "bool", title: "Create an HTML 'RecorderFriendsLocation' tile for all members current location (<b>Requires OwnTracks Recorder</b>)", defaultValue: DEFAULT_displayFriendsTile
-    input name: "displayGoogleFriendsLocation", type: "bool", title: "Create an HTML 'GoogleFriendsLocation' tile for all members current location (<b>Requires Google Map API key</b>)", description: "<i>Add a 'Momentary' attribute to the dashboard for the push button refresh.</i>", defaultValue: DEFAULT_displayFriendsTile
+    input name: 'displayRecorderFriendsLocation', type: 'bool', title: "Create an HTML 'RecorderFriendsLocation' tile for all members current location (<b>Requires OwnTracks Recorder</b>)", defaultValue: DEFAULT_displayFriendsTile
+    input name: 'displayGoogleFriendsLocation', type: 'bool', title: "Create an HTML 'GoogleFriendsLocation' tile for all members current location (<b>Requires Google Map API key</b>)", description: "<i>Add a 'Momentary' attribute to the dashboard for the push button refresh.</i>", defaultValue: DEFAULT_displayFriendsTile
 
-    input name: "descriptionTextOutput", type: "bool", title: "Enable Description Text logging", defaultValue: DEFAULT_descriptionTextOutput
-    input name: "debugOutput", type: "bool", title: "Enable Debug Logging", defaultValue: DEFAULT_debugOutput
+    input name: 'descriptionTextOutput', type: 'bool', title: 'Enable Description Text logging', defaultValue: DEFAULT_descriptionTextOutput
+    input name: 'debugOutput', type: 'bool', title: 'Enable Debug Logging', defaultValue: DEFAULT_debugOutput
 }
 
 def installed() {
@@ -88,7 +88,7 @@ def push() {
 
 def generateRecorderFriendsLocationTile() {
     if (displayRecorderFriendsLocation) {
-        sendEvent(name: "RecorderFriendsLocation", value: parent.displayTile(true, "recordermap"), displayed: true)
+        sendEvent(name: 'RecorderFriendsLocation', value: parent.displayTile(true, 'recordermap'), displayed: true)
     } else {
         device.deleteCurrentState('RecorderFriendsLocation')
     }
@@ -96,15 +96,15 @@ def generateRecorderFriendsLocationTile() {
 
 def generateGoogleFriendsLocationTile() {
     if (displayGoogleFriendsLocation) {
-        sendEvent(name: "GoogleFriendsLocation", value: parent.displayTile(false, "googlemap"), displayed: true)
+        sendEvent(name: 'GoogleFriendsLocation', value: parent.displayTile(false, 'googlemap'), displayed: true)
     } else {
         device.deleteCurrentState('GoogleFriendsLocation')
     }
 }
 
 def generateConfigMapTile() {
-    if (parent.getGoogleMapsAPIKey()) {
-        sendEvent(name: "ConfigurationMap", value: parent.displayTile(false, "configmap"), displayed: true)
+    if (parent.googleMapsAPIKey()) {
+        sendEvent(name: 'ConfigurationMap', value: parent.displayTile(false, 'configmap'), displayed: true)
     } else {
         device.deleteCurrentState('ConfigurationMap')
     }
