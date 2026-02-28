@@ -148,12 +148,13 @@
  *  1.8.10     2025-11-25      - Changed to dynamic tile URL.
  *  1.8.11     2026-01-15      - The wifi home lock was missed in the past improvements.
  *  1.8.12     2026-01-17      - Prevent duplicate presense log entries due to caching delays.
+ *  1.8.14     2026-02-22      - Cleanup and lint.
  **/
 
 import java.text.SimpleDateFormat
 import groovy.transform.Field
 
-def driverVersion() { return '1.8.12' }
+def driverVersion() { return '1.8.14' }
 
 @Field static final Map MONITORING_MODE = [ 0: 'Unknown', 1: 'Significant', 2: 'Move' ]
 @Field static final Map BATTERY_STATUS = [ 0: 'Unknown', 1: 'Unplugged', 2: 'Charging', 3: 'Full' ]
