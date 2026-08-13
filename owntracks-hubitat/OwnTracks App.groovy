@@ -181,13 +181,14 @@
  *  1.9.4      2026-05-03      - Fixed map exception if members pin images were not used.
  *  1.9.5      2026-06-27      - Moved the app to the integrations menu.
  *  1.9.6      2026-07-28      - Fixed exception when debug logging was enabled.
+ *  1.9.7      2026-08-12      - Added disable SSL checks for recorder and secondary hub.
 */
 
 import groovy.transform.Field
 import groovy.json.JsonBuilder
 import java.text.SimpleDateFormat
 
-def appVersion() { return '1.9.6' }
+def appVersion() { return '1.9.7' }
 
 @Field static final Map BATTERY_STATUS = [ '0': 'Unknown', '1': 'Unplugged', '2': 'Charging', '3': 'Full' ]
 @Field static final Map DATA_CONNECTION = [ 'w': 'WiFi', 'm': 'Mobile', 'o': 'Offline'  ]
@@ -725,6 +726,7 @@ def configureRecorder() {
             paragraph("The <a href='https://owntracks.org/booklet/clients/recorder/' target='_blank'>OwnTracks Recorder</a> (optional) can be installed for local tracking.  For the Recorder dashboard tiles and links to work outside the home network, the recorder must have a secure URL (https) and be secured with a public certificate.")
             input name: 'recorderURL', type: 'text', title: "HTTP URL of the OwnTracks Recorder.  It will be in the format <b>'http://enter.your.recorder.ip:8083'</b>, assuming using the default port of 8083.  The app will automatically add the <b>'$RECORDER_PUBLISH_FOLDER'</b> path.", defaultValue: ''
             input name: 'enableRecorder', type: 'bool', title: 'Enable location updates to be sent to the Recorder URL', defaultValue: false, submitOnChange: true
+            input name: 'recorderIgnoreSSL', type: 'bool', title: 'Ignore SSL certificate errors for the Recorder (only enable for a self-signed/private https recorder)', defaultValue: false, submitOnChange: true
             if (!recorderURL) {
                 app.updateSetting('enableRecorder', [value: false, type: 'bool'])
             }
@@ -745,6 +747,7 @@ def configureSecondaryHub() {
             """.stripMargin())
             input name: 'secondaryHubURL', type: 'text', title: "Host URL of the Seconday Hub from the OwnTracks app 'Mobile App Installation Instructions' page.", defaultValue: ''
             input name: 'enableSecondaryHub', type: 'bool', title: 'Enable location updates to be sent to the secondary hub URL', defaultValue: false, submitOnChange: true
+            input name: 'secondaryHubIgnoreSSL', type: 'bool', title: 'Ignore SSL certificate errors for the Secondary Hub (only enable for a self-signed/private https hub)', defaultValue: false, submitOnChange: true
             if (!secondaryHubURL) {
                 app.updateSetting('enableSecondaryHub', [value: false, type: 'bool'])
             }
@@ -1207,12 +1210,14 @@ def deleteRegions() {
 def sendRegionsToSecondaryHub() {
     data = [ '_type':'waypoints', 'waypoints':state.places ]
     def postParams = [ uri: secondaryHubURL?.trim(), requestContentType: 'application/json', contentType: 'application/json', headers: ['X-limit-u' : COMMON_CHILDNAME, 'X-limit-d' : COMMON_CHILDNAME], body : (new JsonBuilder(data)) ]
+    if (settings.secondaryHubIgnoreSSL) { postParams.ignoreSSLIssues = true }
     asynchttpPost('httpCallbackMethod', postParams)
 }
 
 def retrieveRegionsFromSecondaryHub() {
     data = sendReportWaypointsRequest([ name:COMMON_CHILDNAME ])
     def postParams = [ uri: secondaryHubURL?.trim(), requestContentType: 'application/json', contentType: 'application/json', headers: ['X-limit-u' : COMMON_CHILDNAME, 'X-limit-d' : COMMON_CHILDNAME], body : (new JsonBuilder(data)) ]
+    if (settings.secondaryHubIgnoreSSL) { postParams.ignoreSSLIssues = true }
     asynchttpPost('httpCallbackMethod', postParams)
 }
 
@@ -2074,6 +2079,7 @@ def webhookEventHandler() {
                 // Pass the location to a secondary hub if configured
                 if (secondaryHubURL && enableSecondaryHub) {
                     def postParams = [ uri: secondaryHubURL?.trim(), requestContentType: 'application/json', contentType: 'application/json', headers: parsePostHeaders(request.headers), body : (new JsonBuilder(data).toPrettyString()) ]
+                    if (settings.secondaryHubIgnoreSSL) { postParams.ignoreSSLIssues = true }
                     asynchttpPost('httpCallbackMethod', postParams)
                 }
                 // update the device ID should it have changed
@@ -2133,6 +2139,7 @@ def parseMessage(headers, data, member) {
             // if we have the OwnTracks recorder configured, and the timestamp is valid, and the user is not marked as private, pass the location data to it
             if (recorderURL && enableRecorder && !data.private && memberInGlobalMemberGroup(member)) {
                 def postParams = [ uri: recorderURL + RECORDER_PUBLISH_FOLDER, requestContentType: 'application/json', contentType: 'application/json', headers: parsePostHeaders(headers), body : (new JsonBuilder(data)).toPrettyString() ]
+                if (settings.recorderIgnoreSSL) { postParams.ignoreSSLIssues = true }
                 asynchttpPost('httpCallbackMethod', postParams)
             }
             break

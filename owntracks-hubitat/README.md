@@ -302,6 +302,9 @@ NOTE: A region named '+follow' is automatically created to allow iOS phones to h
 - HTTP URL of the OwnTracks Recorder will be in the format 'http://enter.your.recorder.ip:8083', assuming using the default port of 8083.
 - Follow the directions on the page 'Installing OwnTracks Recorder and Configuring User Card Instructions' to install OwnTrack Recorder and configure user cards.
 - When 'Enable location updates to be sent to the Recorder URL' is selected, incoming mobile locations are mirrored to the above URL. 
+- 'Ignore SSL certificate errors for the Recorder' - leave this disabled unless your Recorder uses an https URL with a self-signed or private certificate.
+	- When disabled (the default), the Recorder's certificate is fully validated, which is the recommended and secure behavior.
+	- Only enable this if the Recorder is on a trusted private network and its certificate cannot be validated; it has no effect on plain http URLs.
 - To view the OwnTracks recorder, open a web browser and navigate to 'http://enter.your.recorder.ip:8083'
 
 ## Enable Optional OwnTracks Frontend
@@ -313,6 +316,9 @@ NOTE: A region named '+follow' is automatically created to allow iOS phones to h
 - Allows location updates to be sent to a secondary hub running the OwnTracks app.
 - Enter the host URL of the Seconday Hub from the OwnTracks app 'Mobile App Installation Instructions' page.
 - When 'Enable location updates to be sent to the secondary hub URL' is selected, incoming mobile locations are mirrored to the above URL. 
+- 'Ignore SSL certificate errors for the Secondary Hub' - leave this disabled unless the secondary hub uses an https URL with a self-signed or private certificate.
+	- When disabled (the default), the secondary hub's certificate is fully validated, which is the recommended and secure behavior.
+	- Only enable this if the secondary hub is on a trusted private network and its certificate cannot be validated; it has no effect on plain http URLs.
 
 
 # Advanced Settings - Hub and Mobile
