@@ -182,13 +182,14 @@
  *  1.9.5      2026-06-27      - Moved the app to the integrations menu.
  *  1.9.6      2026-07-28      - Fixed exception when debug logging was enabled.
  *  1.9.7      2026-08-12      - Added disable SSL checks for recorder and secondary hub.
+ *  1.9.8      2026-08-18      - Stopped clearing the URL of a device that reports with a blank Username or Device ID which was blanking new installs.
 */
 
 import groovy.transform.Field
 import groovy.json.JsonBuilder
 import java.text.SimpleDateFormat
 
-def appVersion() { return '1.9.7' }
+def appVersion() { return '1.9.8' }
 
 @Field static final Map BATTERY_STATUS = [ '0': 'Unknown', '1': 'Unplugged', '2': 'Charging', '3': 'Full' ]
 @Field static final Map DATA_CONNECTION = [ 'w': 'WiFi', 'm': 'Mobile', 'o': 'Offline'  ]
@@ -2056,9 +2057,8 @@ def webhookEventHandler() {
     if (!request.body) {
         logError("Username: '${sourceName}' / Device ID: '${sourceDeviceID}' reported no data from the OwnTracks app, aborting.")
     } else if (!sourceName || !sourceDeviceID) {
-        // catch the exception if a webhook comes in without being configured properly
-        logError("Username: '${sourceName}' / Device ID: '${sourceDeviceID}' not configured in the OwnTracks app - Deactivating unknown user.  Ensure the 'Username' and 'Device ID' are set on the OwnTracks mobile app.")
-        result = sendDeactivateUpdate([ 'name':"${sourceDeviceID}" ])
+        // A missing username or device ID is our own app before it has been configured, not a rogue device
+        logError("Username: '${sourceName}' / Device ID: '${sourceDeviceID}' not configured in the OwnTracks app - ignoring this report.  Ensure the 'Username' and 'Device ID' are set on the OwnTracks mobile app.")
     } else {
         // strip the [] around these values
         sourceName = sourceName.substring(1, (sourceName.length() - 1))
